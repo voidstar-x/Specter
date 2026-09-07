@@ -114,3 +114,9 @@ in `src/presets/system_prompt.rs`, which walks a locale fall-back chain.
 - NOTICE.md: Specter trademarks now attributed to this project (not upstream); logo path corrected; dead semplifica.ai link removed; third-party trademark list updated to the APAC official legal sources.
 - CORPORA.md: rewritten from the EU/Danish corpus survey to document the 8 bundled APAC official-government corpora.
 - WORKFLOWS.md: built-in preset count updated (14 -> 25) and Italian UI strings replaced with English.
+
+## [Unreleased] - docs cleanup
+### Removed
+- Removed upstream Italian/EU domain & plan docs (macchine*, piano_*, nis2-prompts, pa-prompts, TEMPLATE_PRONTUARIO, Toolkit_Prompt_Commercialista_Bilanci, EURLEX_REGISTRATION, PLAN_FONTI_INTERNAZIONALI, PLAN_MISTRAL, insurance-workflows-plan, PLAN.md, SESSION_RECAP) not relevant to Specter APAC/common-law focus.
+### Changed
+- WORKFLOWS.md: built-in preset count updated (14 -> 25) and Italian UI strings replaced with English.
