@@ -138,7 +138,7 @@ function cellRetryKey(reviewId: string, rowId: string, columnKey: string): strin
   return `${reviewId}/${rowId}/${columnKey}`
 }
 
-/** Heuristic match against the Italian backend error string + the
+/** Heuristic match against the backend error string + the
  *  raw status code. Matches both `Mistral 429:` and "rate limit". */
 function isRateLimitError(content: string): boolean {
   return /\b429\b|rate[\s_]?limit/i.test(content)
@@ -167,7 +167,7 @@ function scheduleRateLimitRetry(
       rowId,
       columnKey,
       'error',
-      `Rate limit non risolto dopo ${MAX_RATE_LIMIT_RETRIES} tentativi.`,
+      `Rate limit unresolved after ${MAX_RATE_LIMIT_RETRIES} attempts.`,
     )
     return
   }

@@ -352,7 +352,7 @@
   }
 
   /** Persist the toggle the instant the user flips it. The section's
-   *  bulk "Salva modifiche" button still works for the other fields,
+   *  bulk "Save changes" button still works for the other fields,
    *  but the secure-mode flag is special: the rest of the section's
    *  UI (curated picker vs. free-form inputs) keys off it, and
    *  losing the choice on navigation away was a real bug. */
@@ -496,7 +496,7 @@
     form.tabular_model = preset.tabular
     try {
       // Persist immediately. The earlier behaviour (only sync to
-      // the form, save on the section's "Salva modifiche" button)
+      // the form, save on the section's "Save changes" button)
       // confused users: clicking a profile felt like a no-op until
       // they realised they had to click Save. Now profile clicks
       // are committed in one shot, and the `activeMistralProfile`
@@ -583,7 +583,7 @@
              URL/api-key fields for the curated picker below. -->
         <div class="flex items-start gap-3 pb-2 border-b border-(--color-surface-200)">
           <!-- Auto-saves on flip. Persisting only via the section's
-               "Salva modifiche" button confused users (2026-06-07):
+               "Save changes" button confused users (2026-06-07):
                toggling, leaving Settings, coming back showed the
                server-side OFF again because the click never reached
                the save batch. -->

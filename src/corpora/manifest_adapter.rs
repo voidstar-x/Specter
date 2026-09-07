@@ -54,11 +54,10 @@ pub struct ManifestAdapter {
 
 impl ManifestAdapter {
     /// Build a new adapter from a plugin whose strategy is
-    /// `http-fetch-per-id`. Returns `None` for any other strategy.
+    /// `http-fetch-per-id`. Returns `None` for invalid manifests.
     pub fn try_from_plugin(plugin: &CorpusPlugin) -> Option<Self> {
-        let CorpusStrategy::HttpFetchPerId(spec) = &plugin.strategy else {
-            return None;
-        };
+        plugin.validate().ok()?;
+        let CorpusStrategy::HttpFetchPerId(spec) = &plugin.strategy;
         let static_id: &'static str = Box::leak(plugin.id.clone().into_boxed_str());
         let static_languages: &'static [&'static str] = {
             let leaked: Vec<&'static str> = plugin
@@ -72,8 +71,7 @@ impl ManifestAdapter {
             Box::leak(leaked.into_boxed_slice())
         };
         let client = reqwest::Client::builder()
-            // Browser-like UA matches what the EUR-Lex adapter does
-            // and avoids the basic "Specter/x.y" filter that some
+            // Browser-like UA avoids the basic "Specter/x.y" filter that some
             // sites apply by default.
             .user_agent(
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 \
@@ -356,8 +354,6 @@ impl ManifestAdapter {
         // useful thing the engine can do is fail loudly. A silent
         // "fetch succeeded, body was a challenge HTML" would
         // poison the cache with garbage and confuse the user.
-        // Same pattern as src/corpora/eurlex.rs's WAF detector,
-        // generalised here for any declarative corpus.
         if let Some(provider) = detect_anti_bot_challenge(&String::from_utf8_lossy(&body)) {
             tracing::warn!(
                 "[manifest] {url}: {} anti-bot challenge intercepted — \
@@ -883,22 +879,11 @@ fn collapse_whitespace(s: &str) -> String {
 // Adapter registry — built at startup
 // ---------------------------------------------------------------------------
 
-/// Map of corpus_id → adapter, populated once at AppState::new.
-/// Today only `http-fetch-per-id` corpora go through this registry;
-/// `builtin` corpora keep their hand-written impls accessible
-/// directly from the routes that need them (EUR-Lex, Italian Legal).
+/// Map of corpus_id → generic HTTP adapter, populated at startup.
 pub type AdapterRegistry =
     HashMap<String, Arc<dyn LegalCorpusAdapter>>;
 
-/// Build the registry from a list of plugins. Today's policy:
-///   - `http-fetch-per-id` plugins → ManifestAdapter goes in registry
-///   - `builtin` plugins         → NOT inserted (their routes call
-///                                  EurlexAdapter::new() etc.
-///                                  directly, no registry lookup).
-///   - `hf-dataset-bulk`         → skipped (not implemented).
-///
-/// Once we move EUR-Lex / Italian Legal through generic routes too,
-/// they'll register here under their `builtin_id`.
+/// Build the runtime registry from validated HTTP manifests.
 pub fn build_adapter_registry(plugins: &[CorpusPlugin]) -> AdapterRegistry {
     let mut out: AdapterRegistry = HashMap::new();
     for plugin in plugins {
@@ -908,20 +893,6 @@ pub fn build_adapter_registry(plugins: &[CorpusPlugin]) -> AdapterRegistry {
                 plugin.id
             );
             out.insert(plugin.id.clone(), Arc::new(adapter));
-        } else if let CorpusStrategy::Builtin { builtin_id } = &plugin.strategy {
-            // Builtin adapters that opt into the generic /corpora routes.
-            // EUR-Lex and Italian-Legal keep their dedicated routes and
-            // are intentionally NOT registered here.
-            if builtin_id == "ch-fedlex" {
-                tracing::info!(
-                    "[adapter-registry] registered FedlexAdapter for corpus {:?}",
-                    plugin.id
-                );
-                out.insert(
-                    plugin.id.clone(),
-                    Arc::new(crate::corpora::fedlex::FedlexAdapter::new()),
-                );
-            }
         }
     }
     out
@@ -1274,7 +1245,7 @@ mod tests {
     fn anti_bot_detection_cloudflare_challenge_page() {
         let body = r#"<!DOCTYPE html><html><head>
             <title>Just a moment...</title></head><body>
-            <h1>www.legifrance.gouv.fr</h1>
+            <h1>example.com</h1>
             <h2>Esecuzione della verifica di sicurezza</h2>
             <script src="/cdn-cgi/challenge-platform/h/g/orchestrate/chl_page/v1/p"></script>
             <a href="https://www.cloudflare.com/?utm_source=challenge">Cloudflare</a>
@@ -1303,42 +1274,23 @@ mod tests {
     }
 
     #[test]
-    fn build_adapter_registry_skips_non_runnable() {
-        // Three plugins: one Builtin, one HttpFetchPerId, one
-        // HfDatasetBulk. Only the HttpFetchPerId is registered.
-        let json_builtin = r#"{
-            "id": "eurlex", "display_name": "EUR-Lex",
-            "languages": ["en"], "default_language": "en", "fallback_language": "en",
-            "identifier_label": "CELEX",
-            "strategy": { "kind": "builtin", "builtin_id": "eurlex" }
+    fn build_adapter_registry_registers_valid_http_only() {
+        let json = r#"{
+            "id": "apac-example", "display_name": "APAC example",
+            "languages": ["en"], "default_language": "en",
+            "supports_language_fallback": false, "identifier_label": "Act",
+            "strategy": { "kind": "http-fetch-per-id", "search_by_id": {
+                "url_template": "https://example.com/{identifier}",
+                "shape": "rest-html", "body_path": "main"
+            }}
         }"#;
-        let json_http = r#"{
-            "id": "cnil", "display_name": "CNIL",
-            "languages": ["fr"], "default_language": "fr",
-            "supports_language_fallback": false,
-            "identifier_label": "Ref",
-            "strategy": {
-                "kind": "http-fetch-per-id",
-                "search_by_id": {
-                    "url_template": "https://x/{identifier}",
-                    "shape": "rest-html",
-                    "body_path": "main"
-                }
-            }
-        }"#;
-        let json_hf = r#"{
-            "id": "later", "display_name": "Later",
-            "languages": ["en"], "default_language": "en", "fallback_language": "en",
-            "identifier_label": "X",
-            "strategy": { "kind": "hf-dataset-bulk" }
-        }"#;
-        let plugins: Vec<CorpusPlugin> = [json_builtin, json_http, json_hf]
-            .iter()
-            .map(|s| serde_json::from_str(s).unwrap())
-            .collect();
-        let reg = build_adapter_registry(&plugins);
-        assert!(!reg.contains_key("eurlex"));
-        assert!(reg.contains_key("cnil"));
-        assert!(!reg.contains_key("later"));
+        let valid: CorpusPlugin = serde_json::from_str(json).unwrap();
+        let mut invalid = valid.clone();
+        invalid.id = "invalid".to_string();
+        invalid.capabilities.bulk_import = true;
+        let reg = build_adapter_registry(&[valid, invalid]);
+        assert_eq!(reg.len(), 1);
+        assert!(reg.contains_key("apac-example"));
+        assert!(!reg.contains_key("invalid"));
     }
 }

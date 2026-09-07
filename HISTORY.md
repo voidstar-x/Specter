@@ -2,18 +2,27 @@
 
 Release notes for Specter. Tagged releases (`v0.1.0` and later) collect
 the work into shippable semver bumps; the entries between tags are
-ordered by the date the work landed on `main` (Europe/Rome), most recent
-first. Each entry follows a light Keep-a-Changelog shape (Added /
+ordered by the date the work landed on `main` (Europe/Rome, the timezone
+recorded in the inherited release notes), most recent first. Each entry
+follows a light Keep-a-Changelog shape (Added /
 Changed / Fixed / Docs / Removed) so contributors can skim by intent.
 
-Commits referenced are short SHAs; run `git log <sha>` for the full
-diff. For the upstream-sync audit trail (which fixes were ported from
+These inherited entries describe MikeRust and its Mike lineage at the time
+of each release, not the current Specter feature set. Historical Italian UI
+labels, canonical identifiers, version numbers and attribution are retained.
+Removed documents and source files are identified as historical references,
+not links to current functionality.
+
+Commits referenced are short SHAs from the original repositories; use
+`git show <sha>` in a checkout containing that history for the full diff.
+The local snapshot may not contain those commits. For the upstream-sync
+audit trail (which fixes were ported from
 `willchen96/mike` and which we declined), see
 [`docs/UPSTREAM_SYNC.md`](docs/UPSTREAM_SYNC.md).
 
 ---
 
-## v0.7.4 — 2026-06-14 (cross-dominio nell'editor dei workflow)
+## v0.7.4 — 2026-06-14 (cross-domain support in the workflow editor)
 
 Extends the `also_applicable_to` cross-domain mechanism — shipped for
 built-in presets in v0.7.3 — to **user-created** workflows, so the
@@ -54,10 +63,10 @@ than one sector via a free-text tag picker.
 
 ---
 
-## v0.7.3 — 2026-06-13 (workflow cross-dominio + analisi cespiti e libri contabili)
+## v0.7.3 — 2026-06-13 (cross-domain workflows + fixed-asset and bookkeeping analysis)
 
 Adds two commercialista workflows — fixed-asset analysis and
-bookkeeping quadrature — and the **cross-domain registration**
+bookkeeping reconciliation — and the **cross-domain registration**
 mechanism the user asked for so a single preset can surface in more
 than one sector's picker.
 
@@ -93,7 +102,7 @@ plafond 5% per art. 102 c.6):
   reconciliation, amortisation deductibility, fiscal excess (→ IRES
   variation), movements + plus/minusvalenze. One row per asset/category.
 * **`builtin-finance-controlli-libri-contabili`** (tabular, primary
-  `finance`, also `fiscale`) — bookkeeping quadrature → anomaly
+  `finance`, also `fiscale`) — bookkeeping reconciliation → anomaly
   register: double-entry balance, numbering progressivity, key-account
   balances (cassa never negative, bank reconciled), VAT registers ↔
   LIPE ↔ annual return, ritenute ↔ F24, customer/supplier squaring,
@@ -101,13 +110,13 @@ plafond 5% per art. 102 c.6):
 
 Both appear in the Fiscale **and** Finance workflow pickers.
 docs/WORKFLOWS.md §2 documents the `also_applicable_to` field;
-docs/piano_settore_fiscale.md §3 notes the cross-domain pair.
+`docs/piano_settore_fiscale.md` (historical document; removed from this fork) §3 notes the cross-domain pair.
 
 42/42 preset-loader tests green; no schema migration.
 
 ---
 
-## v0.7.2 — 2026-06-13 (settore Fiscale — analisi del bilancio ai fini fiscali)
+## v0.7.2 — 2026-06-13 (Tax sector — financial-statement analysis for tax purposes)
 
 Fills a gap reported during testing: the Fiscale sector had no
 balance-sheet workflow, forcing the user to reach into the
@@ -139,14 +148,14 @@ income, IRAP base, deferred tax). v0.7.2 adds that reading.
   integrale dipendenti a tempo indeterminato L. 190/2014).
 
 The Fiscale sector now ships **11 workflows** (4 assistant + 7
-tabular). `docs/piano_settore_fiscale.md` §3 updated with the new
+tabular). `docs/piano_settore_fiscale.md` (historical document; removed from this fork) §3 updated with the new
 entries and a note on the fiscal-vs-financial bilancio angle.
 
 40/40 preset-loader tests green; no schema migration.
 
 ---
 
-## v0.7.1 — 2026-06-09 (localizzazione italiana del verticale legale)
+## v0.7.1 — 2026-06-09 (Italian localisation of the legal vertical)
 
 Translates the **legal vertical** workflow + column presets from
 English to Italian, for the Italian-market product. The legal
@@ -195,8 +204,8 @@ the credit presets.
 Integration of public Italian case-law / norm databases
 (def.finanze.it, Sentenze Web Cassazione, Giustizia Tributaria DGT)
 as in-chat consultable corpora is **explicitly parked** at the
-user's request — annotated in `docs/piano_settore_fiscale.md` §6
-+ roadmap Fase 3. It needs a per-source `LegalCorpusAdapter`, not a
+user's request — annotated in `docs/piano_settore_fiscale.md` (historical document; removed from this fork) §6
++ roadmap Phase 3. It needs a per-source `LegalCorpusAdapter`, not a
 config drop-in; deferred to a dedicated future workstream.
 
 ### Tests
@@ -208,7 +217,7 @@ migration.
 
 ---
 
-## v0.7.0 — 2026-06-09 (nuovo settore «Fiscale» — tax/commercialista italiano)
+## v0.7.0 — 2026-06-09 (new Tax sector — Italian tax/accounting practice)
 
 Adds a twelfth professional vertical, **`fiscale`** (Italian tax /
 commercialista compliance + advisory), end-to-end. It sits next to
@@ -245,27 +254,26 @@ model never cites superseded institutes:
 
 ### Workflow presets — `config/workflow-presets/fiscale/` (8)
 
-Assistant: `parere-tributario`, `ravvedimento-operoso` (calcolo con
-regime D.Lgs. 87/2024 + interessi legali pro-rata + codici tributo
-F24), `analisi-avviso-accertamento` (termini, vizi, confronto
-adesione/autotutela/ricorso post-abrogazione reclamo).
+Assistant: `parere-tributario`, `ravvedimento-operoso` (calculation under
+the D.Lgs. 87/2024 regime + pro-rata statutory interest + F24 tax codes), `analisi-avviso-accertamento` (deadlines, defects, comparison of
+settlement/self-review/appeal after repeal of the complaint procedure).
 
-Tabular: `riconciliazione-iva` (registri vs LIPE vs F24),
-`verifica-forfettario` (requisiti L. 190/2014 art. 1 c. 54-89),
-`quadro-rw-monitoraggio` (IVIE/IVAFE su attività estere),
-`imposte-indirette-atto` (registro/bollo/ipo-catastali, DPR 131/86),
+Tabular: `riconciliazione-iva` (registers vs LIPE vs F24),
+`verifica-forfettario` (requirements of L. 190/2014 art. 1 c. 54-89),
+`quadro-rw-monitoraggio` (IVIE/IVAFE on foreign assets),
+`imposte-indirette-atto` (registration/stamp/mortgage and cadastral taxes, DPR 131/86),
 `scadenzario-versamenti-f24`.
 
 ### Column presets — `config/column-presets/fiscale/` (9)
 
 `imponibile`, `aliquota`, `imposta-dovuta`, `ritenuta`, `sanzione`
-(con avviso sul nuovo regime D.Lgs. 87/2024), `interessi` (tasso
-legale pro-rata annuo), `norma-riferimento`, `scadenza`,
+(with a warning about the new D.Lgs. 87/2024 regime), `interessi` (annual pro-rata
+statutory rate), `norma-riferimento`, `scadenza`,
 `codice-tributo`.
 
 ### Docs
 
-* New `docs/piano_settore_fiscale.md` — descriptive sector plan:
+* New `docs/piano_settore_fiscale.md` (historical document; removed from this fork) — descriptive sector plan:
   scope, distinction from finance, 2024 reform notes, the 8
   workflows + 9 columns, **public/open databases for norms and
   case-law** (Normattiva, def.finanze.it DEF, Sentenze Web
@@ -301,7 +309,7 @@ domain-scoped UI:
 
   * The workflow + template pickers in the chat composer default
     to filtering by it.
-  * "Nuovo progetto" / "Nuova revisione tabellare" pre-populate
+  * "New project" / "New tabular review" pre-populate
     their domain dropdown to it.
   * The chat composer inherits it on chats that aren't inside a
     project.
@@ -936,7 +944,8 @@ landed during the same cycle:
 
 ### Closed `.mikeprj` export-shape gaps
 
-The v0.5.4 audit ([HISTORY v0.5.4 "Known gaps"](#v054--2026-06-05))
+The v0.5.4 audit (HISTORY v0.5.4 "Known gaps"; historical reference,
+original `#v054--2026-06-05` anchor unavailable)
 called out several fields the exporter wasn't reading or was
 reading-and-discarding. All fixed in v0.5.5:
 
@@ -1036,7 +1045,7 @@ No frontend / backend code change — the route handler was already
 binding `workflow_id` as a free string. No DB seeding hack. No
 behaviour change for any existing review.
 
-### UX — workflow picker now labels Tabellare vs Assistente
+### UX — workflow picker now labels Tabular vs Assistant
 
 [`PickerModal`](frontend/src/lib/components/ui/PickerModal.svelte)
 gains an optional `badge` field per item, rendered as a right-aligned
@@ -1137,7 +1146,7 @@ SHA-256 `content_hash`. Without it the dedup join couldn't match
 anything coming through the new picker Upload affordance. Hashing
 50 MB takes <100 ms — dwarfed by the upload bandwidth.
 
-### "Nuova revisione" inside a project + clickable review rows
+### "New review" inside a project + clickable review rows
 
 Parity with the existing "Nuova chat" button on the Conversazioni
 tab. [`ProjectDetail.svelte`](frontend/src/lib/components/projects/ProjectDetail.svelte)
@@ -1244,7 +1253,7 @@ Two follow-up fixes needed to make the back-stack robust:
    navigation, because the write itself is observable across
    untrack boundaries.
 
-### Sidebar "Progetti recenti" accordion
+### Sidebar "Recent projects" accordion
 
 [`Shell.svelte`](frontend/src/routes/Shell.svelte) gains a
 collapsible "Progetti recenti" section between the tool nav and the
@@ -1308,7 +1317,7 @@ documented for transparency — fixes shipped in a follow-up): the
 SELECT in `build_payload` doesn't read the project's `domain` or
 `isolation_mode`, the workflows query hard-codes `type =
 "assistant"` and discards `columns_config` (so tabular custom
-workflows arrive monchi), `documents.project_folder_id` and the
+workflows arrive incomplete), `documents.project_folder_id` and the
 per-chat decision state aren't carried, and `content_hash` isn't
 re-emitted (the recipient's dedup-by-hash works only after a
 re-upload). See the next entry once it lands.
@@ -1412,16 +1421,16 @@ still depends on `thrift ^0.17`.
 Mitigation lands as a hard byte cap applied **before** the bytes ever
 reach `parse_parquet_metadata`:
 
-- New file [`config/corpora.json`](config/corpora.json) holds the
+- New file `config/corpora.json` (historical file, removed) holds the
   knob `max_parquet_file_size_mb` (default **500 MB** — comfortably
   above any legitimate shard from the corpora we ingest, well below
   the threshold at which a malicious footer would matter on a 16 GB
   workstation).
-- New module [`src/corpora/limits.rs`](src/corpora/limits.rs) is the
+- New module `src/corpora/limits.rs` (historical; removed from this fork) is the
   loader. Same env-override + ancestor-walk pattern as
   `src/presets/model.rs` (`MRUST_CORPORA_LIMITS` env var). Falls back
   to defaults with a warning if the JSON is missing or malformed.
-- [`src/corpora/italian_legal.rs`](src/corpora/italian_legal.rs)
+- `src/corpora/italian_legal.rs` (historical; removed from this fork)
   refuses to decode a shard above the cap with a clear bail message;
   the import job surfaces it through the normal `corpus_state`
   channel.
@@ -2398,7 +2407,7 @@ composing the answer; the cap fired well before the model finished.
   one LLM round-trip, so 20 bounds a runaway loop at ~20× the per-turn
   latency budget while comfortably covering ten-doc anamnesis flows.
 
-### Fixed — Settings → "Modelli LLM" probe CORS-blocked
+### Fixed — Settings → "LLM models" probe CORS-blocked
 
 Symptom (`mike-tauri.log` + browser console):
 
@@ -3269,7 +3278,7 @@ carried the upstream URL (`https://eur-lex.europa.eu/legal-content/...`),
 which `/sync/kb-doc` rejected because it does `std::fs::read(path)`
 and can't take a URL. Older `doc_chunks` rows persisted the URL as
 `source_path`; the fix in
-[`src/routes/eurlex.rs`](src/routes/eurlex.rs)
+`src/routes/eurlex.rs` (historical; removed from this fork)
 (2026-05-20) used the local cache file going forward but didn't
 rewrite existing rows.
 
@@ -3630,27 +3639,27 @@ Commit: `9d91f4a`.
 
 ---
 
-## 2026-05-21 — Compliance vertical brief: `docs/macchine.md`
+## 2026-05-21 — Compliance vertical brief: `docs/macchine.md` (historical; removed from this fork)
 
 Added the operational spec for the **compliance** product vertical —
 validation, analysis, generation and comparison of regulatory
-technical documentation for industrial machinery (autoofficina,
+technical documentation for industrial machinery (vehicle workshops,
 lifting accessories, connected IoT machinery).
 
 ### Added
 
-- **[docs/macchine.md](docs/macchine.md)** (1544 lines, v2.2). Six EU
-  regulations in scope: Dir. 2006/42/CE · Reg. 2023/1230 (in vigore
+- **docs/macchine.md (historical; removed from this fork)** (1544 lines, v2.2). Six EU
+  regulations in scope: Dir. 2006/42/CE · Reg. 2023/1230 (application date recorded as
   20/01/2027) · CRA 2024/2847 · RED 2014/53 · NIS2 2022/2555 ·
-  D.Lgs. 138/2024. Defines: 4 document levels (L1 scheda · L2 manuale
-  · L3 fascicolo · L4 accessori di sollevamento), 30 workflows
+  D.Lgs. 138/2024. Defines: 4 document levels (L1 data sheet · L2 manual
+  · L3 technical file · L4 lifting accessories), 30 workflows
   (A1-A14 analysis, B1-B8 binary checklists, C1-C8 DOCX generation),
   11 analysis rules with standardised GAP types, a 4-layer SBOM/CVE
   pipeline with 10 function-calling tools (NVD + EPSS + CISA KEV),
   the "Validazione Fascicolo Tecnico" XLSX workbook in 6 sheets, and
   12 ready prompts (A-L) with the `[RUOLO][CONTESTO][ISTRUZIONI]
   [VINCOLI][FLAG OPERATIVI][OUTPUT]` skeleton.
-- **First preset of the vertical** — [`macchine-classify-doc.json`](config/workflow-presets/compliance/macchine-classify-doc.json)
+- **First preset of the vertical** — `macchine-classify-doc.json` (historical reference; removed from this fork; `config/workflow-presets/compliance/macchine-classify-doc.json`)
   (Prompt A, L1/L2/L3/L4 classifier; assistant workflow returning
   pure JSON). It is the prerequisite for every subsequent analysis
   in the brief.
@@ -3665,7 +3674,7 @@ lifting accessories, connected IoT machinery).
 - Two issues flagged during the analysis on 2026-05-21:
   "Prompt B0" referenced in §15 but never defined (typo); the archive
   deadline formula in Sheet 1 (`Data_emissione + 3650`) is inconsistent
-  with Regola 3 ("10 anni dalla *cessazione produzione*", Dir.
+  with Rule 3 ("10 years after *production ceases*", Dir.
   2006/42/CE Art. 5(3)).
 - The remaining 13 workflows + 3 DOCX templates from the priority-1
   list of §15 are deferred to the next pass.
@@ -4014,10 +4023,10 @@ collapse to the same canonical string. Full suite:
 
 ---
 
-## 2026-05-20 — Pubblica Amministrazione domain + Fase-1 workflow pack
+## 2026-05-20 — Public Administration domain + Phase-1 workflow pack
 
 Introduced `pa` as a new canonical professional vertical and shipped
-the seven workflow presets specified in `docs/pa-prompts.md` with full
+the seven workflow presets specified in `docs/pa-prompts.md` (historical; removed from this fork) with full
 prompt templates (the Fase-1 four-pack plus determina, RUP checklist
 and PNRR milestone). All other workflows from blocks 1–5 that the spec
 sketches with only a one-line description are deferred to a follow-up
@@ -4072,7 +4081,7 @@ Frontend `pnpm typecheck` → 0 errors / 0 warnings.
 
 ### Deferred
 
-The fourteen workflows from `docs/pa-prompts.md` that are sketched
+The fourteen workflows from `docs/pa-prompts.md` (historical; removed from this fork) that are sketched
 with only a one-line description (pa-ordinanza, pa-parere, pa-bando,
 pa-collaudo, pa-variante, pa-silenzio, pa-autotutela, pa-accesso,
 pa-rendiconto, pa-audit, pa-irregolarita, pa-foia, pa-conflitto,
@@ -4083,7 +4092,7 @@ follow-up batch.
 
 ## 2026-05-20 — NIS2 compliance pack: docx template + assistant workflow + tabular review
 
-Translated `docs/nis2-prompts.md` into three ready-to-ship Specter
+Translated `docs/nis2-prompts.md` (historical; removed from this fork) into three ready-to-ship Specter
 artefacts, all anchored to the **compliance** domain and to the Italian
 NIS2 transposition (D.Lgs. 138/2024).
 
@@ -4300,7 +4309,7 @@ panel, and cleared a long tail of QA findings on the corpus workflow.
 - **Per-hit indexing queue** — multiple "Index" clicks now queue up,
   each hit showing its own state (queued → running → done/error) with
   a retry, instead of only the last click showing a progress bar.
-- `PLAN_FONTI_INTERNAZIONALI.md` — a matrix of the 28 SuzieLaw-derived
+- `PLAN_FONTI_INTERNAZIONALI.md` (historical document; removed from this fork) — a matrix of the 28 SuzieLaw-derived
   international legal sources (download mode, auth, format, doc_id).
 
 ### Changed
@@ -4603,7 +4612,7 @@ re-checked manually.
 
 - Per user request, every future development step must include at least
   one formal technical validation (typecheck/build/targeted tests), and
-  both `HISTORY.md` and `PLAN_CODEX.md` must be updated with the
+  both `HISTORY.md` and `PLAN_CODEX.md` (historical document; removed from this fork) must be updated with the
   executed command(s) and result(s) for manual re-verification.
 
 ## 2026-05-17 — Clean-room frontend rewrite (React → Svelte 5)
@@ -4616,48 +4625,48 @@ architecture.
 ### Added — Svelte 5 foundations
 
 - clean-room scaffold + bootable Tauri shell; new design-system
-  primitives and layout shell (`Fase 0–1`). ([`b86fe5f`](#),
-  [`a6b7f3f`](#), [`9f20c21`](#))
-- API layer + Svelte runes stores + auth flow (`Fase 2–3`).
-  ([`5b45e71`](#))
-- Routed shell + Workflows screen (`Fase 4`). ([`2e42c92`](#))
+  primitives and layout shell (`Phase 0–1`). (`b86fe5f`,
+  `a6b7f3f`, `9f20c21`)
+- API layer + Svelte runes stores + auth flow (`Phase 2–3`).
+  (`5b45e71`)
+- Routed shell + Workflows screen (`Phase 4`). (`2e42c92`)
 - Theme toggle (light/dark/system) and i18n store; locale bundles back
-  to 6 languages. ([`70e75d9`](#), [`43251fb`](#), [`501f58d`](#))
+  to 6 languages. (`70e75d9`, `43251fb`, `501f58d`)
 
 ### Added — Core product screens
 
 - Assistant chat with streaming responses, attachments, and model
-  selection. ([`c92f2a0`](#))
+  selection. (`c92f2a0`)
 - Projects screen (list/create/edit/delete) with project detail workflow.
-  ([`6ca253e`](#))
-- Tabular reviews screen. ([`0b8fe49`](#))
-- Workflow creation modal + editor path. ([`def3757`](#))
-- Templates (DOCX) screen. ([`4e1f6bd`](#))
+  (`6ca253e`)
+- Tabular reviews screen. (`0b8fe49`)
+- Workflow creation modal + editor path. (`def3757`)
+- Templates (DOCX) screen. (`4e1f6bd`)
 - Settings screens: profile/security, LLM models, MCP servers.
-  ([`f8a7700`](#), [`3c6863e`](#), [`5f0b4ea`](#))
-- Sidebar refinements (chat list, sticky settings). ([`9593df8`](#))
+  (`f8a7700`, `3c6863e`, `5f0b4ea`)
+- Sidebar refinements (chat list, sticky settings). (`9593df8`)
 
 ### Removed
 
 - Legacy React/Next.js frontend removed from the repository.
-  ([`0a9bbcf`](#))
+  (`0a9bbcf`)
 
 ### Docs
 
 - README reframed to explain the blind Svelte rewrite and code
-  independence; screenshots refreshed. ([`6342131`](#), [`46de002`](#))
-- Svelte rewrite gap-analysis document added. ([`def85a1`](#))
+  independence; screenshots refreshed. (`6342131`, `46de002`)
+- Svelte rewrite gap-analysis document added. (`def85a1`)
 
-## 2026-05-14 — Toolkit commercialista (22 workflows + 3 DOCX templates)
+## 2026-05-14 — Accountant toolkit (22 workflows + 3 DOCX templates)
 
-Mirror del toolkit medico-legale shipped earlier today, this time for
+Mirrors the medical-legal toolkit shipped earlier today, this time for
 the Italian commercialista / dottore commercialista vertical. Maps
-the 6 operational areas of `docs/piano_toolkit_commercialista.md`
+the 6 operational areas of `docs/piano_toolkit_commercialista.md` (historical document; removed from this fork)
 under the canonical `finance` domain.
 
-### Added — Workflow tabular (17)
+### Added — Tabular workflows (17)
 
-**Trasversale (Fase 1 del piano, working life dello studio):**
+**Cross-cutting (Phase 1 of the plan, day-to-day practice operations):**
 - `commerc-inventario-documenti` (8 cols) — classificazione
   documentale universale per tutte le aree, ancorata a `DOC-NN`.
 - `commerc-scadenzario-annuale` (7 cols) — calendario adempimenti
@@ -4667,7 +4676,7 @@ under the canonical `finance` domain.
 - `commerc-quality-check-preinvio` (6 cols) — checklist quality
   pre-invio dichiarazioni (Mod. Redditi / IVA / 770).
 
-**Area 1 — Perizie e stime di valore:**
+**Area 1 — Expert reports and valuations:**
 - `commerc-riclassificazione-bilanci` (8 cols) — riclassificazione
   CE pluriennale a valore aggiunto.
 - `commerc-indicatori-econ-finanz` (8 cols) — ROE/ROI/EBITDA
@@ -4675,7 +4684,7 @@ under the canonical `finance` domain.
 - `commerc-metodi-valutativi` (7 cols) — patrimoniale / reddituale
   / DCF / multipli ponderati → valore finale.
 
-**Area 2 — CTU tributaria:**
+**Area 2 — Court-appointed tax expert work (CTU):**
 - `commerc-contestazioni-ufficio` (7 cols) — estrazione rilievi
   da avviso di accertamento / PVC / cartella.
 - `commerc-analisi-bancaria` (8 cols) — mappa movimenti c/c ex
@@ -4683,7 +4692,7 @@ under the canonical `finance` domain.
 - `commerc-rideterminazione-reddito` (6 cols) — confronto importi
   ufficio vs rideterminati.
 
-**Area 3 — Crisi d'impresa e procedure concorsuali (CCII):**
+**Area 3 — Business distress and insolvency proceedings (CCII):**
 - `commerc-indicatori-crisi` (7 cols) — DSCR / PFN-EBITDA / PN /
   liquidità / CCN con soglie di allerta.
 - `commerc-stato-passivo` (8 cols) — classificazione creditori per
@@ -4693,7 +4702,7 @@ under the canonical `finance` domain.
 - `commerc-cashflow-previsionale` (7 cols) — FCF previsionale
   5 anni con DSCR di piano.
 
-**Area 4 — Due diligence fiscale e societaria:**
+**Area 4 — Tax and corporate due diligence:**
 - `commerc-checklist-dd-documenti` (6 cols) — tracking documenti
   per area (fiscale / societario / previdenziale / giuslavoristico).
 - `commerc-rischi-dd-semaforo` (10 cols) — risk map con semaforo
@@ -4703,22 +4712,21 @@ under the canonical `finance` domain.
   anno × tributo (IRES / IRAP / IVA / Ritenute / INPS+INAIL) +
   sanzioni min/max + interessi → esposizione worst case.
 
-**Area 5 — Contenzioso tributario (D.Lgs. 546/92):**
+**Area 5 — Tax litigation (D.Lgs. 546/92):**
 - `commerc-rilievi-controdeduzioni` (10 cols) — matrice
   rilievo × tesi difensiva × giurisprudenza × DOC probanti.
 - `commerc-scadenze-processuali` (6 cols) — termini D.Lgs. 546/92
   (60 gg ricorso, 90 gg reclamo, 30 gg costituzione, 20 gg memoria,
   appello, Cassazione) con giorni residui.
 
-**Area 6 — Adempimenti periodici:**
+**Area 6 — Periodic compliance:**
 - `commerc-checklist-redditi-pf` (6 cols) — documenti per
   dichiarazione persone fisiche (CU, oneri detraibili / deducibili
   con soglie normative).
 
-### Added — Workflow assistant (5)
+### Added — Assistant workflows (5)
 
-Narrative output che chiude ciascuna area con la relazione
-professionale finale:
+Narrative output that closes each area with the final professional report:
 
 - `commerc-relazione-stima` (Area 1) — relazione di stima d'azienda
   per cessione / conferimento / fusione / asseverata / Art. 2343 c.c.
@@ -4758,15 +4766,15 @@ manual intervention. Test `presets::*` continuano a passare.
 
 ---
 
-## 2026-05-14 — Medico-legale toolkit + chat-history persistence + generated-doc cleanup
+## 2026-05-14 — Medical-legal toolkit + chat-history persistence + generated-doc cleanup
 
 Three converging streams shipped on the same day, all addressing the
 "will my work still be here tomorrow?" question that the assistant
 chat keeps raising:
 
-### Added — Medico-legale toolkit (11 workflow-presets + 1 DOCX template)
+### Added — Medical-legal toolkit (11 workflow-presets + 1 DOCX template)
 
-Maps the 7 operational modules of `docs/piano_toolkit_medico_legale.md`
+Maps the 7 operational modules of `docs/piano_toolkit_medico_legale.md` (historical document; removed from this fork)
 into Specter's preset registry under the canonical `medical` domain.
 All assets load automatically at the next backend boot. Designed to
 chain: each workflow references the `DOC-NN` codes minted by the
@@ -4970,8 +4978,8 @@ authoring contract flows through to the model in one round-trip.
   available".
 - **`describe_docx_template(template_id)`** — returns the full
   authoring contract: the auto-generated `prompt_md` (composed
-  programmatically from sidecar fields per `docs/TEMPLATE_PRONTUARIO.md`
-  Parte V) plus the raw sidecar for introspection. Second step:
+  programmatically from sidecar fields per `docs/TEMPLATE_PRONTUARIO.md` (historical document; removed from this fork)
+  Part V) plus the raw sidecar for introspection. Second step:
   "I picked the Diffida — how do I write it?". The model injects
   the returned `prompt_md` into its working context and then writes
   the body following the section_skeleton.
@@ -5155,9 +5163,9 @@ pipeline (Phase 1.A.1, next lap).
 
 ### Added — DocxTemplate registry
 
-- **`docs/TEMPLATE_PRONTUARIO.md`** — authoritative Italian-professional
-  template specification (Versione 1.0, May 2026): 9 schede + 5 sotto-
-  schede ad alto volume covering CTU, Atto difensivo, Comunicazione PA,
+- **`docs/TEMPLATE_PRONTUARIO.md` (historical document; removed from this fork)** — authoritative Italian-professional
+  template specification (Version 1.0, May 2026): 9 specification sheets + 5 high-
+  volume subsheets covering CTU, Atto difensivo, Comunicazione PA,
   Risposta AdE, Commercialista, Rogito notarile, Diffida, Locazione,
   Verbale, Istanza PA, Parcella, Procedura ISO, Ricorso tributario.
   Each scheda lists paper size, margins, typography, structure, layout
@@ -5343,18 +5351,18 @@ can switch domain on the fly.
   `identifier_label`, `license`, and a `strategy` discriminator. Loader
   walks `corpora-plugins/` from the workspace root or the binary's
   ancestors so both `cargo run` and `cargo tauri dev` find the manifests
-  ([`f777405`](#), [`dd1c3c2`](#)).
+  (`f777405`, `dd1c3c2`).
 - **Schema v2** — adds explicit `capabilities` (`search`, `fetch`,
   `documents`, `documents_delete`, `documents_resync`, `embed_progress`,
   `bulk_import`, `user_config`) and a list of `sources` so a single
   corpus can ship multiple sub-toggles (e.g. CNIL → délibérations /
   recommandations / avis / guides pratiques). Sources are surfaced in
-  the UI with available / coming-soon grouping ([`c123400`](#)).
+  the UI with available / coming-soon grouping (`c123400`).
 - **`http-fetch-per-id` strategy** — declarative single-document fetcher
   driven by a URL template, with CSS / JSONPath extractors for body and
   metadata, automatic anti-bot detection (Cloudflare, AWS WAF, Akamai)
   and a structured `ManifestAdapter` registry on `AppState`
-  ([`dcb5e43`](#), [`cfc38b9`](#)).
+  (`dcb5e43`, `cfc38b9`).
 - **`dila-bulk-xml` strategy** — generic importer for DILA OPENDATA
   archives (CNIL / LEGI / JORF / CASS / KALI share the same XML schema):
   scrape the Apache directory index for the latest `Freemium_*` tarball,
@@ -5362,7 +5370,7 @@ can switch domain on the fly.
   XML entry (`quick-xml`), batch-insert into a new `corpus_documents`
   table backed by an FTS5 virtual table with `unicode61 +
   remove_diacritics`. Idempotent: skip the import if the same
-  archive_ts is already on record ([`87f6907`](#), [`c388beb`](#)).
+  archive_ts is already on record (`87f6907`, `c388beb`).
 - **CNIL** — first plugin to exercise the bulk strategy end-to-end. ~18 MB
   archive, ~26 000 délibérations indexed locally, Etalab 2.0 licence
   attribution wired through to the UI footer. Zero anti-bot exposure
@@ -5372,7 +5380,7 @@ can switch domain on the fly.
   `/import`, `/import-status`, `/import-progress`. Dispatch picks
   `dila-bulk-xml` short-circuit, `ManifestAdapter` registry, or 501
   with a hint for builtin corpora that still ride their dedicated
-  routes ([`812638f`](#)).
+  routes (`812638f`).
 - **`migrations/0017_corpus_documents.sql`** — composite-key table
   `(corpus_id, identifier)` plus FTS5 virtual table indexing
   `titre / titre_full / numero / body`, plus a per-corpus
@@ -5381,39 +5389,39 @@ can switch domain on the fly.
 - **End-to-end test** for the DILA bulk path: insert a real
   CNIL XML fixture into a fresh DB, run `search_local_index`, assert FTS5
   matches. Pinned a production bug: FTS5 `MATCH` clauses must reference
-  the bare table name, not an alias ([`f21c2db`](#)).
+  the bare table name, not an alias (`f21c2db`).
 - **Data-driven sidebar** — the Account → Documents & sources section
   now renders from `/corpora`; runnable corpora are clickable, declared-
   but-not-yet-wired corpora are dimmed with the manifest description as
   tooltip. New corpora appear in the sidebar the moment their JSON ships
-  ([`a83d2a4`](#)).
+  (`a83d2a4`).
 - **Generic corpus settings page** (`/account/corpora/[id]`) — renders
   capabilities, sources, search box, bulk-import button + live progress
   bar, indexed-docs list with trash icon, license footer with deep link
-  to the original source opened in the OS default browser ([`9c444b6`](#),
-  [`f78c8bb`](#)).
+  to the original source opened in the OS default browser (`9c444b6`,
+  `f78c8bb`).
 - **Per-row indeterminate progress strip** under each search hit while
   its fetch is in flight, so the user sees motion during the
-  multi-second embedding step ([`f78c8bb`](#)).
+  multi-second embedding step (`f78c8bb`).
 - **Concurrent syncs** — `syncing` state is now a `Set<string>` with
   functional `setState`, so multiple "Indicizza" clicks each keep their
   own spinner + strip and the backend `POST /corpora/:id/fetch` calls
-  run in parallel ([`f78c8bb`](#)).
+  run in parallel (`f78c8bb`).
 - **Re-indicizza state** — the index-button in the search list switches
   to "Re-indicizza" when the hit's identifier is already in the local
-  index (cross-referenced via Set) ([`f78c8bb`](#)).
+  index (cross-referenced via Set) (`f78c8bb`).
 
 ### Added — projects refactor (upstream sync)
 
 - **`PATCH /project/:id/document/:docId/rename`** — port from upstream
   `willchen96/mike@f39f175`: rename a document inside a project, with
   filename uniqueness check and `updated_at` bump. Wired to a
-  `RowActions` UI in the Documents tab ([`ca4073b`](#), [`0ea5161`](#)).
+  `RowActions` UI in the Documents tab (`ca4073b`, `0ea5161`).
 - Frontend `ProjectPage` decomposed into focused components — layout
   helpers + `DocVersionHistory` moved to `ProjectPageParts`,
   `ProjectPageSkeleton` extracted, Assistant tab and Reviews tab become
   their own files. Same behaviour, smaller diffs from now on
-  ([`b60feda`](#), [`a967dab`](#), [`41ea283`](#)).
+  (`b60feda`, `a967dab`, `41ea283`).
 
 ### Added — internationalisation
 
@@ -5443,7 +5451,7 @@ can switch domain on the fly.
   browser), discovery fails fast and falls back to
   `NEXT_PUBLIC_API_BASE_URL` ([`src/lib.rs`](src/lib.rs),
   [`src-tauri/src/lib.rs`](src-tauri/src/lib.rs),
-  [`frontend/src/lib/apiBase.ts`](frontend/src/lib/apiBase.ts)).
+  `frontend/src/lib/apiBase.ts` (historical; removed from this fork)).
   `.env.example` updated to leave `PORT` commented out by default.
 - **Migration auto-heal at startup.** When sqlx detects checksum drift
   on a previously-applied migration (the dev edited a migration file
@@ -5540,7 +5548,7 @@ can switch domain on the fly.
 ### Added — insurance vertical (late afternoon)
 
 First non-legal vertical shipped with real, useful content (driven
-by the user's `docs/insurance-workflows-plan.md`):
+by the user's `docs/insurance-workflows-plan.md` (historical document; removed from this fork)):
 
 - **3 tabular comparison workflows** — `RC Professionale Review`,
   `RC Prodotti Review`, `D&O Review`. Each has **24 columns**: 16
@@ -5692,7 +5700,7 @@ anyway so the safeguard is explicit and survives future refactors:
   wordmark, corporate name, and logo are reserved trademarks of
   Specter s.r.l. Forks with substantive changes are asked to drop the
   marks and rename the binary. Same pattern as GitLab CE, Mastodon,
-  Nextcloud, Element, Plausible ([`0709f6d`](#)).
+  Nextcloud, Element, Plausible (`0709f6d`).
 - **README rewrite** of the "Authoritative legal corpora" section:
   reframed around the stated intent of a JSON-manifest plugin system,
   with an explicit trade-off table comparing it against an MCP-backend
@@ -5700,12 +5708,12 @@ anyway so the safeguard is explicit and survives future refactors:
   cannot express declaratively (PISTE OAuth, multi-step approval flows,
   etc.). Maintainer attribution to Specter s.r.l. + a collaboration
   invite (GitHub issues / PRs / email) added near the top
-  ([`42ad45f`](#)).
+  (`42ad45f`).
 - **`docs/CORPUS_PLUGINS.md`** — full schema reference and "how to add
-  a corpus" walk-through ([`f777405`](#)).
+  a corpus" walk-through (`f777405`).
 - **`docs/UPSTREAM_SYNC.md`** — policy + audit log for the periodic
-  upstream-sync passes against `willchen96/mike` ([`74eab2b`](#),
-  [`c94199e`](#), [`606cd50`](#)).
+  upstream-sync passes against `willchen96/mike` (`74eab2b`,
+  `c94199e`, `606cd50`).
 - **`docs/WORKFLOWS.md`** — end-user manual for Workflows, Tabular
   Reviews, and Assistant injection. Twelve sections covering the
   mental model, column-format reference (9 formats), prompt-writing
@@ -5723,28 +5731,28 @@ anyway so the safeguard is explicit and survives future refactors:
   via Tauri's `open_external_url` command (avoids navigating the
   in-app WebView). Logo image dropped per design feedback; the asset
   stays under `frontend/public/semplifica/` for future use
-  ([`e94c178`](#), [`0709f6d`](#)).
+  (`e94c178`, `0709f6d`).
 - Bulk-import progress bar no longer renders 100% green when the
   snapshot is already current (backend emits `phase=done` /
   `total=0`); the green text line stays but the misleading "26K docs
-  indexed now" bar is hidden ([`f78c8bb`](#)).
+  indexed now" bar is hidden (`f78c8bb`).
 
 ### Fixed
 
 - `ProjectsOverview` fetch is now gated on auth state and gracefully
-  surfaces load errors instead of throwing ([`e9f4f4a`](#)).
+  surfaces load errors instead of throwing (`e9f4f4a`).
 - `generic_search` short-circuits to `dila-bulk-xml` *before* the
   `corpus_adapters` registry lookup, so DILA-backed corpora actually
   serve queries instead of 501-ing because they have no `ManifestAdapter`
-  ([`812638f`](#)).
+  (`812638f`).
 - CNIL routing heuristic: prefer search-first endpoints over deep-link
   identifier fetches (CNIL/Légifrance HTML lookups returned anti-bot
   pages on direct URN access); detector now scans Cloudflare / AWS WAF
   / Akamai signatures and surfaces a descriptive error
-  ([`3a59276`](#), [`cfc38b9`](#)).
+  (`3a59276`, `cfc38b9`).
 - DILA `tar::Archive` walks are wrapped in `tokio::task::spawn_blocking`
   so the iterator's non-`Send` state doesn't trip an `.await` in the
-  importer ([`c388beb`](#)).
+  importer (`c388beb`).
 
 ### Removed
 
@@ -5767,32 +5775,32 @@ and the README gets its first screenshot pair.
   async pattern: when an MCP tool returns `{status: "pending",
   session_id: ...}`, the dispatcher polls the matching `get_*` tool
   until completion or timeout, transparently to the model
-  ([`2f83a7a`](#)).
+  (`2f83a7a`).
 - **5-minute dispatch timeout** for MCP tool calls (was the
   Tower default), configurable via `MCP_CALL_TIMEOUT_SECS`. Short
-  result bodies are logged at info level for diagnosis ([`a6b78d5`](#)).
+  result bodies are logged at info level for diagnosis (`a6b78d5`).
 - **Per-user MCP discovery cache** so the tool catalogue isn't
   re-fetched on every chat message; cache invalidates on MCP-config
   change. Silent tool-injection failures now log the exact reason
-  ([`5d526f8`](#)).
+  (`5d526f8`).
 - **Phase-by-phase dispatch logging** + SSE heartbeats so the chat
   channel doesn't look dead during a long MCP roundtrip
-  ([`813a8e4`](#)).
+  (`813a8e4`).
 - **Live wait indicator** in the chat composer — when a tool call is in
   flight on the MCP server side (e.g. a human has to click "Approve" in
   Edge's UI), the assistant message shows a pulsing "waiting" affordance
   with a hint that the result will arrive as soon as the server releases
-  it ([`72e1f21`](#)).
+  it (`72e1f21`).
 
 ### Added — EUR-Lex
 
 - **Cellar REST fallback** as a fourth path after the public HTML / SOAP
   / SPARQL routes. Activates when the prior three return AWS WAF
-  challenge markers ([`d9408d1`](#)).
+  challenge markers (`d9408d1`).
 - **Phantom-row guard** — refuse to persist a fetched document under
   1 KB. The page often comes back as a stub when EUR-Lex's CDN gets
-  testy, and a 0-chunk row was getting marked `ready` ([`b6099bd`](#),
-  [`c691e57`](#)).
+  testy, and a 0-chunk row was getting marked `ready` (`b6099bd`,
+  `c691e57`).
 - **Retry-with-backoff** in the fetch path; threshold raised from 400 to
   2 000 characters so genuinely short acts (one-page decisions) still
   pass but actual stubs are caught.
@@ -5802,26 +5810,26 @@ and the README gets its first screenshot pair.
 - Numeric citation pills (`[1]`, `[2]`) and KB tags (`[gN]` / `[pN]`)
   now open EUR-Lex / corpus-document sources in the side panel with
   the cited quote highlighted on the page (previously only chat-
-  attached PDFs worked) ([`3da46f0`](#)).
+  attached PDFs worked) (`3da46f0`).
 
 ### Added — docs
 
 - README gains the chat-with-citations and EUR-Lex-sync screenshot pair
-  ([`6de8073`](#)) and a frank note that MCP async multi-step flows are
-  partial ([`aa174da`](#)).
+  (`6de8073`) and a frank note that MCP async multi-step flows are
+  partial (`aa174da`).
 - New `docs/` diagrams: local-MCP-gatekeeper flow and the Specter
-  architectural-stack overview ([`d093369`](#), [`615a4dc`](#),
-  [`01dd8cc`](#)).
+  architectural-stack overview (`d093369`, `615a4dc`,
+  `01dd8cc`).
 
 ### Fixed
 
 - `ChatView.upsertTab` assigned the same id to multiple tabs on rapid
   open / close cycles — fixed by deriving the id from a monotonic
-  counter ([`82fa2af`](#)).
+  counter (`82fa2af`).
 - `isDocxFilename` no longer panics on `null` / `undefined` input
-  ([`10f8a74`](#)).
+  (`10f8a74`).
 - `.taurignore` widened so editing docs or i18n catalogues doesn't
-  trigger a Tauri dev-binary restart ([`56d832d`](#)).
+  trigger a Tauri dev-binary restart (`56d832d`).
 
 ---
 
@@ -5882,7 +5890,7 @@ replaces the backend with a Rust + axum implementation designed to run
   MCP settings page.
 - **MCP tool-schema injection** for tool-capable models so the assistant
   knows which tools are available without re-fetching per turn
-  ([`c043a3b`](#)).
+  (`c043a3b`).
 
 ### Added — authoritative corpus framework
 

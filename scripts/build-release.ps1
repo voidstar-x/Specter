@@ -208,23 +208,15 @@ function New-ResourcesOverlay {
         ("../libs/onnxruntime/win-$Arch/onnxruntime.dll")   = "libs/onnxruntime/win-$Arch/onnxruntime.dll"
         "../config/workflow-presets/**/*.json"              = "config/workflow-presets/"
         "../config/column-presets/**/*.json"                = "config/column-presets/"
-        "../config/docx-templates/**/*.json"                = "config/docx-templates/"
         "../config/model.json"                              = "config/model.json"
-        # Domain-aware system-prompt prologue (v0.4.0). Six locale
-        # sub-folders Ã— 11 domains = 66 Markdown files; the Rust
-        # loader in crate::presets::system_prompt walks
-        # <install>/config/system-prompts/<locale>/<domain>.md with
-        # locale fallback chain (requested â†’ it â†’ en â†’ None).
-        #
-        # One glob per locale (instead of a single `**/*.md` mapped to
-        # `config/system-prompts/`) because the WiX bundler flattens a
-        # `**`-glob into the destination directory: every locale's
-        # `pa.md` / `legal.md` / `medical.md` collided in a single dir
-        # and `light.exe` failed with ICE30 ("two different components
-        # install the same target file"). Mapping each locale to its
-        # own destination subdir preserves the `<locale>/<domain>.md`
-        # layout the Rust loader expects.
+        # English-only domain prompts. Preserve the en/ directory because
+        # the runtime resolves config/system-prompts/en/<domain>.md.
         "../config/system-prompts/en/*.md"                  = "config/system-prompts/en/"
+    }
+    # Specter ships no upstream DOCX sidecars. Only bundle the directory
+    # when templates have actually been added; an unmatched glob fails Tauri.
+    if (Get-ChildItem -Path "config/docx-templates" -Filter *.json -Recurse -File -ErrorAction SilentlyContinue | Select-Object -First 1) {
+        $resources["../config/docx-templates/**/*.json"] = "config/docx-templates/"
     }
     $obj = @{
         build  = @{ beforeBuildCommand = '' }

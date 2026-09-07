@@ -2,7 +2,7 @@
 
 import { api } from './client'
 
-/** Wrappers for `src/routes/sync.rs` and `src/routes/eurlex.rs`. */
+/** Wrappers for local sync and manifest-driven corpus routes. */
 
 // ── Local folder sync ────────────────────────────────────────────────
 
@@ -85,67 +85,12 @@ export const syncApi = {
   nerStatus: () => api<NerStatus>('/sync/ner-status'),
 }
 
-// ── EUR-Lex corpus ───────────────────────────────────────────────────
-
-export interface EurlexConfig {
-  enabled: boolean
-  language: string
-  fallback_en: boolean
-}
-
 export interface CorpusHit {
   identifier: string
   title: string
   date: string | null
   url: string
   languages_available: string[]
-}
-
-export interface EurlexDocument {
-  id: string
-  filename: string
-  corpus_identifier: string | null
-  corpus_language: string | null
-  corpus_date?: string | null
-  fetched_with_fallback: boolean
-  size_bytes: number
-  created_at: string
-  status: string
-  chunks_indexed: number
-  source_url: string | null
-}
-
-export interface EmbedProgress {
-  document_id: string
-  current: number
-  total: number
-  percent: number
-}
-
-export const eurlexApi = {
-  getConfig: () => api<EurlexConfig>('/eurlex/config'),
-
-  putConfig: (body: EurlexConfig) =>
-    api<EurlexConfig>('/eurlex/config', { method: 'PUT', body }),
-
-  search: (query: string, language?: string) =>
-    api<{ hits: CorpusHit[]; note: string | null }>('/eurlex/search', {
-      method: 'POST',
-      body: { query, language },
-    }),
-
-  fetchCelex: (celex: string, language?: string, date?: string) =>
-    api<unknown>('/eurlex/fetch', { method: 'POST', body: { celex, language, date } }),
-
-  listDocuments: () => api<{ documents: EurlexDocument[] }>('/eurlex/documents'),
-
-  deleteDocument: (id: string) =>
-    api<{ ok: boolean }>(`/eurlex/documents/${encodeURIComponent(id)}`, { method: 'DELETE' }),
-
-  resyncDocument: (id: string) =>
-    api<unknown>(`/eurlex/documents/${encodeURIComponent(id)}/resync`, { method: 'POST' }),
-
-  embedProgress: () => api<EmbedProgress | null>('/eurlex/embed-progress'),
 }
 
 // ── Corpora registry ─────────────────────────────────────────────────
@@ -210,24 +155,6 @@ export const corporaApi = {
   list: () => api<{ corpora: CorpusItem[] }>('/corpora'),
 }
 
-// ── Italian Legal corpus (dedicated /italian-legal/* routes) ─────────
-
-export interface ItalianLegalConfig {
-  enabled: boolean
-  sources: string[]
-}
-
-export interface ItalianLegalHit {
-  hf_id: string
-  source: string | null
-  doc_type: string | null
-  title: string | null
-  authority: string | null
-  number: string | null
-  year: number | null
-  date: string | null
-}
-
 export interface CorpusDocument {
   id: string
   filename: string
@@ -238,45 +165,9 @@ export interface CorpusDocument {
   status: string
 }
 
-export interface ImportStatus {
-  job_state: string
-  current_shard?: number
-  total_shards?: number
-  rows_imported?: number
-  percent?: number
-  row_count?: number
-  last_import_at?: string | null
-  job_error?: string | null
-}
-
-export const italianLegalApi = {
-  getConfig: () => api<ItalianLegalConfig>('/italian-legal/config'),
-  putConfig: (body: ItalianLegalConfig) =>
-    api<ItalianLegalConfig>('/italian-legal/config', { method: 'PUT', body }),
-  startImport: () => api<{ started: boolean }>('/italian-legal/import', { method: 'POST' }),
-  importStatus: () => api<ImportStatus>('/italian-legal/import-status'),
-  search: (query: string) =>
-    api<{ hits: ItalianLegalHit[] }>('/italian-legal/search', {
-      method: 'POST',
-      body: { query },
-    }),
-  fetchRow: (hf_id: string, opts?: { signal?: AbortSignal }) =>
-    api<unknown>('/italian-legal/fetch', { method: 'POST', body: { hf_id }, signal: opts?.signal }),
-  documents: () => api<{ documents: CorpusDocument[] }>('/italian-legal/documents'),
-  deleteDocument: (id: string) =>
-    api<{ ok: boolean }>(`/italian-legal/documents/${encodeURIComponent(id)}`, {
-      method: 'DELETE',
-    }),
-  resyncDocument: (id: string, opts?: { signal?: AbortSignal }) =>
-    api<unknown>(`/italian-legal/documents/${encodeURIComponent(id)}/resync`, {
-      method: 'POST',
-      signal: opts?.signal,
-    }),
-}
-
 // ── Generic corpus (declarative plugins, /corpora/{id}/* routes) ─────
 
-/** API surface for a plugin-defined corpus (e.g. CNIL). */
+/** API surface for a manifest-defined APAC corpus. */
 export function genericCorpusApi(id: string) {
   const base = `/corpora/${encodeURIComponent(id)}`
   return {
@@ -319,8 +210,6 @@ export function genericCorpusApi(id: string) {
         method: 'POST',
         signal: opts?.signal,
       }),
-    startImport: () => api<{ started?: boolean }>(`${base}/import`, { method: 'POST' }),
-    importStatus: () => api<ImportStatus>(`${base}/import-status`),
     getConfig: () => api<CorpusConfig>(`${base}/config`),
     setConfig: (body: CorpusConfig) =>
       api<CorpusConfig>(`${base}/config`, { method: 'PUT', body }),

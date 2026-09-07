@@ -56,26 +56,18 @@ pub fn router() -> Router<Arc<AppState>> {
 }
 
 // ---------------------------------------------------------------------------
-// GET /user/locale  →  { locale: "it" | "en" | "fr" | "de" | "es" | "pt" | null }
-// PUT /user/locale  body { locale: "it" | "en" | "fr" | "de" | "es" | "pt" }
-//
-// Persists the UI locale in user_settings so the choice follows the data
-// folder rather than living only in the browser. The Next.js frontend
-// keeps a cookie for SSR, but on profile load it reconciles that cookie
-// with this value.
+// GET /user/locale returns English even when an older installation saved
+// another locale. PUT accepts English only; no migration or user-data reset.
 // ---------------------------------------------------------------------------
 async fn get_locale(
-    State(state): State<Arc<AppState>>,
-    auth: AuthUser,
+    State(_state): State<Arc<AppState>>,
+    _auth: AuthUser,
 ) -> ApiResult {
-    let row: Option<(Option<String>,)> =
-        sqlx::query_as("SELECT locale FROM user_settings WHERE user_id = ?")
-            .bind(&auth.user_id)
-            .fetch_optional(&state.db)
-            .await
-            .map_err(|e| err(StatusCode::INTERNAL_SERVER_ERROR, &e.to_string()))?;
-    let locale = row.and_then(|(l,)| l);
-    Ok(Json(json!({ "locale": locale })))
+    Ok(Json(json!({ "locale": "en" })))
+}
+
+fn supported_ui_locale(locale: &str) -> Option<&'static str> {
+    (locale == "en").then_some("en")
 }
 
 #[derive(Deserialize)]
@@ -88,10 +80,8 @@ async fn update_locale(
     auth: AuthUser,
     Json(body): Json<UpdateLocaleBody>,
 ) -> ApiResult {
-    let normalized = match body.locale.as_str() {
-        "it" | "en" | "fr" | "de" | "es" | "pt" => body.locale,
-        _ => return Err(err(StatusCode::BAD_REQUEST, "unsupported locale")),
-    };
+    let normalized = supported_ui_locale(&body.locale)
+        .ok_or_else(|| err(StatusCode::BAD_REQUEST, "Specter supports English only"))?;
     sqlx::query(
         "INSERT INTO user_settings (user_id, locale, updated_at) \
          VALUES (?, ?, datetime('now')) \
@@ -1401,4 +1391,17 @@ async fn delete_account(
         .map_err(|e| err(StatusCode::INTERNAL_SERVER_ERROR, &e.to_string()))?;
 
     Ok(Json(json!({ "ok": true })))
+}
+
+#[cfg(test)]
+mod locale_tests {
+    use super::supported_ui_locale;
+
+    #[test]
+    fn only_english_ui_locale_is_supported() {
+        assert_eq!(supported_ui_locale("en"), Some("en"));
+        for locale in ["it", "fr", "de", "es", "pt", "", "../en"] {
+            assert_eq!(supported_ui_locale(locale), None);
+        }
+    }
 }

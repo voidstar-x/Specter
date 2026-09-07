@@ -53,7 +53,7 @@ dotenvy = "0.15"
 # the `open_external_url` Tauri command so links from the in-app
 # WebView land in Edge/Chrome/Safari instead of being intercepted
 # by the WebView itself (which makes the in-app shell behave like a
-# mini-browser, not what the user wants for "Apri su EUR-Lex").
+# mini-browser, not what the user wants for "Open on source").
 open = "5"
 # Native folder/file picker. Used by the `pick_folder` Tauri command
 # so the sync-folder field in Settings can be filled from an OS dialog.

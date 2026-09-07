@@ -199,8 +199,8 @@
 
   // When the user clicks "+" while a project-scoped chat is active,
   // we don't silently inherit the project for the next chat (the
-  // 2026-06-07 report: "ho creato una nuova chat e il progetto è
-  // rimasto assegnato senza chiedermelo"). Ask first.
+  // 2026-06-07 report: a new chat inherited the project without
+  // asking the user). Ask first.
   let newChatModalOpen = $state(false)
   function newChat() {
     if (chatStore.activeProjectId) {
@@ -504,7 +504,7 @@
      the third "cancel" action is implicit via the Modal's own close
      X (top-right) + Esc + backdrop click — adding it as a third
      footer button was overflowing the sm container and pushed
-     "Annulla" off-screen. md sizing also gives the two action
+     "Cancel" off-screen. md sizing also gives the two action
      labels room to breathe. -->
 <Modal
   open={newChatModalOpen}

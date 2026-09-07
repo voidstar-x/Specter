@@ -1,8 +1,0 @@
-{
-    "name": "Norma di riferimento",
-    "match_pattern": "\\bnorma\\b|\\briferimento normativo\\b|\\barticolo\\b",
-    "match_flags": "i",
-    "format": "text",
-    "domain": "fiscale",
-    "prompt": "Norma tributaria puntuale applicabile, citata per esteso. Esempi: 'Art. 13 D.Lgs. 472/1997' (ravvedimento), 'Art. 109 TUIR' (competenza), 'Art. 19 DPR 633/1972' (detrazione IVA), 'Art. 1 c. 54 L. 190/2014' (forfettario). Una norma per cella; se più norme, separa con ';'."
-}

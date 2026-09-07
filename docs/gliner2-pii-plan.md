@@ -1,7 +1,11 @@
 # GLiNER2 PII — integration plan
 
-**Status**: design + scaffolding lands on `main`; route + UI follow once
-the foundation is callable.
+> **Historical design — implementation has since shipped.** The May 2026
+> release notes in [HISTORY](../HISTORY.md) record the GLiNER PII pipeline and
+> subsequent fixes. This document preserves the original design and upstream
+> library attribution; its phase checklist, model/API examples and Italian
+> label assumptions are not a current implementation plan. Consult
+> [`src/ner/`](../src/ner/) for the implementation.
 
 ## 1. Scope
 
@@ -86,7 +90,7 @@ matching the GDPR + Italian fiscal context the rest of the app
 targets:
 
 - `person_name`, `email`, `phone`, `address`
-- `fiscal_code` (codice fiscale), `vat_number` (partita IVA)
+- `fiscal_code` (tax identifier), `vat_number` (VAT identifier)
 - `iban`, `credit_card`
 - `date_of_birth`, `ip_address`
 - `license_plate`

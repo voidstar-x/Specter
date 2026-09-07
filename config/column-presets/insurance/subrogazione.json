@@ -1,8 +1,8 @@
 {
-    "name": "Subrogazione",
-    "match_pattern": "\\bsurroga(zione)?\\b|\\bsubrogazione\\b|\\brivalsa\\b|\\bsubrogation\\b",
+    "name": "Subrogation",
+    "match_pattern": "\\bsubrogation\\b|\\bright of recourse\\b",
     "match_flags": "i",
     "format": "yes_no",
     "domain": "insurance",
-    "prompt": "L'assicuratore subentra (per surrogazione ex art. 1916 c.c.) nei diritti dell'assicurato verso terzi responsabili dopo aver liquidato il sinistro? Indica eventuali limitazioni o rinunce espresse al diritto di rivalsa. Cita l'articolo."
+    "prompt": "Does the insurer succeed (by subrogation under Article 1916 of the Italian Civil Code) to the insured's rights against liable third parties after settling the claim? State any limitations or express waivers of the right of recourse. Cite the clause."
 }

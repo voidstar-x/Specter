@@ -14,7 +14,7 @@
      *  domains). */
     tags?: string[]
     /** Optional right-aligned pill — used by the workflow picker to surface
-     *  Tabellare vs Assistente at a glance without lengthening the sublabel. */
+     *  Tabular vs Assistant at a glance without lengthening the sublabel. */
     badge?: { text: string; tone: BadgeTone }
   }
 </script>

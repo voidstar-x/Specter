@@ -208,7 +208,7 @@
   })
 
   // Explicit "clear chip" signal from the sidebar's new-chat confirm
-  // modal — fires when the user picked "una chat indipendente" while
+  // modal — fires when the user picked "an independent chat" while
   // a project-scoped chat was active. The store-level tick lets us
   // avoid an otherwise-needed prop or callback drilling. Effect skips
   // its first run (tick = 0 at mount) to keep the chip on initial

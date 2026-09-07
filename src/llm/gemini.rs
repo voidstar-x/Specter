@@ -134,7 +134,7 @@ fn safety_settings_off() -> Value {
 /// Gemini 3.5 (and later) exposes a discrete `thinkingLevel` enum
 /// (`OFF` / `LOW` / `MEDIUM` / `HIGH`). The default on Flash-class 3.5
 /// is `HIGH`, which observed empirically tends to burn output budget
-/// thinking instead of writing — implicated in the truncated NIS2
+/// thinking instead of writing — implicated in the truncated long-form
 /// report. `MEDIUM` is the documented balanced setting.
 ///
 /// Gemini 2.5 uses the older integer `thinkingBudget` (in tokens);

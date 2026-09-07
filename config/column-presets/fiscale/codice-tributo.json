@@ -1,8 +1,0 @@
-{
-    "name": "Codice tributo",
-    "match_pattern": "\\bcodice tributo\\b|\\bcod\\.? tributo\\b|\\btax code\\b",
-    "match_flags": "i",
-    "format": "text",
-    "domain": "fiscale",
-    "prompt": "Codice tributo per il modello F24. Esempi: '4001' (IRPEF saldo), '4033'/'4034' (acconti IRPEF), '6099' (IVA annuale), '1001' (ritenute dipendenti), '8901'/'8906' (sanzioni), '1989' (interessi ravvedimento). Se NON certo del codice per la fattispecie, scrivi 'verificare su tabella Agenzia delle Entrate' — non inventarlo."
-}

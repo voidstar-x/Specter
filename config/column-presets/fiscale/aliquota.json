@@ -1,8 +1,0 @@
-{
-    "name": "Aliquota",
-    "match_pattern": "\\baliquota\\b|\\btax rate\\b|\\bpercentuale d.imposta\\b",
-    "match_flags": "i",
-    "format": "percentage",
-    "domain": "fiscale",
-    "prompt": "Aliquota d'imposta applicabile. Per IVA: 4%/5%/10%/22%. Per IRES: 24%. Per IRPEF: scaglione/i applicabili. Per registro: la percentuale di tariffa. Indica l'aliquota e, se a scaglioni, le aliquote marginali. Cita la norma/tariffa quando rilevante."
-}

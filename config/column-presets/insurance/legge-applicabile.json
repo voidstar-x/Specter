@@ -1,8 +1,8 @@
 {
-    "name": "Legge applicabile",
-    "match_pattern": "\\blegge applicabile\\b|\\bgoverning law\\b|\\bdiritto applicabile\\b",
+    "name": "Governing law",
+    "match_pattern": "\\bgoverning law\\b|\\bapplicable law\\b",
     "match_flags": "i",
     "format": "text",
     "domain": "insurance",
-    "prompt": "Governing law della polizza (es. \"Legge italiana\", \"Diritto svizzero\"). Cita l'articolo."
+    "prompt": "Identify the governing law of the policy. Cite the clause."
 }

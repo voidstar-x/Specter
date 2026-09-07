@@ -170,7 +170,7 @@ function createChatStore() {
   let abortCtrl: AbortController | null = null
   // Monotonic — bumped by `newChat({ clearProject: true })`. The
   // composer (ChatInput.svelte) watches it to drop its project chip
-  // when the user explicitly says "voglio una chat indipendente"
+  // when the user explicitly says "I want an independent chat"
   // after a confirm modal in the sidebar.
   let clearProjectTick = $state(0)
 

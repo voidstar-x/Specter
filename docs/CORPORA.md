@@ -1,79 +1,65 @@
 # Authoritative legal corpora
 
-Plan and per-source survey for ingesting public legal sources into
-Specter's RAG store, configurable per-corpus from
-**Settings → Local documents / Corpora**.
+Specter's bundled source catalogue targets official APAC government sources.
+The manifests live in [`config/corpora-plugins/`](../config/corpora-plugins/) and
+are surfaced through **Settings → Data sources**. See [CORPUS_PLUGINS](CORPUS_PLUGINS.md)
+for the schema, capability flags and extension procedure.
 
-Specter is oriented to APAC / common-law jurisdictions. The bundled
-corpus plugins each target an **official government source** for a
-jurisdiction; sources are manifest-driven and live under
-`config/corpora-plugins/*.json`, so adding or changing a source is a
-config-only change (no code). Manifest shape is documented in
-[`CORPUS_PLUGINS.md`](CORPUS_PLUGINS.md).
+## Scope and limits
 
-## Goals
+- Index documents selected for the user's work; the bundled connectors are
+  not complete offline mirrors of national legislation or case law.
+- Availability and initial enabled state come from each manifest. They do not
+  prove coverage, legal currency or successful retrieval of every identifier.
+- Fetching by identifier is distinct from keyword search. Only offer search
+  when the manifest and endpoint actually support it.
+- Source-document language is independent of Specter's English-only interface.
+  Do not silently present translated wording as authoritative original text.
+- Preserve official source URLs, publisher attribution and redistribution terms.
+  Check jurisdiction, version, commencement and amendments before relying on law.
 
-1. Let the user opt-in to one or more authoritative corpora — they're
-   large, so they default off.
-2. Per-corpus controls:
-   - **Enabled** toggle (powers sync on/off).
-   - **Reference language** picker (for multilingual sources).
-   - **Search by law number / identifier** — e.g. an Act number or
-     gazette reference.
-   - **Search by keyword** — full-text search routed to the source's
-     native search endpoint (not RAG).
-3. Ingestion is opt-in *per document*: search returns hits, the user
-   picks which to add to their personal index. We don't bulk-mirror
-   national gazettes — that's gigabytes and most of it is irrelevant
-   to any one user.
-4. Ingested documents land in the same `sqlite-vec` partition as
-   folder-synced docs (scope = `global` by default), so retrieval
-   treats them uniformly.
+## Bundled manifest survey
 
-## Bundled APAC source survey
+The table below describes the checked-in configuration, not a fresh network
+verification. Consult each manifest for its exact URL, selectors, availability
+and capability flags; publishers may change their sites independently.
 
-Official government sources only. Some sources require a user-agent
-or a direct-PDF fetch; the `DirectPdf` fetch shape handles the
-PDF-only sources.
+| Corpus | Display name | Fetch response shape | Source languages | Identifier input |
+|---|---|---|---|---|
+| [`au-federalregister`](../config/corpora-plugins/au-federalregister.json) | AU / Federal Register | `rest-html` | en | Register ID |
+| [`id-peraturan`](../config/corpora-plugins/id-peraturan.json) | Indonesia / National Regulations (Peraturan) | `direct-pdf` | id | Full official PDF URL |
+| [`jp-egov`](../config/corpora-plugins/jp-egov.json) | JP / e-Gov | `rest-html` | ja | LawId |
+| [`kr-lawinfo`](../config/corpora-plugins/kr-lawinfo.json) | Korea / Law Information Center (law.go.kr) | `rest-html` | ko | Law serial (lsiSeq) |
+| [`my-lom`](../config/corpora-plugins/my-lom.json) | Malaysia / Laws of Malaysia (LOM) | `direct-pdf` | en, ms | Full official LOM PDF URL (processFile.php?token=... harvested from the site) |
+| [`sg-statutes`](../config/corpora-plugins/sg-statutes.json) | Singapore / Statutes (Singapore Statutes Online) | `rest-html` | en | Act short code (e.g. IA1965) |
+| [`th-royalgazette`](../config/corpora-plugins/th-royalgazette.json) | Thailand / Official Law Library (PRD, Government of Thailand) | `direct-pdf` | th | Full official law.prd.go.th PDF URL |
+| [`vn-legal`](../config/corpora-plugins/vn-legal.json) | Vietnam / Government Legal Documents (Chinh Phu) | `rest-html` | vi | 18-digit publication id (from xaydungchinhsach.chinhphu.vn URL) |
 
-### Singapore — Singapore Statutes Online
-- **Site**: https://sso.agc.gov.sg
-- **Notes**: Attorney-General's Chambers consolidated statutes; needs a
-  browser user-agent; body selector `#legisContent`.
+## Direct PDF handling
 
-### Malaysia — LOM (Laws of Malaysia)
-- **Site**: https://lom.agc.gov.my
-- **Notes**: Attorney General's Chambers; PDF/HTML act detail pages.
+`direct-pdf` is a response shape under `strategy.kind: "http-fetch-per-id"`.
+It downloads an official PDF and extracts its text layer through Pdfium. The
+backend must be built with the `pdf` feature and have the native Pdfium runtime.
+Image-only/scanned PDFs without extractable text are not OCR'd by this path.
+An HTML portal or anti-bot challenge is not a substitute for a PDF URL.
 
-### Indonesia — Peraturan
-- **Site**: https://peraturan.go.id / https://peraturan.bpk.go.id
-- **Notes**: bpk.go.id is a scripted/Cloudflare-protected portal; uses
-  the DirectPdf adapter.
+## Add or update a source
 
-### South Korea — Korea Law Information Center
-- **Site**: https://law.go.kr
-- **Notes**: JS-rendered pages; uses the DirectPdf adapter.
+1. Copy a manifest with the appropriate response shape.
+2. Set `id`, English `display_name`, official `homepage`, language fields and
+   `strategy.search_by_id` (`url_template`, `shape`, selectors).
+3. Explicitly set capabilities, keeping `bulk_import: false`. Keep a new source
+   unavailable until its fetch and error paths have been verified.
+4. Restart the backend, inspect `GET /corpora`, and exercise a real document
+   through the UI/API. Check the extracted body, not just the HTTP status.
 
-### Vietnam — Legal Portal
-- **Site**: https://phapluat.gov.vn / https://vanban.chinhphu.vn
-- **Notes**: Government legal documents portal.
+There is no `fetch_shape: js` browser-execution mode. Sources requiring login,
+interactive challenges or unsupported formats need a different implementation,
+not invented manifest fields.
 
-### Thailand — Royal Gazette
-- **Site**: https://ratchakitcha.soc.go.th / https://krisdika.go.th
-- **Notes**: Uses the DirectPdf adapter.
+## Historical connectors
 
-### Australia — Federal Register of Legislation
-- **Site**: https://legislation.gov.au
-- **Notes**: Official consolidated Australian legislation.
-
-### Japan — e-Gov
-- **Site**: https://e-gov.go.jp
-- **Notes**: Official government portal for Japanese laws.
-
-## Adding a new source
-
-1. Copy an existing manifest in `config/corpora-plugins/` and adapt
-   `id`, `name`, `url`, `fetch_shape` (one of `http` / `direct_pdf` /
-   `js`), and the extraction selectors.
-2. Set `available: true`.
-3. Restart Specter; the corpus appears in Settings → Local documents.
+EUR-Lex, Italian Legal, Fedlex and DILA bulk connectors are retired from this
+fork. Their historical engineering work and attribution remain in
+[HISTORY](../HISTORY.md). The English EU AI Act workflow is intentional legal
+content and remains separate from the removed connector infrastructure.

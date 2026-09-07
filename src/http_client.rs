@@ -1,8 +1,8 @@
 //! Shared `reqwest::Client` factories with sane timeout defaults.
 //!
 //! Most of Specter's outbound HTTP — MCP probe / MCP dispatch, LLM
-//! chat (non-streaming bits), corpus metadata fetches, EUR-Lex /
-//! Italian-legal / DILA poke endpoints — has no natural watchdog
+//! chat (non-streaming bits), and APAC corpus metadata fetches —
+//! has no natural watchdog
 //! upstream of `reqwest`. A network partition or a slow remote
 //! server can leave a `spawn_blocking` task wedged for minutes,
 //! pegging the dispatcher and tying up an HTTP-route worker.
@@ -14,7 +14,7 @@
 //!
 //!   - `default()` — 60 s overall, 10 s connect. The right answer
 //!     for **transactional** calls (single round-trip, no streaming).
-//!     Use it for: MCP probes, EUR-Lex metadata, presets fetch.
+//!     Use it for: MCP probes, corpus metadata, presets fetch.
 //!
 //!   - `streaming()` — 10 s connect, **no overall timeout**. Right for
 //!     LLM streaming and SSE consumption where the server legitimately
@@ -22,8 +22,8 @@
 //!     `tokio::time::timeout` upstream when you want a deadline.
 //!
 //!   - `bulk_download(secs)` — caller-specified overall timeout for
-//!     long-running file downloads (HuggingFace model weights, DILA
-//!     archive .tar.gz, ONNX bundles). The single configurable knob
+//!     long-running file downloads (HuggingFace model weights and
+//!     ONNX bundles). The single configurable knob
 //!     keeps the per-caller `Client::builder()` boilerplate out.
 //!
 //! All three set `native-tls` (the project default) implicitly via
@@ -49,8 +49,8 @@ pub fn default() -> reqwest::Client {
 /// to drive a per-event deadline via `tokio::time::timeout`.
 ///
 /// Use specifically when the remote endpoint legitimately holds the
-/// connection open over minutes (LLM token streaming, EUR-Lex sync
-/// progress feed). For everything else, prefer `default()`.
+/// connection open over minutes (LLM token streaming, SSE
+/// progress feeds). For everything else, prefer `default()`.
 pub fn streaming() -> reqwest::Client {
     reqwest::Client::builder()
         .connect_timeout(Duration::from_secs(10))
@@ -60,8 +60,8 @@ pub fn streaming() -> reqwest::Client {
 
 /// Build a `reqwest::Client` for bulk file downloads with an explicit
 /// overall ceiling. Used for: HuggingFace model weights (~ 30 min for
-/// the 1 GB FP32 e5-base, ~ 5 min for the 265 MB INT8 variant), DILA
-/// `.tar.gz` archive ingestion, ONNX runtime bundles.
+/// the 1 GB FP32 e5-base, ~ 5 min for the 265 MB INT8 variant),
+/// and ONNX runtime bundles.
 ///
 /// Pass the timeout that matches the slowest realistic download for
 /// the use case. Anything below 60 s defeats the purpose — call

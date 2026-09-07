@@ -1,8 +1,0 @@
-{
-    "name": "Ritenuta",
-    "match_pattern": "\\britenut[ae]\\b|\\bwithholding\\b|\\bd.acconto\\b",
-    "match_flags": "i",
-    "format": "monetary_amount",
-    "domain": "fiscale",
-    "prompt": "Ritenuta d'acconto o d'imposta applicata. Indica l'importo '€ X.XXX,XX', l'aliquota applicata (es. 20% lavoro autonomo, 26% capitali) e se è a titolo d'acconto o d'imposta. Cita il codice tributo della ritenuta se desumibile."
-}

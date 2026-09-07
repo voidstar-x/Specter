@@ -272,7 +272,7 @@ mod tests {
             id: "x".into(),
             title: "X".into(),
             kind: "tabular".into(),
-            domain: "fiscale".into(),
+            domain: "insurance".into(),
             also_applicable_to: vec!["finance".into()],
             practice: None,
             prompt_md: None,
@@ -280,133 +280,77 @@ mod tests {
             default_output_template: None,
         };
         assert!(p.matches_domain(None), "no filter ⇒ always matches");
-        assert!(p.matches_domain(Some("fiscale")), "primary domain matches");
+        assert!(p.matches_domain(Some("insurance")), "primary domain matches");
         assert!(p.matches_domain(Some("finance")), "also_applicable_to matches");
         assert!(!p.matches_domain(Some("legal")), "unrelated domain does not match");
         p.also_applicable_to.clear();
         assert!(!p.matches_domain(Some("finance")), "without also_applicable_to, secondary no longer matches");
     }
 
-    /// The two cross-domain commercialista workflows (fixed-asset
-    /// analysis + bookkeeping quadrature) must surface in BOTH the
-    /// `fiscale` and `finance` pickers via `also_applicable_to`.
-    /// Guards the cross-domain registration the user asked for in
-    /// v0.7.3.
     #[test]
-    fn shipped_cross_domain_commercialista_presets_in_both_pickers() {
+    fn shipped_legal_presets_have_expected_ids() {
         let dir = crate::presets::config_subdir("workflow-presets");
-        let presets = load_workflow_presets(&dir).expect("load");
-        for id in ["builtin-fiscale-analisi-cespiti", "builtin-finance-controlli-libri-contabili"] {
-            let p = presets
-                .iter()
-                .find(|p| p.id == id)
-                .unwrap_or_else(|| panic!("missing cross-domain preset {id}"));
-            assert!(p.matches_domain(Some("fiscale")), "{id} must show under fiscale");
-            assert!(p.matches_domain(Some("finance")), "{id} must show under finance");
-        }
+        let presets = load_workflow_presets(&dir).expect("load legal presets");
+        let actual: std::collections::BTreeSet<&str> =
+            presets.iter().map(|p| p.id.as_str()).collect();
+        let expected: std::collections::BTreeSet<&str> = [
+            "ai-act-conformity-eu",
+            "ai-governance-assessment",
+            "ai-governance-assessment-au",
+            "ai-governance-assessment-sg",
+            "cloud-saas-dpa-review",
+            "consultation-response-au",
+            "consultation-response-sg",
+            "content-online-safety",
+            "dpia-cross-border",
+            "dpia-cross-border-au",
+            "dpia-cross-border-sg",
+            "gdpr-pdpa-compliance",
+            "horizon-scan-obligation-map",
+            "horizon-scan-obligation-map-au",
+            "horizon-scan-obligation-map-sg",
+            "nda-review-sg",
+            "online-safety-code-au",
+            "online-safety-code-sg",
+            "oss-licence-review",
+            "privacy-notice-consent-au",
+            "privacy-notice-consent-sg",
+            "saas-supply-review-sg",
+            "statutory-analysis",
+            "statutory-analysis-au",
+            "statutory-analysis-sg",
+        ].into_iter().collect();
+        assert_eq!(presets.len(), 25);
+        assert_eq!(actual, expected);
     }
 
-    /// Anchor the Pubblica Amministrazione presets shipped with the
-    /// `docs/pa-prompts.md` spec: the four Fase-1 priority workflows
-    /// (delibera, 241-check, appalto-review, ptpct) plus determina,
-    /// PNRR milestone and RUP checklist. Failure here means a
-    /// contributor renamed or deleted one of them, or the `pa` domain
-    /// itself disappeared from the canonical set.
     #[test]
-    fn shipped_pa_workflows_present_and_typed() {
+    fn shipped_workflows_are_legal_tabular_with_columns() {
         let dir = crate::presets::config_subdir("workflow-presets");
-        let presets = load_workflow_presets(&dir).expect("load");
-
-        // Domain must be canonical or the loader silently dropped the
-        // preset (validate_minimal rejects unknown domains).
-        assert!(
-            crate::domain::is_valid("pa"),
-            "`pa` must be in the canonical domain set for these presets to load"
-        );
-
-        let expected: [(&str, &str); 7] = [
-            ("builtin-pa-delibera", "assistant"),
-            ("builtin-pa-determina", "assistant"),
-            ("builtin-pa-appalto-review", "assistant"),
-            ("builtin-pa-rup-checklist", "tabular"),
-            ("builtin-pa-241-check", "assistant"),
-            ("builtin-pa-pnrr-milestone", "tabular"),
-            ("builtin-pa-ptpct", "assistant"),
-        ];
-        for (id, kind) in expected {
-            let preset = presets
-                .iter()
-                .find(|p| p.id == id)
-                .unwrap_or_else(|| panic!("PA preset must ship: {id}"));
-            assert_eq!(preset.domain, "pa", "{id} must be domain=pa");
-            assert_eq!(preset.kind, kind, "{id} must be type={kind}");
-            // Every PA preset belongs to one of the spec's five blocks
-            // and the practice string anchors that mapping in the UI.
-            let practice = preset.practice.as_deref().unwrap_or("");
-            assert!(
-                practice.starts_with("PA — "),
-                "{id} practice must start with 'PA — ': got {practice:?}"
-            );
-        }
-        // Sanity: the tabular ones must carry columns_config; the
-        // assistant ones must NOT (otherwise the picker mis-renders).
-        for p in presets.iter().filter(|p| p.domain == "pa") {
-            match p.kind.as_str() {
-                "tabular" => assert!(
-                    p.columns_config.as_ref().is_some_and(|c| !c.is_empty()),
-                    "tabular preset {} must have non-empty columns_config",
-                    p.id
-                ),
-                "assistant" => assert!(
-                    p.columns_config.is_none(),
-                    "assistant preset {} must NOT carry columns_config",
-                    p.id
-                ),
-                _ => {}
+        let presets = load_workflow_presets(&dir).expect("load legal presets");
+        assert_eq!(presets.len(), 25);
+        for p in presets {
+            assert_eq!(p.domain, "legal", "{} domain", p.id);
+            assert_eq!(p.kind, "tabular", "{} type", p.id);
+            assert!(p.matches_domain(Some("legal")));
+            let columns = p.columns_config.expect("tabular columns required");
+            assert!(!columns.is_empty(), "{} has no columns", p.id);
+            let mut indices = std::collections::HashSet::new();
+            for column in columns {
+                assert!(indices.insert(column.index), "{} duplicate column index", p.id);
+                assert!(!column.name.trim().is_empty(), "{} empty column name", p.id);
+                assert!(!column.prompt.trim().is_empty(), "{} empty column prompt", p.id);
             }
         }
     }
 
-    /// Anchor the three NIS2 compliance presets shipped together with the
-    /// `docs/nis2-prompts.md` spec — both an assistant workflow (linked
-    /// to the docx template) and a tabular workflow for policy inventory.
-    /// Failure here means a contributor renamed or deleted one of them.
     #[test]
-    fn shipped_compliance_nis2_presets_present_and_wired() {
+    fn shipped_workflows_do_not_reference_docx_templates() {
         let dir = crate::presets::config_subdir("workflow-presets");
-        let presets = load_workflow_presets(&dir).expect("load");
-
-        let assistant = presets
-            .iter()
-            .find(|p| p.id == "builtin-compliance-nis2-audit-readiness")
-            .expect("NIS2 audit-readiness assistant workflow must ship");
-        assert_eq!(assistant.kind, "assistant");
-        assert_eq!(assistant.domain, "compliance");
-        assert_eq!(
-            assistant.default_output_template.as_deref(),
-            Some("compliance/nis2-audit-readiness-report"),
-            "assistant workflow must reference the docx template"
-        );
-        assert!(assistant.columns_config.is_none());
-
-        let tabular = presets
-            .iter()
-            .find(|p| p.id == "builtin-compliance-nis2-policy-inventory")
-            .expect("NIS2 policy-inventory tabular workflow must ship");
-        assert_eq!(tabular.kind, "tabular");
-        assert_eq!(tabular.domain, "compliance");
-        let cols = tabular.columns_config.as_ref().expect("tabular columns");
-        assert!(
-            cols.len() >= 7,
-            "expected ≥7 columns for the policy inventory, got {}",
-            cols.len()
-        );
-        // Column 0 must be the human-readable title — drives the row
-        // header in the review grid.
-        assert!(
-            cols[0].name.to_lowercase().contains("titolo"),
-            "first column should be the document title, got {:?}",
-            cols[0].name
-        );
+        let presets = load_workflow_presets(&dir).expect("load legal presets");
+        assert_eq!(presets.len(), 25);
+        for p in presets {
+            assert!(p.default_output_template.is_none(), "{} references a DOCX template", p.id);
+        }
     }
 }

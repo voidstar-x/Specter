@@ -6,33 +6,14 @@
 //! professional-vertical persona before the generic Mike tool-use /
 //! citation rules kick in.
 //!
-//! Resolution fall-back chain (first hit wins):
+//! Specter always loads `en/<domain>.md`; legacy stored UI locales do
+//! not select a different language or imply a jurisdiction. The English
+//! domain prompts provide practice-specific context and jurisdiction guidance.
 //!
-//!   1. requested locale + requested domain
-//!   2. `"en"` + requested domain (`en` is the canonical locale —
-//!      Specter's first-class users are English-speaking)
-//!   3. `"it"` + requested domain (kept for backward compatibility,
-//!      but `en` is preferred so no non-English content leaks)
-//!   4. `None` — the caller composes a prologue without a domain body
-//!
-//! The directory hosting the files is found the same way the other
-//! `crate::presets::*` registries find theirs: env-var override
-//! (`MRUST_SYSTEM_PROMPTS_DIR`), CWD ancestor walk, then exe-dir
-//! ancestor walk — so dev (cwd = workspace root) and installed-MSI
-//! (cwd = anywhere, exe = `<install>/`) both land on the bundled
-//! files without configuration.
-//!
-//! Country / jurisdiction handling is **prompt-time text**: there is
-//! no `country` column on `user_settings` or `projects`. The
-//! composer hard-codes a locale → default-country mapping (Italian →
-//! Italy, French → France, …) and instructs the model to ASK the
-//! user whenever the conversation suggests a different jurisdiction.
-//! Adding a database-backed override is cheap if the present approach
-//! turns out to be too coarse for power users.
+//! Directory discovery: `MRUST_SYSTEM_PROMPTS_DIR`, CWD ancestors,
+//! then executable ancestors. Missing English prompts return `None`.
 
 use std::path::{Path, PathBuf};
-
-const FALLBACK_LOCALES: &[&str] = &["en", "it"];
 
 /// Locate the `config/system-prompts/` root directory. Mirrors the
 /// `presets_dir` / `config_subdir` pattern in `crate::presets` so the
@@ -66,67 +47,23 @@ fn walk_for_root(start: &Path) -> Option<PathBuf> {
     None
 }
 
-/// Load the `.md` body for `(locale, domain)` walking the fallback
-/// chain. Returns `None` when neither the requested pair nor any
-/// fallback (`it/<domain>`, `en/<domain>`) exists.
-///
-/// The returned string is the raw file content trimmed of trailing
-/// whitespace — the caller composes it into a wrapper section so the
-/// stored `.md` can stay readable as a stand-alone document.
+/// Load the English domain prompt, regardless of a legacy UI locale.
+/// Invalid path segments are still rejected before filesystem access.
 pub fn resolve(locale: &str, domain: &str) -> Option<String> {
     let root = root_dir();
     let domain_safe = sanitize_segment(domain)?;
-    // Locale that fails sanitize_segment carries path-traversal or
-    // other shell-metacharacter intent — hard reject rather than
-    // silently substituting a fallback locale, otherwise a request
-    // for `resolve("../etc", "medical")` would happily serve
-    // `it/medical.md` (the fallback chain finds it) which masks the
-    // attack. Sanitize-passing-but-unknown locales (e.g. "ja") still
-    // walk the fallback chain normally — that path is benign.
-    let locale_safe = sanitize_segment(locale)?;
-    // 1. Requested locale.
-    if let Some(text) = try_read(&root, &locale_safe, &domain_safe) {
-        return Some(text);
-    }
-    // 2-3. Fallback locales in order.
-    for fb in FALLBACK_LOCALES {
-        if *fb == locale_safe {
-            continue;
-        }
-        if let Some(text) = try_read(&root, fb, &domain_safe) {
-            return Some(text);
-        }
-    }
-    None
+    sanitize_segment(locale)?;
+    try_read(&root, "en", &domain_safe)
 }
 
-/// Map a UI / chat locale to its conventional default country string.
-/// Surfaced verbatim in the prologue (`Default country: Italy`) so the
-/// model knows what jurisdiction to assume absent explicit signals.
-/// The English mapping is intentionally vague ("ask the user") because
-/// the en locale legitimately spans US / UK / IE / AU / CA / NZ / IN.
-pub fn default_country_for_locale(locale: &str) -> &'static str {
-    match locale {
-        "it" => "Italy",
-        "fr" => "France",
-        "de" => "Germany",
-        "es" => "Spain",
-        "pt" => "Portugal",
-        _ => "unspecified (ask the user)",
-    }
+/// UI language does not determine the applicable legal jurisdiction.
+pub fn default_country_for_locale(_locale: &str) -> &'static str {
+    "unspecified (ask the user)"
 }
 
-/// Human-facing language name surfaced in the prologue. Mirrors the
-/// frontend's locale dropdown.
-pub fn language_name_for_locale(locale: &str) -> &'static str {
-    match locale {
-        "it" => "Italian",
-        "fr" => "French",
-        "de" => "German",
-        "es" => "Spanish",
-        "pt" => "Portuguese",
-        _ => "English",
-    }
+/// Specter's sole working language, including for legacy saved locales.
+pub fn language_name_for_locale(_locale: &str) -> &'static str {
+    "English"
 }
 
 /// Assemble the full prologue section that gets prepended to
@@ -229,22 +166,22 @@ mod tests {
     }
 
     #[test]
-    fn resolve_uses_requested_locale_when_present() {
+    fn resolve_uses_english_even_when_legacy_locale_is_present() {
         let _tmp = make_tree(&[
             ("it", "medical", "ITALIANO"),
             ("en", "medical", "ENGLISH"),
         ]);
-        assert_eq!(resolve("it", "medical").as_deref(), Some("ITALIANO"));
+        assert_eq!(resolve("it", "medical").as_deref(), Some("ENGLISH"));
     }
 
     #[test]
-    fn resolve_falls_back_to_italian_when_locale_missing() {
+    fn resolve_does_not_fall_back_to_legacy_locale() {
         let _tmp = make_tree(&[("it", "medical", "ITALIANO")]);
-        assert_eq!(resolve("fr", "medical").as_deref(), Some("ITALIANO"));
+        assert!(resolve("fr", "medical").is_none());
     }
 
     #[test]
-    fn resolve_falls_back_to_english_when_italian_missing() {
+    fn resolve_uses_english_for_other_ui_locales() {
         let _tmp = make_tree(&[("en", "medical", "ENGLISH")]);
         assert_eq!(resolve("de", "medical").as_deref(), Some("ENGLISH"));
     }
@@ -267,8 +204,8 @@ mod tests {
         let _tmp = make_tree(&[("it", "medical", "BODY")]);
         let p = assemble_prologue("it", "medical");
         assert!(p.contains("Domain: medical"));
-        assert!(p.contains("Working language: Italian"));
-        assert!(p.contains("Default country / jurisdiction: Italy"));
+        assert!(p.contains("Working language: English"));
+        assert!(p.contains("Default country / jurisdiction: unspecified (ask the user)"));
         assert!(p.contains("BODY"));
         assert!(p.contains("Country disambiguation"));
     }
@@ -284,11 +221,10 @@ mod tests {
 
     #[test]
     fn default_country_for_locale_known_locales() {
-        assert_eq!(default_country_for_locale("it"), "Italy");
-        assert_eq!(default_country_for_locale("fr"), "France");
-        assert_eq!(default_country_for_locale("de"), "Germany");
-        assert_eq!(default_country_for_locale("es"), "Spain");
-        assert_eq!(default_country_for_locale("pt"), "Portugal");
+        for locale in ["it", "fr", "de", "es", "pt", "en"] {
+            assert_eq!(default_country_for_locale(locale), "unspecified (ask the user)");
+            assert_eq!(language_name_for_locale(locale), "English");
+        }
         assert!(default_country_for_locale("en").contains("ask"));
     }
 }

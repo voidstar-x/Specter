@@ -1,8 +1,0 @@
-{
-    "name": "Interessi",
-    "match_pattern": "\\binteress[ei]\\b|\\binterest\\b",
-    "match_flags": "i",
-    "format": "monetary_amount",
-    "domain": "fiscale",
-    "prompt": "Interessi dovuti (legali o da dilazione). Importo '€ X.XXX,XX'. Per il ravvedimento usa il tasso legale pro-rata per ciascun anno (cambia annualmente con decreto MEF). Indica il tasso applicato e i giorni. Se il ritardo attraversa più anni con tassi diversi, mostra il calcolo per anno."
-}

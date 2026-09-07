@@ -1,14 +1,9 @@
 //! `/corpora` — list the JSON-manifest-driven corpus plugin registry.
 //!
-//! Read-only: the manifests live on disk under `corpora-plugins/` and
-//! are loaded once at startup into `AppState::corpus_plugins`. This
-//! endpoint surfaces the registry to the UI (settings panel can list
-//! every available corpus uniformly, regardless of whether it's
-//! served by a builtin Rust adapter or — eventually — a declarative
-//! HTTP-fetch strategy).
-//!
-//! Per-user enable/disable state is NOT here; that still lives in
-//! `corpus_settings` (see /eurlex/config etc.) keyed per-corpus.
+//! Manifests under `config/corpora-plugins/` are loaded at startup.
+//! Generic HTTP adapters provide search, fetch, and read-only preview;
+//! shared document routes handle caching, indexing, resync, and deletion.
+//! Per-user settings live in `corpus_settings`, keyed by corpus id.
 
 use axum::{
     extract::{Path, Query, State},
@@ -49,31 +44,15 @@ pub fn router() -> Router<Arc<AppState>> {
         // in the shared `corpus_settings` table. Every corpus is
         // deactivatable — the route is not gated on a capability.
         .route("/{id}/config", get(generic_get_config).put(generic_put_config))
-        // Generic operations dispatched by corpus id. Each handler
-        // looks the corpus up in `state.corpus_plugins`, validates
-        // the capability is enabled, then delegates to the adapter
-        // in `state.corpus_adapters` (declarative corpora only —
-        // builtin ones keep their `/eurlex` `/italian-legal` routes
-        // for now).
+        // Validate manifest capabilities, then dispatch via the registry.
         .route("/{id}/search", post(generic_search))
         .route("/{id}/fetch", post(generic_fetch))
-        // Read-only preview of a corpus document body. Same dispatch as
-        // /fetch (DilaBulkXml → corpus_documents; italian-legal →
-        // HuggingFace /rows; ManifestAdapter → live HTTP), but does NOT
-        // persist or chunk. Used by the UI's "view text" modal so the
-        // user can read the source before deciding to index it.
+        // Live HTTP preview without persisting or indexing the document.
         .route("/{id}/preview", get(generic_preview))
         .route("/{id}/documents", get(generic_list_documents))
         .route("/{id}/documents/{doc_id}", delete(generic_delete_document))
         .route("/{id}/documents/{doc_id}/resync", post(generic_resync_document))
-        // Bulk import (DILA-style: download tar.gz, walk XML, populate
-        // corpus_documents + FTS5). Synchronous today; the route
-        // blocks until the import finishes. Acceptable for CNIL
-        // (~18 MB, ~10s); larger fondi like LEGI will need async +
-        // progress polling.
-        .route("/{id}/import", post(generic_import))
-        .route("/{id}/import-status", get(generic_import_status))
-        .route("/{id}/import-progress", get(generic_import_progress))
+
 }
 
 /// Public projection of a `CorpusPlugin` for the API. Strips the
@@ -170,7 +149,7 @@ fn lookup_plugin(
 // GET|PUT /corpora/:id/config — per-user enable/disable + language
 // ---------------------------------------------------------------------------
 //
-// Shares the `corpus_settings` table with EUR-Lex (`/eurlex/config`).
+// Uses the shared per-user `corpus_settings` table.
 // When no row exists yet the response reflects the manifest defaults
 // (`enabled_by_default`, `default_language`).
 
@@ -254,112 +233,11 @@ async fn generic_put_config(
     })))
 }
 
-fn de_gesetze_slug_for_code(code: &str) -> Option<&'static str> {
-    match code {
-        "BGB" => Some("bgb"),
-        "STGB" => Some("stgb"),
-        "HGB" => Some("hgb"),
-        "GG" => Some("gg"),
-        "ZPO" => Some("zpo"),
-        "STPO" => Some("stpo"),
-        "AO" => Some("ao_1977"),
-        "VWGO" => Some("vwgo"),
-        "BVERFGG" => Some("bverfgg"),
-        _ => None,
-    }
-}
-
-fn is_section_token(token: &str) -> bool {
-    let mut chars = token.chars();
-    let mut saw_digit = false;
-    while let Some(c) = chars.next() {
-        if c.is_ascii_digit() {
-            saw_digit = true;
-            continue;
-        }
-        if c.is_ascii_alphabetic() {
-            continue;
-        }
-        return false;
-    }
-    saw_digit
-}
-
-fn extract_section_after_paragraph_sign(query: &str) -> Option<String> {
-    let idx = query.find('§')?;
-    let mut out = String::new();
-    let mut started = false;
-    for c in query[idx + '§'.len_utf8()..].chars() {
-        if !started && c.is_whitespace() {
-            continue;
-        }
-        if c.is_ascii_digit() || c.is_ascii_alphabetic() {
-            started = true;
-            out.push(c.to_ascii_lowercase());
-            continue;
-        }
-        break;
-    }
-    if out.is_empty() {
-        None
-    } else {
-        Some(out)
-    }
-}
-
-fn parse_de_gesetze_identifier(query: &str) -> Option<String> {
-    let q = query.trim();
-    if q.is_empty() {
-        return None;
-    }
-
-    // Already a direct path (advanced users / pasted href).
-    if q.contains('/') && q.ends_with(".html") && !q.contains(' ') {
-        return Some(q.trim_start_matches('/').to_string());
-    }
-
-    let tokens: Vec<String> = q
-        .split(|c: char| !c.is_ascii_alphanumeric() && c != '_')
-        .filter(|s| !s.is_empty())
-        .map(|s| s.to_ascii_uppercase())
-        .collect();
-    let (code_idx, code, slug) = tokens
-        .iter()
-        .enumerate()
-        .find_map(|(i, t)| de_gesetze_slug_for_code(t).map(|slug| (i, t.clone(), slug)))?;
-
-    let section = extract_section_after_paragraph_sign(q).or_else(|| {
-        let neigh = [
-            code_idx.checked_add(1),
-            code_idx.checked_sub(1),
-            code_idx.checked_add(2),
-            code_idx.checked_sub(2),
-        ];
-        for i in neigh.into_iter().flatten() {
-            if let Some(tok) = tokens.get(i) {
-                let n = tok.to_ascii_lowercase();
-                if is_section_token(&n) {
-                    return Some(n);
-                }
-            }
-        }
-        None
-    })?;
-
-    let _ = code; // kept for future metadata/debug use
-    Some(format!("{slug}/__{section}.html"))
-}
-
 // ---------------------------------------------------------------------------
 // POST /corpora/:id/search  — { query, language?, limit? }
 // ---------------------------------------------------------------------------
 //
-// Dispatches to the corpus's declarative adapter (when the manifest
-// uses `http-fetch-per-id`). Builtin corpora (EUR-Lex, Italian Legal)
-// don't pass through this route yet — they still serve via their own
-// `/eurlex/search`, `/italian-legal/search` endpoints. The handler
-// returns 501 with a hint so a misconfigured frontend gets a
-// readable error instead of a silent miss.
+// Dispatches search through the corpus's generic HTTP adapter.
 
 #[derive(Deserialize)]
 struct SearchPayload {
@@ -390,22 +268,6 @@ async fn generic_search(
     let lang = body.language.as_deref();
     let limit = body.limit.unwrap_or(20).min(100);
 
-    // Bulk-indexed corpora (DILA): query corpus_documents FTS5
-    // directly — there's no live HTTP adapter, the data is already
-    // in the local DB. MUST short-circuit BEFORE the
-    // corpus_adapters lookup below, otherwise the registry-miss
-    // branch would 501 every bulk corpus.
-    if matches!(
-        plugin.strategy,
-        crate::corpora::plugin::CorpusStrategy::DilaBulkXml(_)
-    ) {
-        let hits =
-            crate::corpora::dila_bulk::search_local_index(&state.db, &id, q, limit)
-                .await
-                .map_err(|e| err(StatusCode::INTERNAL_SERVER_ERROR, &e.to_string()))?;
-        return Ok(Json(json!({ "hits": hits })));
-    }
-
     // Remaining strategies need a runtime adapter in the registry.
     // Clone the Arc out of the lock so no guard is held across await.
     let adapter = state.corpus_adapters.read().unwrap().get(&id).cloned();
@@ -413,8 +275,7 @@ async fn generic_search(
         return Err(err(
             StatusCode::NOT_IMPLEMENTED,
             &format!(
-                "corpus {id} has no runtime adapter via the generic router \
-                 (likely a builtin corpus — use its dedicated /{id} route instead)"
+                "corpus {id} has no registered runtime adapter"
             ),
         ));
     };
@@ -432,39 +293,9 @@ async fn generic_search(
         crate::corpora::plugin::CorpusStrategy::HttpFetchPerId(spec) => {
             spec.search_by_keyword.is_some()
         }
-        // Builtin adapters in the registry (Fedlex) implement keyword
-        // search natively.
-        crate::corpora::plugin::CorpusStrategy::Builtin { .. } => true,
-        _ => false,
+
     };
-    let hits = if id == "de-gesetze" {
-        if let Some(identifier) = parse_de_gesetze_identifier(q) {
-            let direct = adapter
-                .search_by_id(&identifier, lang)
-                .await
-                .map_err(|e| err(StatusCode::BAD_GATEWAY, &e.to_string()))?;
-            if !direct.is_empty() {
-                direct
-            } else if has_keyword {
-                adapter
-                    .search_by_keyword(q, lang, limit)
-                    .await
-                    .map_err(|e| err(StatusCode::BAD_GATEWAY, &e.to_string()))?
-            } else {
-                Vec::new()
-            }
-        } else if has_keyword {
-            adapter
-                .search_by_keyword(q, lang, limit)
-                .await
-                .map_err(|e| err(StatusCode::BAD_GATEWAY, &e.to_string()))?
-        } else {
-            adapter
-                .search_by_id(q, lang)
-                .await
-                .map_err(|e| err(StatusCode::BAD_GATEWAY, &e.to_string()))?
-        }
-    } else if has_keyword {
+    let hits = if has_keyword {
         // Flexible single-box search: run the keyword search first;
         // if it yields nothing, the query may be a corpus-native
         // identifier the user pasted verbatim — probe it by id so
@@ -489,16 +320,12 @@ async fn generic_search(
     Ok(Json(json!({ "hits": hits })))
 }
 
-// search_local_index lives in src/corpora/dila_bulk.rs (so it's
-// testable end-to-end with a fixture); routes/corpora.rs above
-// delegates to it directly.
-
 // ---------------------------------------------------------------------------
 // POST /corpora/:id/fetch  — { identifier, language? }
 // ---------------------------------------------------------------------------
 //
 // Fetches one document via the corpus adapter, stores its bytes in
-// the shared hash-keyed cache (same layout as EUR-Lex's
+// the shared hash-keyed cache (same layout as chat attachments'
 // `cache/<sha256>.txt`), and inserts a `documents` row. Indexing is
 // kicked off only when the `rag` feature is built in. Returns the
 // new document id + chunk count so the UI can refresh the list.
@@ -534,36 +361,13 @@ async fn generic_fetch(
         .unwrap_or_else(|| plugin.default_language.clone())
         .to_ascii_lowercase();
 
-    // Bulk-indexed strategy: the doc body is already in
-    // corpus_documents. Skip the adapter dispatch and synthesise
-    // a CorpusDocument from the DB row instead.
-    let fetched: crate::corpora::CorpusDocument = if matches!(
-        plugin.strategy,
-        crate::corpora::plugin::CorpusStrategy::DilaBulkXml(_)
-    ) {
-        match fetch_corpus_document(&state.db, &id, &identifier).await {
-            Ok(Some(doc)) => doc,
-            Ok(None) => {
-                return Err(err(
-                    StatusCode::NOT_FOUND,
-                    &format!(
-                        "corpus {id}: identifier {identifier:?} not in local index — \
-                         run /corpora/{id}/import first"
-                    ),
-                ));
-            }
-            Err(e) => {
-                return Err(err(StatusCode::INTERNAL_SERVER_ERROR, &e.to_string()));
-            }
-        }
-    } else {
+    let fetched: crate::corpora::CorpusDocument = {
         let adapter = state.corpus_adapters.read().unwrap().get(&id).cloned();
         let Some(adapter) = adapter else {
             return Err(err(
                 StatusCode::NOT_IMPLEMENTED,
                 &format!(
-                    "corpus {id} has no runtime adapter via the generic router \
-                     (likely a builtin corpus — use its dedicated /{id} route instead)"
+                    "corpus {id} has no registered runtime adapter"
                 ),
             ));
         };
@@ -581,8 +385,7 @@ async fn generic_fetch(
         .map(str::to_string)
         .or(fetched.date.clone());
 
-    // Dedupe by (corpus_id, identifier, language) — same policy the
-    // EUR-Lex route uses.
+    // Dedupe by (corpus_id, identifier, language) within each user.
     let existing: Option<(String, String)> = sqlx::query_as(
         "SELECT id, filename FROM documents \
          WHERE user_id = ? AND corpus_id = ? AND corpus_identifier = ? AND corpus_language = ?",
@@ -615,7 +418,7 @@ async fn generic_fetch(
         })));
     }
 
-    // Hash-keyed cache (same layout as chat attachments + EUR-Lex).
+    // Hash-keyed cache shared with chat attachments.
     let hash = {
         let mut h = Sha256::new();
         h.update(&fetched.bytes);
@@ -704,12 +507,7 @@ async fn generic_fetch(
 // strategy dispatch but DOES NOT persist anything (no `documents` row,
 // no cache file, no chunking, no embedding side-effects).
 //
-// Strategy fan-out:
-//   * DilaBulkXml         — read body from `corpus_documents`
-//   * builtin italian-legal — look up row_offset in `italian_corpus`,
-//                            then fetch the HF /rows endpoint
-//   * ManifestAdapter     — invoke the live adapter `.fetch()` and
-//                            return its bytes verbatim
+// Uses the live HTTP adapter and returns its text without persistence.
 //
 // Response shape: `{ identifier, title, source_url, text }`.
 
@@ -731,90 +529,13 @@ async fn generic_preview(
         return Err(err(StatusCode::BAD_REQUEST, "identifier is empty"));
     }
 
-    // Branch 1: bulk-XML strategy — body already in corpus_documents.
-    if matches!(
-        plugin.strategy,
-        crate::corpora::plugin::CorpusStrategy::DilaBulkXml(_)
-    ) {
-        let doc = fetch_corpus_document(&state.db, &id, &identifier)
-            .await
-            .map_err(|e| err(StatusCode::INTERNAL_SERVER_ERROR, &e.to_string()))?
-            .ok_or_else(|| {
-                err(
-                    StatusCode::NOT_FOUND,
-                    &format!(
-                        "corpus {id}: identifier {identifier:?} not in local index — \
-                         run /corpora/{id}/import first"
-                    ),
-                )
-            })?;
-        let text = String::from_utf8_lossy(&doc.bytes).into_owned();
-        return Ok(Json(json!({
-            "identifier": doc.identifier,
-            "title": doc.title,
-            "source_url": doc.source_url,
-            "text": text,
-        })));
-    }
-
-    // Branch 2: italian-legal builtin — text lives in the HuggingFace
-    // dataset, fetched by row_offset (kept in `italian_corpus`).
-    if id == "italian-legal" {
-        let row: Option<(i64, Option<String>)> = sqlx::query_as(
-            "SELECT row_offset, title FROM italian_corpus WHERE hf_id = ?",
-        )
-        .bind(&identifier)
-        .fetch_optional(&state.db)
-        .await
-        .map_err(|e| err(StatusCode::INTERNAL_SERVER_ERROR, &e.to_string()))?;
-        let Some((row_offset, title_opt)) = row else {
-            return Err(err(
-                StatusCode::NOT_FOUND,
-                &format!(
-                    "italian-legal: hf_id {identifier:?} not in local index — \
-                     run the corpus import first"
-                ),
-            ));
-        };
-        let client = reqwest::Client::builder()
-            .user_agent("Specter/0.1 (italian-legal-corpus preview)")
-            .build()
-            .map_err(|e| err(StatusCode::INTERNAL_SERVER_ERROR, &e.to_string()))?;
-        let (hf_title, text) =
-            crate::corpora::italian_legal::fetch_full_text(&client, row_offset)
-                .await
-                .map_err(|e| {
-                    err(
-                        StatusCode::BAD_GATEWAY,
-                        &format!("HuggingFace fetch: {e}"),
-                    )
-                })?;
-        let title = title_opt
-            .filter(|s| !s.is_empty())
-            .unwrap_or(if hf_title.is_empty() {
-                identifier.clone()
-            } else {
-                hf_title
-            });
-        return Ok(Json(json!({
-            "identifier": identifier,
-            "title": title,
-            "source_url": format!(
-                "https://huggingface.co/datasets/{ds}/viewer/default/train?row={row_offset}",
-                ds = crate::corpora::italian_legal::DATASET,
-            ),
-            "text": text,
-        })));
-    }
-
-    // Branch 3: manifest-adapter live fetch — ephemeral, no persistence.
+    // Ephemeral live fetch, without persistence.
     let adapter = state.corpus_adapters.read().unwrap().get(&id).cloned();
     let Some(adapter) = adapter else {
         return Err(err(
             StatusCode::NOT_IMPLEMENTED,
             &format!(
-                "corpus {id} has no preview path (no DilaBulkXml store, no \
-                 builtin handler, no manifest adapter registered)"
+                "corpus {id} has no registered runtime adapter for preview"
             ),
         ));
     };
@@ -836,9 +557,7 @@ async fn generic_preview(
     })))
 }
 
-/// Run chunking + embedding. Tuple semantics identical to
-/// `eurlex.rs::run_indexing` (kept separate to avoid cross-module
-/// pub coupling on a 20-line helper).
+/// Run shared chunking + embedding; return chunk count, error, and status.
 async fn index_text(
     state: &AppState,
     user_id: &str,
@@ -928,7 +647,7 @@ async fn generic_list_documents(
 // DELETE /corpora/:id/documents/:doc_id — remove a synced doc
 // ---------------------------------------------------------------------------
 //
-// Mirrors `/eurlex/documents/:id` policy: drop the documents row +
+// Drop the documents row +
 // embedding chunks, then delete the on-disk cache file only if no
 // other documents row still references the same content hash
 // (ref-counted across users / chats).
@@ -1002,7 +721,7 @@ async fn generic_delete_document(
 // POST /corpora/:id/documents/:doc_id/resync — restart indexing for a doc
 // ---------------------------------------------------------------------------
 //
-// Mirrors EUR-Lex/Italian Legal behaviour: keeps the cached corpus text,
+// Keep the cached corpus text,
 // marks the row as syncing, re-runs chunk+embed, then writes terminal status.
 async fn generic_resync_document(
     State(state): State<Arc<AppState>>,
@@ -1033,7 +752,7 @@ async fn generic_resync_document(
     let text_key = text_path.ok_or_else(|| {
         err(
             StatusCode::CONFLICT,
-            "Documento senza testo estratto: re-fetch necessario",
+            "Document has no extracted text: fetch it again",
         )
     })?;
 
@@ -1072,215 +791,4 @@ async fn generic_resync_document(
         "chunks_indexed": chunks_indexed,
         "indexing_error": indexing_error,
     })))
-}
-
-// ---------------------------------------------------------------------------
-// Bulk-indexed corpus helpers (DILA today)
-// ---------------------------------------------------------------------------
-
-/// Synthesize a `CorpusDocument` from the local `corpus_documents`
-/// row. Returns `Ok(None)` when the identifier isn't in the local
-/// index — caller should hint at running the importer.
-async fn fetch_corpus_document(
-    db: &sqlx::SqlitePool,
-    corpus_id: &str,
-    identifier: &str,
-) -> Result<Option<crate::corpora::CorpusDocument>, sqlx::Error> {
-    let row: Option<(
-        String,
-        Option<String>,
-        Option<String>,
-        Option<String>,
-        Option<String>,
-        Option<String>,
-        String,
-    )> = sqlx::query_as(
-        "SELECT identifier, titre_full, titre, numero, date_texte, date_publi, body \
-         FROM corpus_documents \
-         WHERE corpus_id = ? AND identifier = ?",
-    )
-    .bind(corpus_id)
-    .bind(identifier)
-    .fetch_optional(db)
-    .await?;
-    Ok(row.map(|(id, titre_full, titre, numero, date_texte, date_publi, body)| {
-        let title = titre_full
-            .filter(|s| !s.is_empty())
-            .or(titre.filter(|s| !s.is_empty()))
-            .or(numero.filter(|s| !s.is_empty()))
-            .unwrap_or_else(|| id.clone());
-        crate::corpora::CorpusDocument {
-            identifier: id,
-            title,
-            date: date_texte
-                .filter(|s| !s.is_empty())
-                .or(date_publi.filter(|s| !s.is_empty())),
-            language: String::new(), // DILA is corpus-monolingual; UI fills in
-            fetched_with_fallback: false,
-            bytes: body.into_bytes(),
-            mime: "text/plain; charset=utf-8",
-            source_url: String::new(),
-        }
-    }))
-}
-
-// ---------------------------------------------------------------------------
-// POST /corpora/:id/import — bulk import (DILA tar.gz today)
-// ---------------------------------------------------------------------------
-//
-// Synchronous: the request blocks until the archive is downloaded,
-// extracted, and every XML inserted. Fine for CNIL (~18 MB, ~10s on
-// a typical link); LEGI-scale fondi will need async + progress
-// polling, tracked as a follow-up.
-
-async fn generic_import(
-    State(state): State<Arc<AppState>>,
-    _auth: AuthUser,
-    Path(id): Path<String>,
-) -> ApiResult {
-    use crate::corpora::plugin::CorpusStrategy;
-    let plugin = lookup_plugin(&state, &id)?;
-    if !plugin.capabilities.bulk_import {
-        return Err(err(
-            StatusCode::METHOD_NOT_ALLOWED,
-            &format!("corpus {id} does not declare capabilities.bulk_import"),
-        ));
-    }
-    let spec = match &plugin.strategy {
-        CorpusStrategy::DilaBulkXml(s) => s.clone(),
-        other => {
-            return Err(err(
-                StatusCode::NOT_IMPLEMENTED,
-                &format!(
-                    "corpus {id}: bulk_import is declared but no bulk strategy \
-                     is wired in this router (strategy: {})",
-                    strategy_kind(other)
-                ),
-            ));
-        }
-    };
-
-    // Refuse to start a second import if one is already running for
-    // the same corpus. The progress map is the source of truth: a
-    // phase in {discovering, downloading, extracting, inserting} means
-    // a task is in flight; anything else (done/error/idle/missing)
-    // means we're free to start.
-    {
-        let guard = state.corpus_import_progress.read().await;
-        if let Some(sink) = guard.get(&id) {
-            let progress = sink.read().await;
-            let in_flight = matches!(
-                progress.phase.as_str(),
-                "discovering" | "downloading" | "extracting" | "inserting"
-            );
-            if in_flight {
-                return Ok(Json(json!({
-                    "started": false,
-                    "already_running": true,
-                    "phase": progress.phase,
-                    "message": progress.message,
-                })));
-            }
-        }
-    }
-
-    // Create / reset the progress sink for this corpus.
-    let sink = Arc::new(tokio::sync::RwLock::new(
-        crate::corpora::dila_bulk::ImportProgress {
-            phase: "discovering".to_string(),
-            message: "Avvio import…".to_string(),
-            current: 0,
-            total: 0,
-            error: None,
-        },
-    ));
-    {
-        let mut guard = state.corpus_import_progress.write().await;
-        guard.insert(id.clone(), sink.clone());
-    }
-
-    // Spawn the task. The progress sink lets the user poll while the
-    // worker runs; the task itself awaits on the import and stamps
-    // `done` / `error` on the sink before exiting.
-    let db = state.db.clone();
-    let corpus_id = id.clone();
-    tokio::spawn(async move {
-        let _ = crate::corpora::dila_bulk::run_import(&spec, &db, &corpus_id, Some(sink))
-            .await;
-        // The result is reflected in the progress sink; nothing more
-        // to do here. Errors are logged inside run_import.
-    });
-
-    Ok(Json(json!({
-        "started": true,
-        "already_running": false,
-    })))
-}
-
-// ---------------------------------------------------------------------------
-// GET /corpora/:id/import-progress — live phase + counter for the bar
-// ---------------------------------------------------------------------------
-//
-// Returns null when no import has been started for this corpus in
-// the current process lifetime. The UI uses that to render the
-// "Importa ora" state vs the live progress section.
-
-async fn generic_import_progress(
-    State(state): State<Arc<AppState>>,
-    _auth: AuthUser,
-    Path(id): Path<String>,
-) -> ApiResult {
-    let guard = state.corpus_import_progress.read().await;
-    let Some(sink) = guard.get(&id).cloned() else {
-        return Ok(Json(serde_json::Value::Null));
-    };
-    drop(guard);
-    let progress = sink.read().await.clone();
-    let value = serde_json::to_value(progress)
-        .map_err(|e| err(StatusCode::INTERNAL_SERVER_ERROR, &e.to_string()))?;
-    Ok(Json(value))
-}
-
-// ---------------------------------------------------------------------------
-// GET /corpora/:id/import-status — snapshot date + doc count
-// ---------------------------------------------------------------------------
-
-async fn generic_import_status(
-    State(state): State<Arc<AppState>>,
-    _auth: AuthUser,
-    Path(id): Path<String>,
-) -> ApiResult {
-    let plugin = lookup_plugin(&state, &id)?;
-    if !plugin.capabilities.bulk_import {
-        return Err(err(
-            StatusCode::METHOD_NOT_ALLOWED,
-            &format!("corpus {id} does not declare capabilities.bulk_import"),
-        ));
-    }
-    let info = crate::corpora::dila_bulk::read_import_status(&state.db, &id)
-        .await
-        .map_err(|e| err(StatusCode::INTERNAL_SERVER_ERROR, &e.to_string()))?;
-    match info {
-        None => Ok(Json(json!({
-            "imported": false,
-            "doc_count": 0,
-        }))),
-        Some((url, ts, at, n)) => Ok(Json(json!({
-            "imported": true,
-            "last_archive_url": url,
-            "last_archive_ts":  ts,
-            "last_imported_at": at,
-            "doc_count":        n,
-        }))),
-    }
-}
-
-fn strategy_kind(s: &crate::corpora::plugin::CorpusStrategy) -> &'static str {
-    use crate::corpora::plugin::CorpusStrategy;
-    match s {
-        CorpusStrategy::Builtin { .. } => "builtin",
-        CorpusStrategy::HttpFetchPerId(_) => "http-fetch-per-id",
-        CorpusStrategy::DilaBulkXml(_) => "dila-bulk-xml",
-        CorpusStrategy::HfDatasetBulk(_) => "hf-dataset-bulk",
-    }
 }

@@ -66,8 +66,8 @@ pub struct EmbeddingService {
     /// Live progress of any document currently being chunk+embed'd.
     /// `None` between jobs; populated for the duration of a single
     /// `embed_passages_with_progress` call. Read by the
-    /// `/eurlex/embed-progress` endpoint to drive the per-row
-    /// progress bar in the EUR-Lex settings panel.
+    /// `/sync/embed-progress` endpoint to drive the per-row
+    /// progress bar in the sync panel.
     pub active_embed: Arc<RwLock<Option<EmbedProgress>>>,
 }
 
@@ -154,7 +154,7 @@ impl EmbeddingService {
     }
 
     /// Public read of the active-embed snapshot, used by the
-    /// `/eurlex/embed-progress` route.
+    /// internal progress consumers.
     pub async fn embed_progress(&self) -> Option<EmbedProgress> {
         self.active_embed.read().await.clone()
     }
@@ -337,7 +337,7 @@ impl EmbeddingService {
             all_vectors.extend(batch_vectors);
             // Update the shared progress snapshot if any caller has
             // populated it — the route layer reads this via
-            // `/eurlex/embed-progress` to drive the UI bar.
+            // internal progress consumers to track indexing.
             if let Some(p) = self.active_embed.write().await.as_mut() {
                 p.current = all_vectors.len();
                 p.total = total;
@@ -405,7 +405,7 @@ impl EmbeddingService {
         let texts: Vec<String> = chunks.iter().map(|c| c.text.clone()).collect();
 
         // Stamp the active-embed snapshot before the long blocking
-        // embed call so the `/eurlex/embed-progress` poll has a doc
+        // embed call so internal progress readers have a doc
         // id to display from the very first frame. The clearing
         // happens in a guard so it runs even on error.
         *self.active_embed.write().await = Some(EmbedProgress {

@@ -1,8 +1,0 @@
-{
-    "name": "Imponibile",
-    "match_pattern": "\\bimponibile\\b|\\bbase imponibile\\b|\\btaxable base\\b",
-    "match_flags": "i",
-    "format": "monetary_amount",
-    "domain": "fiscale",
-    "prompt": "Base imponibile rilevante per il tributo in esame (IRPEF/IRES/IRAP/IVA/registro). Importo in formato '€ X.XXX,XX'. Indica tra parentesi a quale tributo si riferisce se non univoco. Se non determinabile dai documenti: 'DATO NON DISPONIBILE'."
-}

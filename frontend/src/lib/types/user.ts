@@ -10,8 +10,8 @@ export interface UserProfile {
   created_at: string
 }
 
-/** Supported UI locales. English is canonical (plan §14, decision Q8). */
-export const LOCALES = ['en', 'it', 'fr', 'de', 'es', 'pt'] as const
+/** English is the only supported UI locale. */
+export const LOCALES = ['en'] as const
 export type Locale = (typeof LOCALES)[number]
 export const DEFAULT_LOCALE: Locale = 'en'
 
@@ -22,11 +22,6 @@ export function isLocale(value: unknown): value is Locale {
 /** Native names of the supported locales — for language pickers. */
 export const LOCALE_LABELS: Record<Locale, string> = {
   en: 'English',
-  it: 'Italiano',
-  fr: 'Français',
-  de: 'Deutsch',
-  es: 'Español',
-  pt: 'Português',
 }
 
 /** Active LLM provider. */

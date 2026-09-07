@@ -1,18 +1,7 @@
 //! DOCX rendering subsystem.
 //!
-//! Philosophy (from `docs/TEMPLATE_PRONTUARIO.md`, citing G. Panucci):
-//!
-//!   > The Prontuario is not for generating the content. That you get
-//!   > by dialoguing with Claude, iterating, refining. The Prontuario
-//!   > comes into play at the end, when the content is ready and you
-//!   > need to turn it into a printable document.
-//!
-//! This module is the *closing formatter* — never the content
-//! generator. The LLM produces structured Markdown after iterating
-//! with the user; this module's job is to apply the sidecar template
-//! (layout + styles + placeholders), and emit a print-ready `.docx`
-//! that respects the Italian professional conventions catalogued in
-//! the Prontuario.
+//! A closing formatter, not a content generator: applies optional
+//! user-authored sidecar layout, styles, and placeholders to Markdown.
 //!
 //! No `.dotx` files anywhere. The sidecar JSON in
 //! `config/docx-templates/<domain>/<slug>.json` is the **sole** source
@@ -66,12 +55,8 @@ pub fn render(
     metadata: &HashMap<String, String>,
 ) -> Result<RenderOutcome> {
     // ── Step 1: validate required_metadata (soft-warn, do not block).
-    // The Prontuario lists template-specific required fields per
-    // template (e.g. DEBITORE / IMPORTO for Diffida). Missing ones
-    // come out as `[DEBITORE]` in the final document — the user sees
-    // the gap immediately at proofread time, the loudest possible
-    // feedback. Returning an error here would be hostile to the
-    // common "LLM forgot a field, regenerate" workflow.
+    // Missing template metadata is reported without blocking rendering.
+    // Unfilled body placeholders remain visible for proofreading.
     let missing: Vec<&String> = template
         .required_metadata
         .iter()
@@ -132,35 +117,30 @@ mod tests {
     use super::*;
     use std::io::Read;
 
-    fn load_diffida() -> DocxTemplate {
-        let dir = crate::presets::config_subdir("docx-templates");
-        let templates = crate::presets::docx_template::load_docx_templates(&dir)
-            .expect("load templates");
-        templates
-            .into_iter()
-            .find(|t| t.id == "it/diffida-messa-in-mora")
-            .expect("diffida template present")
+    fn test_template() -> crate::presets::docx_template::DocxTemplate {
+        crate::presets::docx_template::test_template()
     }
 
     #[test]
-    fn render_diffida_end_to_end_produces_valid_zip() {
-        let template = load_diffida();
-        let body_md = r#"# Oggetto
+    fn render_project_update_end_to_end_produces_valid_zip() {
+        let template = test_template();
+        let body_md = r#"# Overview
 
-[DEBITORE] è diffidato e messo in mora al pagamento di **[IMPORTO]**
-entro e non oltre il termine perentorio di *[TERMINE_GG] giorni*.
+[PROJECT] has a budget of **[BUDGET]**
+and a duration of *[DAYS] days*.
 
-## Inadempimento
+## Progress
 
-[DESCRIZIONE_INADEMPIMENTO]
+[SUMMARY]
 "#;
         let mut bag = HashMap::new();
-        bag.insert("DEBITORE".into(), "Tizio S.r.l.".into());
-        bag.insert("IMPORTO".into(), "€ 12.345,67".into());
-        bag.insert("TERMINE_GG".into(), "15".into());
+        bag.insert("PROJECT".into(), "Example Project".into());
+        bag.insert("BUDGET".into(), "SGD 12,345.67".into());
+        bag.insert("DAYS".into(), "15".into());
+        bag.insert("OWNER".into(), "Example Owner".into());
         bag.insert(
-            "DESCRIZIONE_INADEMPIMENTO".into(),
-            "Mancato pagamento della fattura n. 42 del 1° marzo 2026.".into(),
+            "SUMMARY".into(),
+            "Work package 42 is ready for review.".into(),
         );
 
         let outcome = render(&template, body_md, &bag).expect("render ok");
@@ -189,8 +169,8 @@ entro e non oltre il termine perentorio di *[TERMINE_GG] giorni*.
             .unwrap()
             .read_to_string(&mut document_xml)
             .unwrap();
-        assert!(document_xml.contains("Tizio S.r.l."));
-        assert!(document_xml.contains("€ 12.345,67"));
+        assert!(document_xml.contains("Example Project"));
+        assert!(document_xml.contains("SGD 12,345.67"));
         assert!(document_xml.contains("15"));
         // Empty unresolved list — every required token was supplied.
         assert!(
@@ -206,21 +186,21 @@ entro e non oltre il termine perentorio di *[TERMINE_GG] giorni*.
             .unwrap()
             .read_to_string(&mut styles_xml)
             .unwrap();
-        assert!(styles_xml.contains("Corpo testo"));
-        assert!(styles_xml.contains("Titolo sezione"));
-        // Diffida is Calibri 11pt — 11pt = 22 half-points.
+        assert!(styles_xml.contains("Body text"));
+        assert!(styles_xml.contains("Section heading"));
+        // Test template is Calibri 11pt — 11pt = 22 half-points.
         assert!(styles_xml.contains(r#"w:ascii="Calibri""#));
         assert!(styles_xml.contains(r#"w:val="22""#));
     }
 
     #[test]
     fn missing_metadata_surfaces_in_unresolved_list() {
-        let template = load_diffida();
-        // Body references [IMPORTO] but the bag doesn't have it.
-        let bag = HashMap::from([("DEBITORE".to_string(), "Caio".to_string())]);
-        let outcome = render(&template, "Pay [IMPORTO] to [DEBITORE].", &bag)
+        let template = test_template();
+        // Body references [BUDGET] but the bag doesn't have it.
+        let bag = HashMap::from([("PROJECT".to_string(), "Example Project".to_string())]);
+        let outcome = render(&template, "Pay [BUDGET] to [PROJECT].", &bag)
             .expect("render still succeeds");
-        assert!(outcome.unresolved_placeholders.contains(&"IMPORTO".to_string()));
+        assert!(outcome.unresolved_placeholders.contains(&"BUDGET".to_string()));
         // Bytes still valid — render is non-blocking on missing data.
         assert_eq!(&outcome.bytes[..4], b"PK\x03\x04");
     }
@@ -232,17 +212,17 @@ entro e non oltre il termine perentorio di *[TERMINE_GG] giorni*.
         // file. Angle brackets `<...>` in a value are a pathological
         // case (pulldown-cmark may interpret as inline HTML); not in
         // scope for Phase 1.A.1, documented in render() comment.
-        let template = load_diffida();
+        let template = test_template();
         let mut bag = HashMap::new();
-        bag.insert("DEBITORE".to_string(), "Rossi & Verdi".to_string());
-        bag.insert("IMPORTO".to_string(), "€ 100".to_string());
-        bag.insert("TERMINE_GG".to_string(), "15".to_string());
+        bag.insert("PROJECT".to_string(), "Example & Partners".to_string());
+        bag.insert("BUDGET".to_string(), "€ 100".to_string());
+        bag.insert("DAYS".to_string(), "15".to_string());
         bag.insert(
-            "DESCRIZIONE_INADEMPIMENTO".to_string(),
-            "Apostrofo: l'inadempimento è grave.".to_string(),
+            "SUMMARY".to_string(),
+            "The owner's update is ready.".to_string(),
         );
         let outcome =
-            render(&template, "Spett.le [DEBITORE].", &bag).expect("render ok");
+            render(&template, "Project [PROJECT].", &bag).expect("render ok");
         let cursor = std::io::Cursor::new(&outcome.bytes);
         let mut archive = zip::ZipArchive::new(cursor).expect("zip");
         let mut document_xml = String::new();
@@ -253,17 +233,17 @@ entro e non oltre il termine perentorio di *[TERMINE_GG] giorni*.
             .unwrap();
         // The substituted name made it in (Markdown parser accepts
         // ampersand fine since the substitution happens BEFORE MD
-        // parsing — pulldown-cmark sees "Rossi & Verdi" as plain
+        // parsing — pulldown-cmark sees "Example & Partners" as plain
         // text, emits a Text event, our WML emitter XML-escapes to
-        // `Rossi &amp; Verdi`).
+        // `Example &amp; Partners`).
         assert!(
-            document_xml.contains("Rossi &amp; Verdi"),
+            document_xml.contains("Example &amp; Partners"),
             "ampersand must be XML-escaped: {document_xml}"
         );
         // The raw unescaped ampersand must NOT survive in document.xml.
-        // (Whitespace check — `& V` would be the dangerous substring.)
+        // (Whitespace check — `& P` would be the dangerous substring.)
         assert!(
-            !document_xml.contains("Rossi & Verdi"),
+            !document_xml.contains("Example & Partners"),
             "raw ampersand leaked into XML: {document_xml}"
         );
     }

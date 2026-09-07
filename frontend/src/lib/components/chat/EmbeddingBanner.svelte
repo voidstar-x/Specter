@@ -9,9 +9,7 @@
   import Spinner from '$lib/components/ui/Spinner.svelte'
   import {
     syncApi,
-    eurlexApi,
     type ModelStatus,
-    type EmbedProgress,
     type NerStatus,
   } from '$lib/api/data-sources'
   import { i18n } from '$lib/stores/i18n.svelte'
@@ -21,19 +19,16 @@
   const t = (k: string, p?: Record<string, string | number>) => i18n.t(k, p)
 
   let model = $state<ModelStatus | null>(null)
-  let progress = $state<EmbedProgress | null>(null)
   let ner = $state<NerStatus | null>(null)
   let timer: ReturnType<typeof setInterval> | undefined
 
   async function poll() {
     try {
-      const [m, p, n] = await Promise.all([
+      const [m, n] = await Promise.all([
         syncApi.modelStatus(),
-        eurlexApi.embedProgress(),
         syncApi.nerStatus(),
       ])
       model = m
-      progress = p
       ner = n
     } catch {
       /* transient — keep last snapshot */
@@ -47,7 +42,6 @@
       timer = setInterval(poll, 600)
     } else {
       model = null
-      progress = null
       ner = null
     }
     return () => clearInterval(timer)
@@ -74,9 +68,6 @@
       return `${t('EmbeddingStatus.downloadingTitle')} (${mb}/${totalMb} MB)`
     }
     if (model?.state === 'loading') return t('EmbeddingStatus.loadingModelTitle')
-    if (progress && progress.total > 0) {
-      return `${t('EmbeddingStatus.embeddingTitle')} ${progress.current}/${progress.total}`
-    }
     return null
   })
 </script>

@@ -2,12 +2,10 @@
 <!--
   Settings → Data sources. Sub-nav over the document corpora the user
   can index into the RAG knowledge base: local folder sync plus every
-  corpus plugin registered in config/corpora-plugins/ (EUR-Lex,
-  Italian Legal, CNIL, …).
+  APAC corpus plugin registered in config/corpora-plugins/.
 -->
 <script lang="ts">
   import SyncSection from './SyncSection.svelte'
-  import EurlexSection from './EurlexSection.svelte'
   import CorpusSection from './CorpusSection.svelte'
   import Input from '$lib/components/ui/Input.svelte'
   import Select from '$lib/components/ui/Select.svelte'
@@ -33,10 +31,8 @@
   }
 
   // A corpus gets a tab only when it has a runnable adapter AND its
-  // manifest hasn't retired it (`available: false`). EUR-Lex renders
-  // its dedicated EurlexSection (via the active === 'eurlex' branch
-  // below); CNIL, Italian-Legal and declarative plugins render
-  // CorpusSection.
+  // manifest hasn't retired it (`available: false`). All plugins use
+  // the generic CorpusSection.
   const allCorpora = $derived.by(() => {
     return corpora
       .filter((c) => c.runnable && c.available)
@@ -188,8 +184,6 @@
 
   {#if active === 'sync'}
     <SyncSection />
-  {:else if active === 'eurlex'}
-    <EurlexSection />
   {:else if activeCorpus}
     {#key activeCorpus.id}
       <CorpusSection corpus={activeCorpus} />

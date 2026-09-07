@@ -1,8 +1,8 @@
 {
-    "name": "Esclusioni principali",
-    "match_pattern": "\\besclusioni( principali)?\\b|\\bexclusions\\b|\\bmain exclusions\\b",
+    "name": "Main exclusions",
+    "match_pattern": "\\b(main )?exclusions\\b",
     "match_flags": "i",
     "format": "bulleted_list",
     "domain": "insurance",
-    "prompt": "Elenca le esclusioni principali della polizza, una per bullet. Tipicamente: dolo, colpa grave, attività non dichiarate, sanzioni amministrative/penali, danni punitivi, contaminazione ambientale, atti di guerra o terrorismo, claims tra assicurati (insured vs insured) per le D&O, ritiri di prodotti già avviati per le RCD. Cita gli articoli delle esclusioni rilevanti."
+    "prompt": "List the main policy exclusions, one per bullet. Typical examples: intentional misconduct, gross negligence, undeclared activities, administrative/criminal penalties, punitive damages, environmental contamination, acts of war or terrorism, insured-versus-insured claims for D&O, and product recalls already initiated for product-liability coverage. Cite the relevant exclusion clauses."
 }

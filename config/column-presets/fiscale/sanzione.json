@@ -1,8 +1,0 @@
-{
-    "name": "Sanzione",
-    "match_pattern": "\\bsanzion[ei]\\b|\\bpenalty\\b|\\bpenalit",
-    "match_flags": "i",
-    "format": "monetary_amount",
-    "domain": "fiscale",
-    "prompt": "Sanzione amministrativa tributaria. Indica importo '€ X.XXX,XX', percentuale base e norma (D.Lgs. 471/1997 o 472/1997). RICORDA il nuovo regime D.Lgs. 87/2024 dal 1.9.2024 (es. omesso versamento 25% anziché 30%): verifica la data della violazione e specifica il regime applicato. Se ridotta da ravvedimento, indica la frazione (1/10, 1/9, 1/8, 1/7)."
-}

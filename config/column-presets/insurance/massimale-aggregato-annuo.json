@@ -1,8 +1,8 @@
 {
-    "name": "Massimale aggregato annuo",
-    "match_pattern": "\\bmassimale aggregato\\b|\\baggregato annuo\\b|\\baggregate limit\\b",
+    "name": "Annual aggregate limit",
+    "match_pattern": "\\b(annual )?aggregate limit\\b|\\bannual aggregate\\b",
     "match_flags": "i",
     "format": "monetary_amount",
     "domain": "insurance",
-    "prompt": "Tetto totale dei risarcimenti per anno di polizza. Importo e valuta. Se l'aggregato non è espressamente previsto rispondi \"Non previsto\". Cita l'articolo."
+    "prompt": "Total indemnity limit per policy year. State the amount and currency. If an aggregate is not expressly provided, answer \"Not provided\". Cite the clause."
 }

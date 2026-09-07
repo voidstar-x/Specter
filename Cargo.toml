@@ -133,19 +133,10 @@ tiff = "0.9"
 zip = "2"
 quick-xml = { version = "0.37", features = ["serialize"] }
 pulldown-cmark = { version = "0.12", default-features = false }
-# HTML scraping for the EUR-Lex adapter — strips the rendered legal-
-# content page down to the article body so we can chunk + embed it.
+# HTML scraping for generic corpus adapters — extracts legal source text
+# for chunking and embedding.
 # pure-Rust, ~1MB of compile-time cost; no native deps.
 scraper = "0.20"
-# Parquet reader for the italian-legal-corpus HuggingFace bulk import.
-# We download the dataset's published shards, project only the
-# metadata columns we need (no `text` body — that stays remote and is
-# fetched on demand), and stream them into our local SQLite FTS5
-# index. Used by `src/corpora/italian_legal.rs`.
-parquet = { version = "53", default-features = false, features = ["arrow", "snap", "zstd"] }
-arrow-array = "53"
-arrow-schema = "53"
-
 # ------------------------------------------------------------------
 # RTF — pure-Rust text extraction via rtf-parser (26k recent
 # downloads, no native deps). Used by the sync scanner + the
@@ -184,14 +175,8 @@ ollama-rs = { version = "0.3", features = ["stream"] }
 # SSE route can forward verbatim.
 async-stream = "0.3"
 
-# ------------------------------------------------------------------
-# Bulk-archive decoding — DILA OPENDATA + future BOE/GU/Gesetze
-# All these portals publish their legal corpora as tar.gz dumps;
-# tar + flate2 lets us stream-walk an archive without holding it
-# all in RAM.
-# ------------------------------------------------------------------
+# Gzip response decoding for the generic HTTP corpus adapter.
 flate2 = "1"
-tar = "0.4"
 
 # ------------------------------------------------------------------
 # MCP client — protocol wire types (no official Rust SDK yet)

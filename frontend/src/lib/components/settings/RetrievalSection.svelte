@@ -1,6 +1,6 @@
 <!-- Copyright (c) 2026 Specter contributors. Licensed under AGPL-3.0-only. -->
 <!--
-  Settings → Recupero documenti.
+  Settings → Document retrieval.
 
   Behavioral knobs for the chat-time RAG pipeline. v0.5.0 ships one
   toggle (HyDE); future RAG features (adaptive top-K, BM25+RRF

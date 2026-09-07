@@ -1,8 +1,8 @@
 {
-    "name": "Assicuratore",
-    "match_pattern": "\\bassicurat(ore|rice)\\b|\\bcompagnia\\b|\\binsurer\\b",
+    "name": "Insurer",
+    "match_pattern": "\\binsurer\\b|\\binsurance company\\b",
     "match_flags": "i",
     "format": "text",
     "domain": "insurance",
-    "prompt": "Nome completo della compagnia assicuratrice come riportato in polizza. Se la sede legale è in un paese diverso da quello dell'agenzia che ha emesso, indica anche il paese di sede (es. \"AXA Assicurazioni S.p.A., Italia\"). No altro commento."
+    "prompt": "Full name of the insurance company as stated in the policy. If its registered office is in a different country from the issuing agency, also state the country of its registered office. No additional commentary."
 }

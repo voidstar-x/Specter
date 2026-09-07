@@ -10,11 +10,11 @@
 
   Step 2 — the modal renders the summary the backend just produced
   next to the user's reason and asks for a final confirmation
-  ("Conferma rifiuto"). On confirm the modal closes and the active
+  ("Confirm rejection"). On confirm the modal closes and the active
   tab's decision state is updated; subsequent chat turns will see
   the summary + reason in place of the document body.
 
-  Annulla at any step rolls back. The first call already persisted
+  Cancel at any step rolls back. The first call already persisted
   the rejection state server-side (the backend is the source of
   truth), so closing the modal between step 1 and 2 leaves the
   document rejected — which matches the "Reject means reject"

@@ -1,8 +1,0 @@
-{
-    "name": "Imposta dovuta",
-    "match_pattern": "\\bimposta dovuta\\b|\\bimposta\\b|\\btax due\\b",
-    "match_flags": "i",
-    "format": "monetary_amount",
-    "domain": "fiscale",
-    "prompt": "Imposta dovuta risultante dal calcolo (base imponibile × aliquota, al netto di detrazioni/crediti applicabili). Importo '€ X.XXX,XX'. Mostra la formula nella cella o nelle note se lo spazio lo consente. Distingui imposta lorda da imposta netta se rilevante."
-}

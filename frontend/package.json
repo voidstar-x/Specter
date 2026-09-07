@@ -2,7 +2,7 @@
     "name":  "specter-frontend",
     "private":  true,
     "version":  "0.7.4",
-    "description":  "Specter frontend â€” clean-room Svelte 5 rewrite",
+    "description":  "Specter frontend - Svelte 5",
     "license":  "AGPL-3.0-only",
     "type":  "module",
     "scripts":  {

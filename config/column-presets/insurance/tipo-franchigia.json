@@ -1,8 +1,8 @@
 {
-    "name": "Tipo franchigia",
-    "match_pattern": "\\btipo (di )?franchigia\\b|\\bdeductible type\\b",
+    "name": "Deductible type",
+    "match_pattern": "\\bdeductible type\\b|\\btype of deductible\\b",
     "match_flags": "i",
     "format": "tag",
     "domain": "insurance",
-    "prompt": "Una sola opzione tra: \"assoluta\", \"relativa\", \"SIR\". Se non chiaramente identificabile rispondi \"Non specificato\"."
+    "prompt": "One option only: \"absolute\", \"relative\", \"SIR\". If not clearly identifiable, answer \"Not specified\"."
 }

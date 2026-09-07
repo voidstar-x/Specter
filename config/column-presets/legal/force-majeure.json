@@ -1,8 +1,8 @@
 {
-    "name": "Forza maggiore",
+    "name": "Force majeure",
     "match_pattern": "\\bforce majeure\\b",
     "match_flags": "i",
     "format": "yes_no",
     "domain": "legal",
-    "prompt": "Il presente contratto contiene una clausola di forza maggiore?"
+    "prompt": "Does this contract contain a force majeure clause?"
 }

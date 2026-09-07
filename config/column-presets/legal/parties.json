@@ -1,8 +1,8 @@
 {
-    "name": "Parti",
+    "name": "Parties",
     "match_pattern": "\\bpart(y|ies)\\b",
     "match_flags": "i",
     "format": "bulleted_list",
     "domain": "legal",
-    "prompt": "Elenca tutte le parti del presente contratto. Per ciascuna parte indica la denominazione legale completa, la forma giuridica e il ruolo definito, ad es.:\n• ABC S.p.A., società per azioni di diritto italiano (\"Società\")\n• Mario Rossi (\"Socio\")\nUna parte per punto elenco. Nessun commento aggiuntivo."
+    "prompt": "List all parties to this contract. For each party, state its full legal name, legal form, and defined role, e.g.:\n• ABC S.p.A., an Italian joint-stock company (\"Company\")\n• Mario Rossi (\"Shareholder\")\nOne party per bullet. No additional commentary."
 }

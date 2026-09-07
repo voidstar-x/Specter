@@ -120,3 +120,17 @@ in `src/presets/system_prompt.rs`, which walks a locale fall-back chain.
 - Removed upstream Italian/EU domain & plan docs (macchine*, piano_*, nis2-prompts, pa-prompts, TEMPLATE_PRONTUARIO, Toolkit_Prompt_Commercialista_Bilanci, EURLEX_REGISTRATION, PLAN_FONTI_INTERNAZIONALI, PLAN_MISTRAL, insurance-workflows-plan, PLAN.md, SESSION_RECAP) not relevant to Specter APAC/common-law focus.
 ### Changed
 - WORKFLOWS.md: built-in preset count updated (14 -> 25) and Italian UI strings replaced with English.
+
+## [Unreleased] - upstream (Italian/EU) cleanup
+### Removed
+- EU/EUR-Lex & European corpus code and routes: src/corpora/{eurlex,fedlex,dila_bulk,italian_legal,limits}.rs, src/routes/{eurlex,italian_legal}.rs, EU corpus config (config/corpora.json), and the frontend EU Settings section (frontend/src/lib/components/settings/EurlexSection.svelte).
+- Non-English locale files (frontend/locales/{de,es,fr,it,pt}.json) and the fill-i18n helper (Specter is English-only).
+- Italian DOCX templates (config/docx-templates/it/* and config/docx-templates/compliance/{macchine-*,nis2-*,procedura-iso-sgi}).
+- Italian fiscal column presets (config/column-presets/fiscale/*) and upstream dev-plan/session docs (PLAN.md, PLAN_FONTI_INTERNAZIONALI.md, docs/specter-ui-rewrite-plan.md) plus orphaned upstream images (docs/images/*).
+- tests/insurance_diffida_e2e.rs (upstream Italian test for a removed workflow).
+### Changed
+- config/column-presets/insurance/* and legal/*: Italian field names/labels translated to English.
+- Cargo.toml/Cargo.lock: dropped unused EU corpus crates/dependencies.
+- HISTORY.md: fixed dangling cross-references to removed docs; translated/neutralised terse Italian; clarified timezone note.
+- README.md: updated built-in preset count/description.
+- frontend/pnpm-workspace.yaml: fixed the allowBuilds esbuild placeholder (esbuild: true) so the pnpm build runs.

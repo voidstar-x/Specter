@@ -1,43 +1,12 @@
 //! Corpus plugin manifests — JSON-driven registry for legal corpora.
 //!
-//! Goal: every corpus Specter knows about (EUR-Lex, Italian legal,
-//! future Légifrance/BOE/Retsinformation/...) is described by a JSON
-//! manifest file. The runtime scans a directory at startup, parses
-//! each manifest, and exposes a registry the UI and chat system
-//! prompt can consult.
+//! APAC corpora are described by JSON manifests under
+//! `config/corpora-plugins/`, overridable with `MRUST_CORPUS_PLUGINS_DIR`.
+//! The runtime validates each manifest and builds a generic HTTP adapter
+//! for HTML, JSON, or (with the `pdf` feature) direct PDF sources.
+//! Unsupported strategies are rejected at deserialization rather than
+//! appearing as available connectors without a working implementation.
 //!
-//! Today the manifest's `strategy` discriminator only knows about
-//! `"builtin"` — the actual fetch/parse logic lives in a hand-written
-//! Rust adapter (`eurlex.rs`, `italian_legal.rs`) referenced by name.
-//! The manifest contributes metadata (display name, supported
-//! languages, identifier label, enabled-by-default, homepage). This
-//! lets us:
-//!
-//!   - Add a new corpus by dropping a JSON file (eventually, once
-//!     `http-fetch-per-id` strategy lands — schema sketched below).
-//!   - Configure existing corpora declaratively (default language,
-//!     fallback policy, display name per locale) without recompiling.
-//!   - Surface the same metadata uniformly to the UI and the chat's
-//!     `<USER LIBRARY>` inventory, regardless of whether the
-//!     underlying connector is builtin or declarative.
-//!
-//! Manifest location: `corpora-plugins/*.json` relative to the
-//! current working directory by default, override with
-//! `MRUST_CORPUS_PLUGINS_DIR`.
-//!
-//! ### Future strategies (schema-only, not implemented yet)
-//!
-//! ```json
-//! "strategy": {
-//!   "kind": "http-fetch-per-id",
-//!   "search_by_id":      { "url_template": "...", "shape": "rest-json", "body_path": "$.content" },
-//!   "search_by_keyword": { "url_template": "...", "shape": "rest-json", "hits_path": "$.results[*]" }
-//! }
-//! ```
-//!
-//! When that lands, `ManifestAdapter` becomes a Rust struct that
-//! interprets the manifest at runtime — same trait, no per-corpus
-//! Rust code.
 
 use anyhow::{anyhow, bail, Context, Result};
 use serde::{Deserialize, Serialize};
@@ -90,7 +59,7 @@ pub struct CorpusPlugin {
     #[serde(default)]
     pub fallback_language: Option<String>,
 
-    /// Label shown next to identifier inputs (CELEX, ELI, URN, ...).
+    /// Label shown next to identifier inputs (Act, law id, URL, ...).
     pub identifier_label: String,
 
     /// Sample identifier the UI can prefill or show in placeholder.
@@ -121,27 +90,18 @@ pub struct CorpusPlugin {
     /// and UI control visibility on the frontend (hide buttons
     /// for operations the corpus can't perform).
     ///
-    /// All-true would be wrong for most real corpora: EUR-Lex has
-    /// no bulk_import (every doc is fetched on demand), Italian
-    /// Legal has bulk_import (HF parquet) but no embed_progress
-    /// at the corpus level (uses /sync/embed-progress instead).
-    /// So we deliberately default each to `false` and force every
-    /// manifest to enumerate what it actually supports — that way
-    /// adding a new capability doesn't silently enable it on old
-    /// manifests.
+    /// Each operation defaults to false; manifests explicitly opt into
+    /// supported functionality rather than promising unavailable actions.
     #[serde(default)]
     pub capabilities: Capabilities,
 
-    /// Optional sub-sources inside the corpus that the user can
-    /// enable/disable independently. Used by Italian Legal to
-    /// expose Normattiva / Corte Cost / OpenGA / Cassazione as
-    /// separately-toggleable inside the same corpus. Empty / absent
-    /// for single-source corpora like EUR-Lex.
+    /// Optional independently selectable sub-sources. Empty for
+    /// single-source APAC manifests.
     #[serde(default)]
     pub sources: Vec<CorpusSource>,
 
     /// Upstream license + attribution metadata. Required by open-data
-    /// providers like DILA (Etalab 2.0) and reused by the UI to render
+    /// providers and reused by the UI to render
     /// a "Source: …" footer / badge in the corpus panel and on
     /// citation pills. Must be present on any corpus that imports
     /// data the user redistributes (via `.mikeprj` export, etc.).
@@ -159,7 +119,7 @@ pub struct CorpusPlugin {
 /// a free-form lowercase token (deliberately NOT validated here) so a
 /// new manifest can introduce a value without breaking older builds:
 ///   - `jurisdiction`: short region code for the filter dropdown
-///     (`eu`, `de`, `fr`, `coe`, `us`, ...).
+///     (`sg`, `my`, `au`, `jp`, ...).
 ///   - `doc_types`: `legislation` / `case_law` — a corpus may serve both.
 ///   - `auth`: `public` / `api-key` / `oauth2` / `optional-token`.
 ///   - `search_mode`: `free-text` / `citation-only` / `date-window` / `sparql`.
@@ -181,7 +141,7 @@ pub struct CorpusDiscovery {
 /// Upstream license info for a corpus. The producer's attribution
 /// requirements are encoded here so the UI can render them
 /// consistently without per-corpus chrome. Compatible licenses today:
-/// `etalab-2.0`, `cc-by-4.0`, `cc-by-sa-4.0`, `cc0-1.0`, `public-domain`.
+/// `cc-by-4.0`, `cc-by-sa-4.0`, `cc0-1.0`, `public-domain`.
 /// Unknown values are accepted (forward-compat) but the UI renders
 /// them verbatim.
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -191,7 +151,7 @@ pub struct CorpusLicense {
     pub id: String,
     /// One-line attribution text the UI shows under the corpus
     /// header. Should follow the producer's recommended template
-    /// — e.g. for Etalab 2.0: "Source: DILA — Licence Ouverte 2.0".
+    /// — e.g. "Source: official legislation publisher".
     pub attribution: String,
     /// Link to the full license text (or to the producer's
     /// reuse policy page).
@@ -199,13 +159,8 @@ pub struct CorpusLicense {
     pub url: Option<String>,
 }
 
-/// Boolean map of operations a corpus exposes. Each field is a
-/// generic operation the runtime knows how to dispatch (via the
-/// `strategy.builtin_id` adapter for builtin corpora, eventually
-/// via declarative URL templates for future strategies). The
-/// router uses these to decide whether to mount the corresponding
-/// `/corpora/:id/<op>` route; the UI uses them to render/hide
-/// controls.
+/// Boolean map of operations exposed by the generic HTTP corpus routes.
+/// Controls which actions clients offer and route handlers accept.
 ///
 /// Adding a new capability: extend this struct + bump
 /// `Capabilities::default()` carefully (defaults are false to
@@ -241,17 +196,13 @@ pub struct Capabilities {
     #[serde(default)]
     pub documents_resync: bool,
 
-    /// `GET /corpora/:id/embed-progress` — per-corpus embedding
-    /// progress polling. EUR-Lex needs this because synchronous fetch
-    /// + embed of a single act takes long enough that the UI polls.
-    /// Italian Legal doesn't (its bulk import has its own progress
-    /// endpoint).
+    /// Reserved per-corpus progress capability; shipped manifests disable
+    /// it. No per-corpus polling endpoint is registered.
     #[serde(default)]
     pub embed_progress: bool,
 
-    /// `POST /corpora/:id/import` — one-shot bulk import (e.g. HF
-    /// parquet metadata download). Italian Legal uses this. EUR-Lex
-    /// doesn't (no bulk dataset).
+    /// Retained for manifest compatibility, but must be false: the
+    /// HTTP adapter has no bulk-import endpoint. Validation rejects true.
     #[serde(default)]
     pub bulk_import: bool,
 
@@ -262,15 +213,11 @@ pub struct Capabilities {
     pub user_config: bool,
 }
 
-/// One sub-source inside a corpus. Lets the corpus expose multiple
-/// data origins under a single id (e.g. Italian Legal: Normattiva +
-/// Corte Cost + OpenGA + Cassazione). Users toggle each one
-/// independently via the settings UI; `corpus_settings.sources_enabled`
-/// (future column, TBD) persists the selection.
+/// One sub-source inside a corpus, independently selectable in the UI.
 ///
 /// `available: false` means the source is *declared* in the manifest
 /// but not yet wired in the runtime — UI shows it disabled with the
-/// `status_label` ("in arrivo" / "coming soon") so the user knows
+/// `status_label` ("coming soon") so the user knows
 /// it's on the roadmap.
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct CorpusSource {
@@ -279,17 +226,16 @@ pub struct CorpusSource {
     pub id: String,
 
     /// Human display name for this source. Not localised — the
-    /// source names are usually proper nouns (Normattiva, Corte
-    /// Costituzionale, Légifrance) that don't translate.
+    /// source names are usually proper nouns that do not translate.
     pub display_name: String,
 
     /// Optional short qualifier rendered next to the name, e.g.
-    /// volume hint ("~125K") or scope hint ("(incrementale)").
+    /// volume hint ("~125K") or scope hint ("(incremental)").
     #[serde(default)]
     pub subtitle: Option<String>,
 
     /// Longer description shown under the row when the source is
-    /// "in arrivo" — explains why it's not available yet and what
+    /// "coming soon" — explains why it's not available yet and what
     /// would unlock it.
     #[serde(default)]
     pub description: Option<String>,
@@ -305,7 +251,7 @@ pub struct CorpusSource {
     pub default_enabled: bool,
 
     /// Free-text label shown next to a non-available source. Common
-    /// values: "in arrivo", "coming soon", "V2 roadmap".
+    /// values: "coming soon", "planned".
     #[serde(default)]
     pub status_label: Option<String>,
 }
@@ -318,13 +264,6 @@ fn default_true() -> bool {
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(tag = "kind", rename_all = "kebab-case")]
 pub enum CorpusStrategy {
-    /// Hand-written Rust adapter. The `builtin_id` names which one.
-    Builtin {
-        /// Identifier matched against the in-binary registry of
-        /// Rust adapters (`eurlex`, `italian-legal-hf`, ...).
-        builtin_id: String,
-    },
-
     /// Declarative REST fetch driven entirely by the JSON manifest.
     /// A generic `ManifestAdapter` reads `spec` and implements
     /// `LegalCorpusAdapter` against it: URL-template substitution,
@@ -333,18 +272,6 @@ pub enum CorpusStrategy {
     #[serde(rename = "http-fetch-per-id")]
     HttpFetchPerId(HttpFetchPerIdSpec),
 
-    /// Bulk download of DILA OPENDATA tar.gz archives. Covers any
-    /// fonds DILA publishes today (CNIL, LEGI, JORF, CASS, KALI) and
-    /// uses the same XML schema across all of them — see
-    /// `src/corpora/dila_bulk.rs` for the parser + importer.
-    #[serde(rename = "dila-bulk-xml")]
-    DilaBulkXml(crate::corpora::dila_bulk::DilaBulkXmlSpec),
-
-    /// Future: bulk metadata import from a Hugging Face dataset
-    /// (parquet projection + filtered rows). What the current
-    /// `italian_legal` adapter does today.
-    #[serde(rename = "hf-dataset-bulk")]
-    HfDatasetBulk(serde_json::Value),
 }
 
 /// Declarative spec for the `http-fetch-per-id` strategy. Two
@@ -497,15 +424,8 @@ impl CorpusPlugin {
                 self.id
             );
         }
-        if let CorpusStrategy::Builtin { builtin_id } = &self.strategy {
-            if !is_known_builtin(builtin_id) {
-                bail!(
-                    "corpus {}: unknown builtin_id {:?} (known: {})",
-                    self.id,
-                    builtin_id,
-                    KNOWN_BUILTINS.join(", ")
-                );
-            }
+        if self.capabilities.bulk_import {
+            bail!("corpus {}: bulk_import is not supported by http-fetch-per-id", self.id);
         }
 
         // Source-level invariants.
@@ -561,17 +481,12 @@ impl CorpusPlugin {
             .unwrap_or(self.display_name.as_str())
     }
 
-    /// Convenience: is this manifest backed by a runnable adapter
-    /// today? `false` for strategies we've parsed but not yet wired
-    /// (currently only `hf-dataset-bulk`).
+    /// Whether this manifest uses a supported runtime adapter.
+    /// Unsupported strategy kinds fail during deserialization.
     pub fn is_runnable(&self) -> bool {
-        matches!(
-            self.strategy,
-            CorpusStrategy::Builtin { .. }
-                | CorpusStrategy::HttpFetchPerId(_)
-                | CorpusStrategy::DilaBulkXml(_)
-        )
+        matches!(self.strategy, CorpusStrategy::HttpFetchPerId(_))
     }
+
 }
 
 fn is_valid_corpus_id(s: &str) -> bool {
@@ -587,14 +502,6 @@ fn is_valid_corpus_id(s: &str) -> bool {
 
 fn is_valid_iso639_1(s: &str) -> bool {
     s.len() == 2 && s.chars().all(|c| c.is_ascii_lowercase())
-}
-
-/// Known builtin adapter ids. Keep in sync with the registry in
-/// `src/corpora/mod.rs` (when we add it).
-const KNOWN_BUILTINS: &[&str] = &["eurlex", "italian-legal-hf", "ch-fedlex"];
-
-fn is_known_builtin(id: &str) -> bool {
-    KNOWN_BUILTINS.contains(&id)
 }
 
 /// Resolve the directory to scan for plugin manifests.
@@ -749,32 +656,68 @@ mod tests {
     }
 
     #[test]
-    fn parses_minimal_builtin_manifest() {
+    fn retired_builtin_strategy_is_rejected() {
+        let strategy = serde_json::json!({
+            "kind": "builtin", "builtin_id": "retired-adapter"
+        });
+        assert!(serde_json::from_value::<CorpusStrategy>(strategy).is_err());
+    }
+
+    #[test]
+    fn unsupported_bulk_strategies_are_rejected() {
+        for kind in ["dila-bulk-xml", "hf-dataset-bulk"] {
+            let strategy = serde_json::json!({
+                "kind": kind,
+                "fonds": "retired",
+                "listing_url": "https://example.com/archives/"
+            });
+            assert!(serde_json::from_value::<CorpusStrategy>(strategy).is_err());
+        }
+    }
+
+    #[test]
+    fn rejects_unimplemented_bulk_import_capability() {
+        let json = serde_json::json!({
+            "id": "apac-example", "display_name": "APAC example",
+            "languages": ["en"], "default_language": "en",
+            "supports_language_fallback": false, "identifier_label": "Act",
+            "strategy": {"kind": "http-fetch-per-id", "search_by_id": {
+                "url_template": "https://example.com/{identifier}",
+                "shape": "rest-html", "body_path": "main"
+            }},
+            "capabilities": {"bulk_import": true}
+        });
+        let plugin: CorpusPlugin = serde_json::from_value(json).unwrap();
+        assert!(plugin.validate().is_err());
+    }
+
+    #[test]
+    fn parses_minimal_http_manifest() {
         let json = r#"{
-            "id": "eurlex",
-            "display_name": "EUR-Lex",
+            "id": "sg-statutes",
+            "display_name": "Singapore Statutes Online",
             "languages": ["en", "it", "fr"],
             "default_language": "en",
             "fallback_language": "en",
-            "identifier_label": "CELEX",
-            "strategy": { "kind": "builtin", "builtin_id": "eurlex" }
+            "identifier_label": "Act",
+            "strategy": { "kind": "http-fetch-per-id", "search_by_id": { "url_template": "https://example.com/{identifier}", "shape": "rest-html", "body_path": "main" } }
         }"#;
         let plugin: CorpusPlugin = serde_json::from_str(json).unwrap();
         plugin.validate().unwrap();
-        assert_eq!(plugin.id, "eurlex");
+        assert_eq!(plugin.id, "sg-statutes");
         assert!(plugin.is_runnable());
     }
 
     #[test]
     fn rejects_uppercase_id() {
         let json = r#"{
-            "id": "EurLex",
+            "id": "SgStatutes",
             "display_name": "x",
             "languages": ["en"],
             "default_language": "en",
             "fallback_language": "en",
             "identifier_label": "X",
-            "strategy": { "kind": "builtin", "builtin_id": "eurlex" }
+            "strategy": { "kind": "http-fetch-per-id", "search_by_id": { "url_template": "https://example.com/{identifier}", "shape": "rest-html", "body_path": "main" } }
         }"#;
         let plugin: CorpusPlugin = serde_json::from_str(json).unwrap();
         assert!(plugin.validate().is_err());
@@ -789,7 +732,7 @@ mod tests {
             "default_language": "en",
             "identifier_label": "X",
             "supports_language_fallback": false,
-            "strategy": { "kind": "builtin", "builtin_id": "eurlex" }
+            "strategy": { "kind": "http-fetch-per-id", "search_by_id": { "url_template": "https://example.com/{identifier}", "shape": "rest-html", "body_path": "main" } }
         }"#;
         let plugin: CorpusPlugin = serde_json::from_str(json).unwrap();
         assert!(plugin.validate().is_err());
@@ -803,7 +746,7 @@ mod tests {
             "languages": ["en"],
             "default_language": "en",
             "identifier_label": "X",
-            "strategy": { "kind": "builtin", "builtin_id": "eurlex" }
+            "strategy": { "kind": "http-fetch-per-id", "search_by_id": { "url_template": "https://example.com/{identifier}", "shape": "rest-html", "body_path": "main" } }
         }"#;
         let plugin: CorpusPlugin = serde_json::from_str(json).unwrap();
         // supports_language_fallback defaults to true; fallback_language is None.
@@ -821,8 +764,7 @@ mod tests {
             "identifier_label": "X",
             "strategy": { "kind": "builtin", "builtin_id": "does-not-exist" }
         }"#;
-        let plugin: CorpusPlugin = serde_json::from_str(json).unwrap();
-        assert!(plugin.validate().is_err());
+        assert!(serde_json::from_str::<CorpusPlugin>(json).is_err());
     }
 
     #[test]
@@ -834,7 +776,7 @@ mod tests {
             "default_language": "eng",
             "fallback_language": "eng",
             "identifier_label": "X",
-            "strategy": { "kind": "builtin", "builtin_id": "eurlex" }
+            "strategy": { "kind": "http-fetch-per-id", "search_by_id": { "url_template": "https://example.com/{identifier}", "shape": "rest-html", "body_path": "main" } }
         }"#;
         let plugin: CorpusPlugin = serde_json::from_str(json).unwrap();
         assert!(plugin.validate().is_err());
@@ -864,20 +806,7 @@ mod tests {
         let plugin: CorpusPlugin = serde_json::from_str(json).unwrap();
         plugin.validate().unwrap();
         assert!(plugin.is_runnable());
-        // The hf-dataset-bulk variant remains a placeholder and is
-        // therefore NOT runnable yet.
-        let hf_json = r#"{
-            "id": "later",
-            "display_name": "Later",
-            "languages": ["en"],
-            "default_language": "en",
-            "fallback_language": "en",
-            "identifier_label": "X",
-            "strategy": { "kind": "hf-dataset-bulk" }
-        }"#;
-        let later: CorpusPlugin = serde_json::from_str(hf_json).unwrap();
-        later.validate().unwrap();
-        assert!(!later.is_runnable());
+
     }
 
     #[test]
@@ -891,7 +820,7 @@ mod tests {
                 "default_language": "en",
                 "fallback_language": "en",
                 "identifier_label": "X",
-                "strategy": { "kind": "builtin", "builtin_id": "eurlex" }
+                "strategy": { "kind": "http-fetch-per-id", "search_by_id": { "url_template": "https://example.com/{identifier}", "shape": "rest-html", "body_path": "main" } }
             }"#,
         )
         .unwrap();
@@ -921,7 +850,7 @@ mod tests {
             "default_language": "en",
             "fallback_language": "en",
             "identifier_label": "X",
-            "strategy": { "kind": "builtin", "builtin_id": "eurlex" }
+            "strategy": { "kind": "http-fetch-per-id", "search_by_id": { "url_template": "https://example.com/{identifier}", "shape": "rest-html", "body_path": "main" } }
         }"#;
         std::fs::write(dir.path().join("ok.json"), valid).unwrap();
         // broken JSON
@@ -934,7 +863,7 @@ mod tests {
             "default_language": "en",
             "fallback_language": "en",
             "identifier_label": "X",
-            "strategy": { "kind": "builtin", "builtin_id": "eurlex" }
+            "strategy": { "kind": "http-fetch-per-id", "search_by_id": { "url_template": "https://example.com/{identifier}", "shape": "rest-html", "body_path": "main" } }
         }"#;
         std::fs::write(dir.path().join("invalid.json"), invalid).unwrap();
         // non-json file (ignored silently)
@@ -958,7 +887,7 @@ mod tests {
             "default_language": "en",
             "fallback_language": "en",
             "identifier_label": "X",
-            "strategy": { "kind": "builtin", "builtin_id": "eurlex" }
+            "strategy": { "kind": "http-fetch-per-id", "search_by_id": { "url_template": "https://example.com/{identifier}", "shape": "rest-html", "body_path": "main" } }
         }"#;
         let p: CorpusPlugin = serde_json::from_str(json).unwrap();
         p.validate().unwrap();
@@ -977,7 +906,7 @@ mod tests {
             "default_language": "en",
             "fallback_language": "en",
             "identifier_label": "X",
-            "strategy": { "kind": "builtin", "builtin_id": "eurlex" },
+            "strategy": { "kind": "http-fetch-per-id", "search_by_id": { "url_template": "https://example.com/{identifier}", "shape": "rest-html", "body_path": "main" } },
             "capabilities": {
                 "search": true,
                 "fetch": true,
@@ -1005,7 +934,7 @@ mod tests {
             "default_language": "en",
             "fallback_language": "en",
             "identifier_label": "X",
-            "strategy": { "kind": "builtin", "builtin_id": "eurlex" },
+            "strategy": { "kind": "http-fetch-per-id", "search_by_id": { "url_template": "https://example.com/{identifier}", "shape": "rest-html", "body_path": "main" } },
             "capabilities": { "documents_delete": true }
         }"#;
         let p: CorpusPlugin = serde_json::from_str(json).unwrap();
@@ -1021,7 +950,7 @@ mod tests {
             "default_language": "en",
             "fallback_language": "en",
             "identifier_label": "X",
-            "strategy": { "kind": "builtin", "builtin_id": "eurlex" },
+            "strategy": { "kind": "http-fetch-per-id", "search_by_id": { "url_template": "https://example.com/{identifier}", "shape": "rest-html", "body_path": "main" } },
             "capabilities": { "documents_resync": true }
         }"#;
         let p: CorpusPlugin = serde_json::from_str(json).unwrap();
@@ -1031,27 +960,27 @@ mod tests {
     #[test]
     fn sources_parse_and_validate() {
         let json = r#"{
-            "id": "italian-legal",
-            "display_name": "Italia legale",
+            "id": "apac-example",
+            "display_name": "APAC example",
             "languages": ["it"],
             "default_language": "it",
             "fallback_language": "it",
             "identifier_label": "URN",
-            "strategy": { "kind": "builtin", "builtin_id": "italian-legal-hf" },
+            "strategy": { "kind": "http-fetch-per-id", "search_by_id": { "url_template": "https://example.com/{identifier}", "shape": "rest-html", "body_path": "main" } },
             "sources": [
                 {
-                    "id": "normattiva",
-                    "display_name": "Normattiva",
+                    "id": "legislation",
+                    "display_name": "Legislation",
                     "available": true,
                     "default_enabled": true
                 },
                 {
-                    "id": "openga",
-                    "display_name": "OpenGA",
+                    "id": "judgments",
+                    "display_name": "Judgments",
                     "subtitle": "(~125K)",
-                    "description": "Already in HF dataset; needs opt-in filter.",
+                    "description": "Example source not yet connected.",
                     "available": false,
-                    "status_label": "in arrivo"
+                    "status_label": "coming soon"
                 }
             ]
         }"#;
@@ -1063,7 +992,7 @@ mod tests {
         assert!(!p.sources[1].available);
         assert_eq!(
             p.sources[1].status_label.as_deref(),
-            Some("in arrivo")
+            Some("coming soon")
         );
     }
 
@@ -1076,7 +1005,7 @@ mod tests {
             "default_language": "en",
             "fallback_language": "en",
             "identifier_label": "X",
-            "strategy": { "kind": "builtin", "builtin_id": "eurlex" },
+            "strategy": { "kind": "http-fetch-per-id", "search_by_id": { "url_template": "https://example.com/{identifier}", "shape": "rest-html", "body_path": "main" } },
             "sources": [
                 { "id": "dup", "display_name": "A", "available": true },
                 { "id": "dup", "display_name": "B", "available": true }
@@ -1095,7 +1024,7 @@ mod tests {
             "default_language": "en",
             "fallback_language": "en",
             "identifier_label": "X",
-            "strategy": { "kind": "builtin", "builtin_id": "eurlex" },
+            "strategy": { "kind": "http-fetch-per-id", "search_by_id": { "url_template": "https://example.com/{identifier}", "shape": "rest-html", "body_path": "main" } },
             "sources": [
                 { "id": "future", "display_name": "F", "available": false, "default_enabled": true }
             ]
@@ -1113,30 +1042,29 @@ mod tests {
         let repo_root = std::env::var("CARGO_MANIFEST_DIR")
             .map(PathBuf::from)
             .expect("CARGO_MANIFEST_DIR set under cargo test");
-        let dir = repo_root.join("corpora-plugins");
-        if !dir.exists() {
-            // Tolerate the case where the test runs from a checkout
-            // without the plugins folder (e.g. submodule consumers).
-            return;
+        let dir = repo_root.join("config").join("corpora-plugins");
+        let mut seen = std::collections::HashSet::new();
+        let mut count = 0;
+        for entry in std::fs::read_dir(&dir).expect("shipped manifest directory") {
+            let path = entry.unwrap().path();
+            if path.extension().and_then(|ext| ext.to_str()) != Some("json") {
+                continue;
+            }
+            count += 1;
+            let value: serde_json::Value = serde_json::from_slice(
+                &std::fs::read(&path).unwrap(),
+            ).unwrap();
+            assert!(seen.insert(value["id"].as_str().unwrap().to_string()));
+            #[cfg(not(feature = "pdf"))]
+            if value["strategy"]["search_by_id"]["shape"] == "direct-pdf" {
+                assert!(parse_manifest_file(&path).is_err());
+                continue;
+            }
+            let plugin = parse_manifest_file(&path).expect("valid shipped manifest");
+            assert!(plugin.is_runnable());
+            assert!(crate::corpora::manifest_adapter::ManifestAdapter::try_from_plugin(&plugin).is_some());
         }
-        let plugins = load_plugins(&dir).expect("load shipped plugins");
-        assert!(
-            !plugins.is_empty(),
-            "expected at least one manifest in {}",
-            dir.display()
-        );
-        // Each shipped manifest is already validated by load_plugins;
-        // we also assert their ids are unique (the loader dedups, but
-        // we want a hard failure if duplication ever sneaks in here).
-        let mut seen: std::collections::HashSet<&str> =
-            std::collections::HashSet::new();
-        for p in &plugins {
-            assert!(
-                seen.insert(p.id.as_str()),
-                "shipped manifest duplicate id: {}",
-                p.id
-            );
-        }
+        assert_eq!(count, 8, "all eight APAC manifests must remain shipped");
     }
 
     #[test]
@@ -1185,7 +1113,7 @@ mod tests {
                     "default_language": "en",
                     "fallback_language": "en",
                     "identifier_label": "X",
-                    "strategy": {{ "kind": "builtin", "builtin_id": "eurlex" }}
+                    "strategy": {{ "kind": "http-fetch-per-id", "search_by_id": {{ "url_template": "https://example.com/{{identifier}}", "shape": "rest-html", "body_path": "main" }} }}
                 }}"#
             )
         };

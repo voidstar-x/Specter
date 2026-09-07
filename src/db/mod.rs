@@ -120,9 +120,8 @@ pub struct AppState {
     /// JSON-driven corpus plugin registry, loaded once at startup from
     /// `MRUST_CORPUS_PLUGINS_DIR` (or walks ancestors for `corpora-plugins`
     /// by default). Read by the `/corpora` endpoint and by the chat
-    /// library-inventory builder. Empty when no manifest directory
-    /// exists — the hardcoded EUR-Lex / Italian routes still work,
-    /// the registry is purely metadata for discovery and UI.
+    /// library-inventory builder. Empty when no manifest directory exists;
+    /// without manifests there are no available corpus connectors.
     /// Behind a `RwLock` so the dev manifest hot-reloader can swap the
     /// registry in-process when a `config/corpora-plugins/*.json` file
     /// changes — no restart needed.
@@ -135,21 +134,8 @@ pub struct AppState {
     /// `/corpora/:id/{search,fetch}` routes look up this map to
     /// dispatch HTTP fetch + extraction without per-corpus Rust code.
     ///
-    /// Builtin corpora (EUR-Lex, Italian Legal) are NOT in this
-    /// registry today — their existing `/eurlex/*` /
-    /// `/italian-legal/*` routes call their adapters directly. They
-    /// migrate here when we converge on generic routes.
     pub corpus_adapters:
         Arc<std::sync::RwLock<crate::corpora::manifest_adapter::AdapterRegistry>>,
-
-    /// Live progress for in-flight bulk imports, keyed by corpus id.
-    /// Spawned by POST `/corpora/:id/import`, polled by GET
-    /// `/corpora/:id/import-progress`. A `phase=="error"` entry
-    /// sticks until the next import overwrites it so the UI can
-    /// surface the message after the user looks away.
-    pub corpus_import_progress: Arc<
-        RwLock<HashMap<String, Arc<RwLock<crate::corpora::dila_bulk::ImportProgress>>>>,
-    >,
 
     /// System-shipped workflow templates loaded from
     /// `workflow-presets/<domain>/*.json` at startup. Merged into the
@@ -176,7 +162,7 @@ pub struct AppState {
     /// Drives the closing-formatter pipeline that turns
     /// LLM-produced Markdown into print-ready Word documents
     /// styled per Italian professional conventions (see
-    /// `docs/TEMPLATE_PRONTUARIO.md`). Served via `GET /docx-templates`.
+    /// `docs/DOCX.md`). Served via `GET /docx-templates`.
     pub docx_templates:
         Arc<Vec<crate::presets::docx_template::DocxTemplate>>,
 }
@@ -235,10 +221,8 @@ impl AppState {
         let embeddings: Option<Arc<EmbeddingService>> =
             Some(Arc::new(EmbeddingService::new(db.clone())));
 
-        // Load corpus plugin manifests from disk. Failures are
-        // non-fatal: we log and continue with an empty registry — the
-        // hardcoded EUR-Lex / Italian routes still serve their requests
-        // regardless of what's in the registry.
+        // Load corpus manifests. Failures are non-fatal: an empty registry
+        // means no corpus connectors are available, while local documents work.
         let plugins_dir = crate::corpora::plugin::plugins_dir();
         let corpus_plugins = match crate::corpora::plugin::load_plugins(&plugins_dir) {
             Ok(p) => {
@@ -259,8 +243,6 @@ impl AppState {
             }
         };
         // Build the runtime adapter registry for declarative corpora.
-        // Builtin corpora are intentionally NOT inserted here yet —
-        // see comment on AppState::corpus_adapters.
         let corpus_adapters =
             crate::corpora::manifest_adapter::build_adapter_registry(&corpus_plugins);
         tracing::info!(
@@ -381,7 +363,6 @@ impl AppState {
             scans: Arc::new(RwLock::new(HashMap::new())),
             corpus_plugins,
             corpus_adapters,
-            corpus_import_progress: Arc::new(RwLock::new(HashMap::new())),
             workflow_presets: Arc::new(workflow_presets),
             column_presets: Arc::new(column_presets),
             model_catalogue: Arc::new(model_catalogue),

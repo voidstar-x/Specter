@@ -1,8 +1,0 @@
-{
-    "name": "Scadenza",
-    "match_pattern": "\\bscadenz[ae]\\b|\\btermine\\b|\\bdeadline\\b|\\bdue date\\b",
-    "match_flags": "i",
-    "format": "date",
-    "domain": "fiscale",
-    "prompt": "Data di scadenza dell'adempimento o del versamento, formato ISO 'YYYY-MM-DD'. Se cade di sabato/domenica/festivo, annota lo slittamento al primo giorno lavorativo. Distingui scadenza ordinaria da quella con maggiorazione 0,40% (differimento) se applicabile."
-}

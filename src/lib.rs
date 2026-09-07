@@ -326,8 +326,6 @@ pub async fn run_server_with_channels(
         .nest("/models", routes::models::router())
         .nest("/tabular-review", routes::tabular_reviews::router())
         .nest("/sync",     routes::sync::router())
-        .nest("/eurlex",   routes::eurlex::router())
-        .nest("/italian-legal", routes::italian_legal::router())
         .nest("/corpora",  routes::corpora::router())
         .nest("/healthz",  routes::health::router())
         .layer(cors)

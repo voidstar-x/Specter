@@ -1,22 +1,16 @@
-//! Authoritative legal-corpus connectors (EUR-Lex, Retsinformation, ...).
+//! Authoritative APAC legal-corpus connectors.
 //!
 //! Each corpus implements `LegalCorpusAdapter`. The routes layer takes
 //! the resulting `CorpusDocument`, runs it through the same hash-keyed
 //! cache layout that chat-attachments use (`data/storage/cache/<sha256>.<ext>`
 //! + `<sha256>.txt`), and indexes it via the existing embedding service.
 //!
-//! V1 ships with the EUR-Lex adapter only — see `eurlex` submodule.
-//! The trait is shared so adding Retsinformation / Légifrance / etc.
-//! later is a matter of dropping a new file in this module.
+//! The generic manifest adapter serves the shipped APAC sources.
+//! The shared trait keeps source-language and cache handling uniform.
 
 use anyhow::Result;
 use async_trait::async_trait;
 
-pub mod dila_bulk;
-pub mod eurlex;
-pub mod fedlex;
-pub mod italian_legal;
-pub mod limits;
 pub mod manifest_adapter;
 pub mod plugin;
 
@@ -24,7 +18,7 @@ pub mod plugin;
 /// list and round-trip back into `fetch()`.
 #[derive(Debug, Clone, serde::Serialize)]
 pub struct CorpusHit {
-    /// Corpus-native identifier (CELEX, ELI, NOR, BOE-A-…). Opaque to
+    /// Corpus-native identifier (act number, law id, or source URL). Opaque to
     /// us; the adapter that produced it is the one that resolves it.
     pub identifier: String,
     pub title: String,
@@ -34,7 +28,7 @@ pub struct CorpusHit {
     /// from the UI for "open on the original site".
     pub url: String,
     /// Languages the source claims this document is available in.
-    /// Populated when cheap (EUR-Lex SOAP includes it); may be empty
+    /// Populated when the source exposes it; may be empty
     /// for adapters that don't surface it in search results.
     pub languages_available: Vec<String>,
 }
@@ -64,11 +58,11 @@ pub trait LegalCorpusAdapter: Send + Sync {
     fn id(&self) -> &'static str;
 
     /// Languages the corpus serves, as ISO-639-1 lowercase codes.
-    /// Single-language corpora (Retsinformation = `["da"]`) return
+    /// Single-language corpora (Singapore statutes = `["en"]`) return
     /// a one-element slice.
     fn languages(&self) -> &[&'static str];
 
-    /// Resolve a corpus-native identifier (CELEX, ELI, ...) to a hit
+    /// Resolve a corpus-native identifier (act number, law id, ...) to a hit
     /// we can fetch. Implementations may optionally probe the source
     /// to validate the identifier.
     async fn search_by_id(

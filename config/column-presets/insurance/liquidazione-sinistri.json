@@ -1,8 +1,8 @@
 {
-    "name": "Liquidazione sinistri",
-    "match_pattern": "\\bliquidazione (sinistri)?\\b|\\bgestione sinistri\\b|\\bclaims handling\\b|\\bclaim management\\b",
+    "name": "Claims handling",
+    "match_pattern": "\\bclaims? handling\\b|\\bclaims? management\\b|\\bclaims? settlement\\b",
     "match_flags": "i",
     "format": "text",
     "domain": "insurance",
-    "prompt": "Gestione dei sinistri: indica se la liquidazione è curata internamente dall'assicuratore o esternalizzata a una compagnia di gestione (claims handler) — riporta il nome se presente. Indica i termini massimi previsti in polizza (in giorni) per accettazione del sinistro e pagamento dell'indennizzo. Cita l'articolo."
+    "prompt": "Claims handling: state whether settlement is managed internally by the insurer or outsourced to a claims handler; provide its name if stated. State the maximum periods specified in the policy (in days) for acceptance of the claim and payment of indemnity. Cite the clause."
 }

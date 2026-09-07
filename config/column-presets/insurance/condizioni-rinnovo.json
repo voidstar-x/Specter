@@ -1,8 +1,8 @@
 {
-    "name": "Condizioni di rinnovo",
-    "match_pattern": "\\bcondizioni di rinnovo\\b|\\brinnovo\\b|\\btacito rinnovo\\b|\\brenewal\\b",
+    "name": "Renewal conditions",
+    "match_pattern": "\\brenewal( conditions)?\\b|\\bautomatic renewal\\b",
     "match_flags": "i",
     "format": "text",
     "domain": "insurance",
-    "prompt": "Indica le condizioni di rinnovo della polizza: presenza di tacito rinnovo (sì/no), preavviso minimo di disdetta (in giorni o mesi), eventuali variazioni automatiche di premio al rinnovo (indicizzazione ISTAT, ricalcolo su sinistralità). Cita l'articolo."
+    "prompt": "State the policy renewal conditions: whether automatic renewal applies (yes/no), minimum notice of non-renewal (in days or months), and any automatic premium changes on renewal (ISTAT indexation, recalculation based on claims experience). Cite the clause."
 }

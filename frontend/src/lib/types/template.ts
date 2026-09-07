@@ -107,8 +107,8 @@ export interface TemplateDescription {
   sidecar: DocxTemplate
 }
 
-/** The six UI locales display names are edited for, in display order. */
-export const TEMPLATE_NAME_LOCALES = ['it', 'en', 'fr', 'de', 'es', 'pt'] as const
+/** Display names are edited in English; legacy names remain readable. */
+export const TEMPLATE_NAME_LOCALES = ['en'] as const
 
 /** The four placeholder-syntax values the backend accepts. */
 export const PLACEHOLDER_SYNTAXES = ['square_brackets', 'docproperty', 'jinja'] as const
@@ -136,10 +136,11 @@ export function blankUserTemplate(): DocxTemplate {
     category: '',
     domain: 'legal' as Domain,
     also_applicable_to: [],
-    locale: 'it-IT',
+    locale: 'en-SG',
     automation_level: 'L1',
     placeholder_syntax: 'square_brackets',
     paper: { size: 'A4', orientation: 'portrait', format: 'standard' },
+    uso_bollo: undefined,
     margins_cm: { top: 2.5, right: 2.5, bottom: 2.5, left: 2.5 },
     typography: {
       body_font: 'Times New Roman',
@@ -150,10 +151,10 @@ export function blankUserTemplate(): DocxTemplate {
       first_line_indent_cm: 0,
     },
     style_map_baseline: {
-      body_text: 'Corpo testo',
-      section_heading: 'Titolo sezione',
-      citation: 'Citazione',
-      footnote: 'Note piè pagina',
+      body_text: 'Body Text',
+      section_heading: 'Section Heading',
+      citation: 'Citation',
+      footnote: 'Footnote',
     },
     style_map: {},
     directives_supported: [],

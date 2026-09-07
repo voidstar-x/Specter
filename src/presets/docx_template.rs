@@ -1,22 +1,10 @@
 //! DOCX template registry — sidecar JSON files under
-//! `config/docx-templates/<domain>/<slug>.json`, each paired with a
-//! Word `.dotx` template file of the same stem.
+//! `config/docx-templates/<domain>/<slug>.json`. Layout is rendered directly
+//! from the sidecar; no companion Word template is needed.
 //!
-//! Authoritative spec: [`docs/TEMPLATE_PRONTUARIO.md`]. Each entry
-//! here corresponds to one of the schede in the Prontuario and is
-//! referenced back via the optional `source_reference` field.
-//!
-//! Philosophy (from Panucci, restated in the Prontuario):
-//!
-//!   > The Prontuario is not for generating the content. That you get
-//!   > by dialoguing with Claude, iterating, refining. The Prontuario
-//!   > comes into play at the end, when the content is ready and you
-//!   > need to turn it into a printable document.
-//!
-//! The template is the **closing formatter**, never the content
-//! generator. The LLM produces structured Markdown after iterating
-//! with the user; the renderer applies the right `.dotx`, binds
-//! `[PLACEHOLDERS]`, and emits a print-ready `.docx`.
+//! Templates are optional, user-authored closing formatters. The LLM
+//! produces Markdown; the renderer applies the sidecar layout and binds
+//! `[PLACEHOLDERS]` to emit a print-ready document. No templates ship by default.
 
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
@@ -48,7 +36,7 @@ fn default_paper_format() -> String {
 
 /// Special paper rules for notarial "uso bollo" deeds. Only present
 /// when `paper.format == "uso_bollo"`. Captures the constraints listed
-/// in Prontuario scheda 6: 25 lines per facciata, mirror margins,
+/// by the template: lines per page, mirror margins,
 /// no blank lines allowed, marginal signature on every page except
 /// the last.
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -123,8 +111,7 @@ pub struct SectionSkeletonEntry {
     pub render: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub guidance: Option<String>,
-    /// When `true`, this section is a *repeating block* (Prontuario
-    /// L3 automation) — e.g. one quesito → one risposta in CTU, one
+    /// When `true`, this section is a *repeating block* (L3 automation) — e.g. one quesito → one risposta in CTU, one
     /// process card → one row in ISO. Renderer expects the LLM to
     /// produce a list under this section in the Markdown.
     #[serde(default)]
@@ -204,9 +191,9 @@ pub struct DocxTemplate {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub footnotes: Option<Footnotes>,
 
-    /// Universal baseline (4 styles from Prontuario Parte III.1).
+    /// Universal baseline of four document styles.
     /// Keys are canonical English IDs; values are the Word style names
-    /// embedded in the companion `.dotx` (localised per template).
+    /// embedded in the generated document (localised per template).
     #[serde(default = "default_style_map_baseline")]
     pub style_map_baseline: std::collections::BTreeMap<String, String>,
 
@@ -345,11 +332,8 @@ impl DocxTemplate {
     /// without manual edits. The author can still append a free-form
     /// `prompt_md_extra` block for jurisdiction-specific tone notes.
     ///
-    /// Output mirrors the "Schema del prompt di formattazione" in
-    /// `docs/TEMPLATE_PRONTUARIO.md` Parte V — same shape, same
-    /// section headers, same placeholder-syntax instruction. The LLM
-    /// reads this as the closing-formatter contract for the
-    /// document type it's about to produce.
+    /// The output is the closing-formatter contract, including layout,
+    /// section headers, and placeholder instructions.
     pub fn auto_generated_prompt_md(&self, locale: &str) -> String {
         let mut out = String::with_capacity(2048);
         let kind = self.display_name_for(locale);
@@ -391,9 +375,7 @@ impl DocxTemplate {
         }
         out.push('\n');
 
-        // ── Placeholder convention (always square brackets per the
-        //    Prontuario, but we read it from the field so a future
-        //    template variant can opt into Jinja or DOCPROPERTY).
+        // ── Placeholder convention declared by the template.
         out.push_str(&format!(
             "PLACEHOLDERS: use the `{}` convention — e.g. `[NOME]`, \
              `[DATA]`, `[PARTE_ASSISTITA.CF]`. Tokens are uppercase \
@@ -590,6 +572,30 @@ pub fn validate(t: &DocxTemplate) -> Result<(), String> {
     Ok(())
 }
 
+/// Synthetic English sidecar shared only by unit tests; never registered at runtime.
+#[cfg(test)]
+pub(crate) fn test_template() -> DocxTemplate {
+    serde_json::from_str(r#"{
+        "id": "test/project-update",
+        "display_name": { "en": "Project update" },
+        "category": "legal", "domain": "legal", "locale": "en",
+        "paper": { "size": "A4" },
+        "margins_cm": { "top": 2.5, "right": 2.5, "bottom": 2.5, "left": 3.0 },
+        "typography": { "body_font": "Calibri", "body_size_pt": 11.0, "line_spacing": 1.15 },
+        "style_map_baseline": {
+            "body_text": "Body text", "section_heading": "Section heading",
+            "citation": "Citation", "footnote": "Footnote"
+        },
+        "source_reference": "Test-only authoring specification",
+        "required_metadata": ["PROJECT", "BUDGET", "DAYS", "SUMMARY", "OWNER"],
+        "field_prompts": { "PROJECT": "Project name." },
+        "section_skeleton": [
+            { "id": "summary", "title": "Project summary", "guidance": "Summarize progress." },
+            { "id": "items", "title": "Action items", "repeating": true }
+        ]
+    }"#).expect("test-only English template parses")
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -598,10 +604,10 @@ mod tests {
         format!(
             r#"{{
                 "id": "{id}",
-                "display_name": {{ "it": "Test {id}", "en": "Test {id}" }},
+                "display_name": {{ "en": "Test {id}" }},
                 "category": "legal",
                 "domain": "{domain}",
-                "locale": "it-IT",
+                "locale": "en",
                 "paper": {{ "size": "A4" }},
                 "margins_cm": {{ "top": 2.5, "right": 2.5, "bottom": 2.5, "left": 3.0 }},
                 "typography": {{ "body_font": "Times New Roman", "body_size_pt": 12.0, "line_spacing": 1.5 }}
@@ -611,9 +617,9 @@ mod tests {
 
     #[test]
     fn parses_minimal_template() {
-        let json = minimal_template_json("it/test", "legal");
+        let json = minimal_template_json("test/example", "legal");
         let t: DocxTemplate = serde_json::from_str(&json).expect("parse minimal");
-        assert_eq!(t.id, "it/test");
+        assert_eq!(t.id, "test/example");
         assert_eq!(t.domain, "legal");
         assert_eq!(t.automation_level, "L1"); // default
         assert_eq!(t.placeholder_syntax, "square_brackets"); // default
@@ -628,7 +634,7 @@ mod tests {
     #[test]
     fn validate_rejects_invalid_domain() {
         let mut t: DocxTemplate =
-            serde_json::from_str(&minimal_template_json("it/test", "legal")).unwrap();
+            serde_json::from_str(&minimal_template_json("test/example", "legal")).unwrap();
         t.domain = "made_up_domain".into();
         let err = validate(&t).unwrap_err();
         assert!(err.contains("domain"));
@@ -637,7 +643,7 @@ mod tests {
     #[test]
     fn validate_rejects_invalid_automation_level() {
         let mut t: DocxTemplate =
-            serde_json::from_str(&minimal_template_json("it/test", "legal")).unwrap();
+            serde_json::from_str(&minimal_template_json("test/example", "legal")).unwrap();
         t.automation_level = "L9".into();
         let err = validate(&t).unwrap_err();
         assert!(err.contains("automation_level"));
@@ -646,7 +652,7 @@ mod tests {
     #[test]
     fn validate_rejects_uso_bollo_without_block() {
         let mut t: DocxTemplate =
-            serde_json::from_str(&minimal_template_json("it/test", "legal")).unwrap();
+            serde_json::from_str(&minimal_template_json("test/example", "legal")).unwrap();
         t.paper.format = "uso_bollo".into();
         // uso_bollo block missing
         let err = validate(&t).unwrap_err();
@@ -656,7 +662,7 @@ mod tests {
     #[test]
     fn validate_accepts_uso_bollo_with_block() {
         let mut t: DocxTemplate =
-            serde_json::from_str(&minimal_template_json("it/test", "legal")).unwrap();
+            serde_json::from_str(&minimal_template_json("test/example", "legal")).unwrap();
         t.paper.format = "uso_bollo".into();
         t.uso_bollo = Some(UsoBollo {
             line_spacing_pt_exact: 28.35,
@@ -674,28 +680,28 @@ mod tests {
     #[test]
     fn display_name_falls_back_to_english_then_first() {
         let t: DocxTemplate =
-            serde_json::from_str(&minimal_template_json("it/test", "legal")).unwrap();
-        assert_eq!(t.display_name_for("it"), "Test it/test");
-        assert_eq!(t.display_name_for("en"), "Test it/test");
+            serde_json::from_str(&minimal_template_json("test/example", "legal")).unwrap();
+        assert_eq!(t.display_name_for("it"), "Test test/example");
+        assert_eq!(t.display_name_for("en"), "Test test/example");
         // Locale we don't have → fallback to en
-        assert_eq!(t.display_name_for("ja"), "Test it/test");
+        assert_eq!(t.display_name_for("ja"), "Test test/example");
     }
 
     #[test]
     fn to_api_json_marks_system() {
         let t: DocxTemplate =
-            serde_json::from_str(&minimal_template_json("it/test", "legal")).unwrap();
+            serde_json::from_str(&minimal_template_json("test/example", "legal")).unwrap();
         let v = t.to_api_json();
         assert_eq!(v["is_system"], serde_json::json!(true));
         assert_eq!(v["is_owner"], serde_json::json!(false));
-        assert_eq!(v["id"], serde_json::json!("it/test"));
+        assert_eq!(v["id"], serde_json::json!("test/example"));
     }
 
     // ── matches_domain ──────────────────────────────────────────────
 
     fn template_with(domain: &str, also: Vec<&str>) -> DocxTemplate {
         let mut t: DocxTemplate =
-            serde_json::from_str(&minimal_template_json("it/test", domain)).unwrap();
+            serde_json::from_str(&minimal_template_json("test/example", domain)).unwrap();
         t.also_applicable_to = also.iter().map(|s| s.to_string()).collect();
         t
     }
@@ -754,182 +760,61 @@ mod tests {
     }
 
     #[test]
-    fn shipped_diffida_is_cross_domain_legal_finance_realestate_insurance() {
-        // Anchors the actual sidecar so a future edit that drops one
-        // of the cross-domain entries fails CI rather than silently
-        // narrowing the surface.
-        let dir = crate::presets::config_subdir("docx-templates");
-        let templates = load_docx_templates(&dir).expect("load");
-        let diffida = templates
-            .iter()
-            .find(|t| t.id == "it/diffida-messa-in-mora")
-            .expect("diffida present");
-        assert_eq!(diffida.domain, "legal");
-        for expected in ["finance", "real_estate", "insurance"] {
-            assert!(
-                diffida.also_applicable_to.contains(&expected.to_string()),
-                "diffida should be applicable to {expected}, got {:?}",
-                diffida.also_applicable_to
-            );
-        }
-        // Cross-domain visibility — Diffida shows up for finance users.
-        assert!(diffida.matches_domain(Some("finance")));
-        assert!(diffida.matches_domain(Some("real_estate")));
-    }
-
-    #[test]
-    fn shipped_parcella_visible_in_every_professional_domain() {
-        let dir = crate::presets::config_subdir("docx-templates");
-        let templates = load_docx_templates(&dir).expect("load");
-        let parcella = templates
-            .iter()
-            .find(|t| t.id == "it/parcella-professionale")
-            .expect("parcella present");
-        // Every professional vertical should see la Parcella.
-        for d in ["legal", "medical", "finance", "ip", "compliance", "real_estate", "insurance"] {
-            assert!(
-                parcella.matches_domain(Some(d)),
-                "parcella should match domain {d}; got domain={} also={:?}",
-                parcella.domain,
-                parcella.also_applicable_to,
-            );
+    fn cross_domain_template_matches_all_professional_domains() {
+        let t = template_with("finance", vec!["legal", "medical", "ip", "compliance", "real_estate", "insurance"]);
+        assert!(validate(&t).is_ok());
+        for domain in ["finance", "legal", "medical", "ip", "compliance", "real_estate", "insurance"] {
+            assert!(t.matches_domain(Some(domain)), "missing domain {domain}");
         }
     }
 
     #[test]
-    fn shipped_locazione_stays_real_estate_only() {
-        let dir = crate::presets::config_subdir("docx-templates");
-        let templates = load_docx_templates(&dir).expect("load");
-        let loc = templates
-            .iter()
-            .find(|t| t.id == "it/contratto-locazione")
-            .expect("contratto-locazione present");
-        assert_eq!(loc.domain, "real_estate");
-        assert!(loc.also_applicable_to.is_empty(), "locazione is form-specific");
-        assert!(loc.matches_domain(Some("real_estate")));
-        assert!(!loc.matches_domain(Some("legal")));
-        assert!(!loc.matches_domain(Some("finance")));
-    }
-
-    #[test]
-    fn shipped_inventario_assets_table_is_repeating_and_anchored_to_insurance() {
-        // Anchors the inventario template: insurance-primary, repeating
-        // assets_table block, visible from adjacent professional domains.
-        let dir = crate::presets::config_subdir("docx-templates");
-        let templates = load_docx_templates(&dir).expect("load");
-        let inv = templates
-            .iter()
-            .find(|t| t.id == "it/inventario-beni-assicurati")
-            .expect("inventario present");
-        assert_eq!(inv.domain, "insurance");
-        for expected in ["legal", "finance", "real_estate", "compliance"] {
-            assert!(
-                inv.also_applicable_to.contains(&expected.to_string()),
-                "inventario should be applicable to {expected}, got {:?}",
-                inv.also_applicable_to
-            );
-        }
-        let assets = inv
-            .section_skeleton
-            .iter()
-            .find(|s| s.id == "assets_table")
-            .expect("assets_table section present");
-        assert!(assets.repeating, "assets_table must be repeating (one row per asset)");
-        // Required metadata covers the policy header and the asset list.
-        for f in ["POLIZZA_NUMERO", "COMPAGNIA", "CONTRAENTE", "ASSETS"] {
-            assert!(
-                inv.required_metadata.iter().any(|x| x == f),
-                "required metadata must include {f}"
-            );
+    fn domain_specific_template_excludes_other_domains() {
+        for domain in ["real_estate", "compliance"] {
+            let t = template_with(domain, vec![]);
+            assert!(t.matches_domain(Some(domain)));
+            assert!(!t.matches_domain(Some("legal")));
+            assert!(!t.matches_domain(Some("finance")));
         }
     }
 
     #[test]
-    fn shipped_iso_procedure_stays_compliance_only() {
-        let dir = crate::presets::config_subdir("docx-templates");
-        let templates = load_docx_templates(&dir).expect("load");
-        let iso = templates
-            .iter()
-            .find(|t| t.id == "compliance/procedura-iso-sgi")
-            .expect("iso procedure present");
-        assert_eq!(iso.domain, "compliance");
-        assert!(iso.also_applicable_to.is_empty(), "ISO procedure is form-specific");
-        assert!(!iso.matches_domain(Some("legal")));
+    fn loader_accepts_nested_test_sidecar_and_empty_registry() {
+        let dir = tempfile::tempdir().unwrap();
+        assert!(load_docx_templates(dir.path()).unwrap().is_empty());
+        assert!(load_docx_templates(&dir.path().join("missing")).unwrap().is_empty());
+        let nested = dir.path().join("test");
+        std::fs::create_dir(&nested).unwrap();
+        std::fs::write(nested.join("project-update.json"), serde_json::to_vec(&test_template()).unwrap()).unwrap();
+        let templates = load_docx_templates(dir.path()).expect("load synthetic sidecar");
+        assert_eq!(templates.len(), 1);
+        let t = &templates[0];
+        assert_eq!(t.id, "test/project-update");
+        assert!(validate(t).is_ok());
+        assert_eq!(t.required_metadata, test_template().required_metadata);
+        assert!(t.section_skeleton.iter().any(|s| s.id == "items" && s.repeating));
     }
 
     #[test]
-    fn shipped_templates_all_load_cleanly() {
-        // Integration test: every JSON under config/docx-templates/
-        // that ships with the repo must parse + validate. Catches
-        // typos and schema drift on every CI run.
+    fn shipped_docx_registry_is_empty() {
         let dir = crate::presets::config_subdir("docx-templates");
-        if !dir.exists() {
-            // Skip silently when running from a stripped checkout
-            // without the config tree (e.g. `cargo publish` package).
-            return;
-        }
-        let templates =
-            load_docx_templates(&dir).expect("shipped templates must load");
-
-        // Phase 1.A acceptance: the 4 ★★★★★ templates from the Prontuario
-        // must all be present and valid after a fresh build.
-        let ids: Vec<&str> = templates.iter().map(|t| t.id.as_str()).collect();
-        for expected in [
-            "it/diffida-messa-in-mora",
-            "it/parcella-professionale",
-            "it/contratto-locazione",
-            "compliance/procedura-iso-sgi",
-        ] {
-            assert!(
-                ids.contains(&expected),
-                "missing shipped template {expected} (found: {ids:?})"
-            );
-        }
+        assert!(load_docx_templates(&dir).expect("load empty shipped registry").is_empty());
     }
 
     #[test]
     fn auto_generated_prompt_md_contains_layout_and_skeleton() {
-        // Use the actual shipped Diffida template — anchors the test
-        // to a representative real-world sidecar.
-        let dir = crate::presets::config_subdir("docx-templates");
-        let templates = load_docx_templates(&dir).expect("load");
-        let diffida = templates
-            .iter()
-            .find(|t| t.id == "it/diffida-messa-in-mora")
-            .expect("diffida present");
-        let prompt = diffida.auto_generated_prompt_md("it");
-
-        // Layout invariants come straight from the sidecar fields.
-        assert!(prompt.contains("Diffida"), "display name missing");
-        assert!(prompt.contains("Paper: A4"), "paper missing");
-        assert!(prompt.contains("Calibri"), "font missing");
-        assert!(prompt.contains("11pt") || prompt.contains("11 pt"));
-        // Authoritative spec back-reference resolves to the Prontuario.
-        assert!(prompt.contains("TEMPLATE_PRONTUARIO.md"));
-        // Required metadata listed with field_prompts as hints.
-        assert!(prompt.contains("`DEBITORE`"));
-        assert!(prompt.contains("`IMPORTO`"));
-        assert!(prompt.contains("`TERMINE_GG`"));
-        // Section skeleton present.
-        assert!(prompt.contains("DIFFIDA E METTE IN MORA"));
-        // Closing instruction telling the LLM how to call the tool.
-        assert!(prompt.contains("generate_docx"));
-        assert!(prompt.contains(r#"template_id="it/diffida-messa-in-mora""#));
-        // Placeholder convention echoed.
-        assert!(prompt.contains("square_brackets"));
+        let prompt = test_template().auto_generated_prompt_md("en");
+        for expected in ["Project update", "Paper: A4", "Calibri", "11pt",
+            "Test-only authoring specification", "`PROJECT`", "`BUDGET`", "`DAYS`",
+            "Project summary", "generate_docx", "square_brackets"] {
+            assert!(prompt.contains(expected), "missing {expected}: {prompt}");
+        }
+        assert!(prompt.contains(r#"template_id="test/project-update""#));
     }
 
     #[test]
     fn auto_generated_prompt_md_marks_repeating_blocks() {
-        // Parcella has a `voci_onorario` repeating section.
-        let dir = crate::presets::config_subdir("docx-templates");
-        let templates = load_docx_templates(&dir).expect("load");
-        let parcella = templates
-            .iter()
-            .find(|t| t.id == "it/parcella-professionale")
-            .expect("parcella present");
-        let prompt = parcella.auto_generated_prompt_md("it");
-        assert!(prompt.contains("[REPEATING BLOCK]"));
+        assert!(test_template().auto_generated_prompt_md("en").contains("[REPEATING BLOCK]"));
     }
 
     // ── auto_generated_prompt_md edge cases on hand-rolled fixtures ──
@@ -938,7 +823,7 @@ mod tests {
     /// would require — to test the "no optionals" path of the prompt
     /// generator.
     fn bare_template() -> DocxTemplate {
-        let json = minimal_template_json("it/bare", "legal");
+        let json = minimal_template_json("test/bare", "legal");
         serde_json::from_str(&json).unwrap()
     }
 
@@ -949,7 +834,7 @@ mod tests {
         // no prompt_md_extra. The generator must omit those headers,
         // not emit empty ones.
         let t = bare_template();
-        let prompt = t.auto_generated_prompt_md("it");
+        let prompt = t.auto_generated_prompt_md("en");
         // Headers absent
         assert!(!prompt.contains("Authoritative spec:"));
         assert!(!prompt.contains("REQUIRED METADATA"));
@@ -964,21 +849,21 @@ mod tests {
     fn prompt_md_emits_character_limits_sorted() {
         let mut t = bare_template();
         let mut limits = std::collections::HashMap::new();
-        limits.insert("note_udienza".to_string(), 10000u64);
-        limits.insert("atto_di_citazione".to_string(), 80000u64);
-        limits.insert("memoria_ex_art_183_cpc".to_string(), 50000u64);
+        limits.insert("notes".to_string(), 10000u64);
+        limits.insert("application".to_string(), 80000u64);
+        limits.insert("motion".to_string(), 50000u64);
         t.character_limits = Some(CharacterLimits { by_atto_type: limits });
 
-        let prompt = t.auto_generated_prompt_md("it");
+        let prompt = t.auto_generated_prompt_md("en");
         assert!(prompt.contains("CHARACTER LIMITS"));
-        assert!(prompt.contains("`atto_di_citazione`: max 80000"));
-        assert!(prompt.contains("`memoria_ex_art_183_cpc`: max 50000"));
-        assert!(prompt.contains("`note_udienza`: max 10000"));
+        assert!(prompt.contains("`application`: max 80000"));
+        assert!(prompt.contains("`motion`: max 50000"));
+        assert!(prompt.contains("`notes`: max 10000"));
         // Alphabetic order: 'a' < 'm' < 'n'. Find each substring and
         // assert their relative position.
-        let pos_a = prompt.find("atto_di_citazione").unwrap();
-        let pos_m = prompt.find("memoria_ex_art_183_cpc").unwrap();
-        let pos_n = prompt.find("note_udienza").unwrap();
+        let pos_a = prompt.find("application").unwrap();
+        let pos_m = prompt.find("motion").unwrap();
+        let pos_n = prompt.find("notes").unwrap();
         assert!(pos_a < pos_m && pos_m < pos_n, "limits must be alphabetically sorted");
     }
 
@@ -986,10 +871,10 @@ mod tests {
     fn prompt_md_appends_author_override_when_present() {
         let mut t = bare_template();
         t.prompt_md_extra =
-            Some("Use 'all'Ill.mo Tribunale adito' without 'contrariis reiectis'.".into());
-        let prompt = t.auto_generated_prompt_md("it");
+            Some("Use plain English and concise headings.".into());
+        let prompt = t.auto_generated_prompt_md("en");
         assert!(prompt.contains("ADDITIONAL AUTHOR NOTES"));
-        assert!(prompt.contains("all'Ill.mo Tribunale adito"));
+        assert!(prompt.contains("Use plain English"));
     }
 
     #[test]
@@ -1000,10 +885,10 @@ mod tests {
         let mut t = bare_template();
         t.section_skeleton = vec![
             SectionSkeletonEntry {
-                id: "in_fatto".into(),
-                title: Some("IN FATTO".into()),
+                id: "facts".into(),
+                title: Some("FACTS".into()),
                 render: None,
-                guidance: Some("Esposizione fatti.".into()),
+                guidance: Some("Statement of facts.".into()),
                 repeating: false,
             },
             SectionSkeletonEntry {
@@ -1014,41 +899,40 @@ mod tests {
                 repeating: false,
             },
         ];
-        let prompt = t.auto_generated_prompt_md("it");
-        assert!(prompt.contains("**IN FATTO**"));
-        assert!(prompt.contains("Esposizione fatti."));
+        let prompt = t.auto_generated_prompt_md("en");
+        assert!(prompt.contains("**FACTS**"));
+        assert!(prompt.contains("Statement of facts."));
         assert!(prompt.contains("literal: `* * *`"));
     }
 
     #[test]
     fn prompt_md_field_prompts_attached_to_required_metadata() {
         let mut t = bare_template();
-        t.required_metadata = vec!["DEBITORE".into(), "IMPORTO".into()];
+        t.required_metadata = vec!["CLIENT".into(), "AMOUNT".into()];
         t.field_prompts.insert(
-            "DEBITORE".into(),
-            "Nome o ragione sociale del debitore.".into(),
+            "CLIENT".into(),
+            "Client name.".into(),
         );
-        // IMPORTO without a field_prompts entry — should still appear
+        // AMOUNT without a field_prompts entry — should still appear
         // in the prompt, just without the hint.
-        let prompt = t.auto_generated_prompt_md("it");
-        assert!(prompt.contains("`DEBITORE` — Nome o ragione sociale del debitore."));
-        // IMPORTO line: id present, no em-dash hint.
-        let importo_line = prompt
+        let prompt = t.auto_generated_prompt_md("en");
+        assert!(prompt.contains("`CLIENT` — Client name."));
+        // AMOUNT line: id present, no em-dash hint.
+        let amount_line = prompt
             .lines()
-            .find(|l| l.contains("`IMPORTO`"))
-            .expect("IMPORTO listed");
-        assert!(!importo_line.contains(" — "), "IMPORTO line should not carry a hint dash");
+            .find(|l| l.contains("`AMOUNT`"))
+            .expect("AMOUNT listed");
+        assert!(!amount_line.contains(" — "), "AMOUNT line should not carry a hint dash");
     }
 
     #[test]
     fn prompt_md_uses_locale_for_display_name() {
         let mut t = bare_template();
-        t.display_name.insert("en".to_string(), "Bare template (EN)".to_string());
-        let it = t.auto_generated_prompt_md("it");
-        // "it" → Italian display name from minimal_template_json
-        assert!(it.contains("Test it/bare"));
-        let en = t.auto_generated_prompt_md("en");
-        assert!(en.contains("Bare template (EN)"));
+        t.display_name.insert("fr".to_string(), "Alternate display name".to_string());
+        let fallback = t.auto_generated_prompt_md("ja");
+        assert!(fallback.contains("Test test/bare"));
+        let localized = t.auto_generated_prompt_md("fr");
+        assert!(localized.contains("Alternate display name"));
     }
 
     #[test]
@@ -1065,7 +949,7 @@ mod tests {
             marginal_signature_required: true,
             signature_exclude_last_page: true,
         });
-        let prompt = t.auto_generated_prompt_md("it");
+        let prompt = t.auto_generated_prompt_md("en");
         // Special-format line surfaces the variant name.
         assert!(prompt.contains("Special format: uso_bollo"));
     }
@@ -1073,23 +957,23 @@ mod tests {
     #[test]
     fn character_limits_parses_flexible_map() {
         let json = r#"{
-            "id": "it/atto",
-            "display_name": { "it": "Atto" },
+            "id": "test/brief",
+            "display_name": { "en": "Brief" },
             "category": "legal",
             "domain": "legal",
-            "locale": "it-IT",
+            "locale": "en",
             "paper": { "size": "A4" },
             "margins_cm": { "top": 3.0, "right": 2.0, "bottom": 2.5, "left": 3.5 },
             "typography": { "body_font": "Times New Roman", "body_size_pt": 12.0, "line_spacing": 1.5 },
             "character_limits": {
-                "atto_di_citazione": 80000,
-                "memoria_ex_art_183_cpc": 50000,
-                "note_udienza": 10000
+                "application": 80000,
+                "motion": 50000,
+                "notes": 10000
             }
         }"#;
         let t: DocxTemplate = serde_json::from_str(json).expect("parse");
         let limits = t.character_limits.expect("has limits");
-        assert_eq!(limits.by_atto_type["atto_di_citazione"], 80000);
-        assert_eq!(limits.by_atto_type["memoria_ex_art_183_cpc"], 50000);
+        assert_eq!(limits.by_atto_type["application"], 80000);
+        assert_eq!(limits.by_atto_type["motion"], 50000);
     }
 }

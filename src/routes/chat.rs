@@ -723,9 +723,9 @@ fn build_mcp_system_prompt(servers: &[McpDiscovered]) -> String {
 /// to its alphanumeric-only, lowercase canonical form. Used by the
 /// citation resolver as a last-resort lookup key against the user's
 /// full corpus library so that bracket/space/separator/case variants
-/// the model produces (e.g. `[italian-legal] corte_costituzionale_1990_241`,
-/// `Italian-Legal_corte_costituzionale_1990_241`, or even
-/// `italianlegal:cortecostituzionale1990/241`) all collapse onto the
+/// the model produces (e.g. `[sg-statutes] PDPA2012`,
+/// `Sg-Statutes_PDPA2012`, or even
+/// `sgstatutes:pdpa/2012`) all collapse onto the
 /// same key as the canonical `<corpus_id><corpus_identifier>` we index.
 fn canonical_corpus_key(s: &str) -> String {
     s.chars()
@@ -1946,7 +1946,7 @@ async fn retrieve_kb_chunks(
         // every turn, leading to "12 citations all pointing to the
         // same 404 page" syndrome the user reported in the medical-
         // legal chat. We probe the source_path here; URL-shaped
-        // source_paths (EUR-Lex / DILA / italian-legal) are remapped
+        // source_paths from corpus documents are remapped
         // to their local cache equivalent further down anyway, so
         // we use the same map for the existence check.
         let probe_path: String = if c.source_path.starts_with("http://")
@@ -2122,8 +2122,8 @@ fn build_library_inventory_prompt(entries: &[CorpusInventoryEntry]) -> String {
              they want a citation-backed answer.\n\
          \n\
          CITATION DOC_ID RULES (mandatory):\n\
-           · NEVER use the inventory identifiers below (e.g. \"32016R0679\", \
-             \"eurlex_32016R0679\") as `doc_id` in <CITATIONS>. Those are \
+           · NEVER use the inventory identifiers below (e.g. \"C2004A03712\", \
+             \"au-federalregister_C2004A03712\") as `doc_id` in <CITATIONS>. Those are \
              corpus references, NOT citation handles.\n\
            · NEVER invent doc-N labels when no files are attached to this \
              chat — only use doc-N if the user actually attached a file.\n\
@@ -4374,15 +4374,15 @@ async fn stream_chat_root(
 
         // Build a corpus-identifier → tag fallback index so the citation
         // resolver can recover when the model invents a doc_id from the
-        // <USER LIBRARY> inventory (e.g. "eurlex_32016R0679" or just
-        // "32016R0679") instead of using the [gN] tag from the
+        // <USER LIBRARY> inventory (e.g. "au-federalregister_C2004A03712" or just
+        // "C2004A03712") instead of using the [gN] tag from the
         // <KNOWLEDGE BASE> section as instructed. Without this fallback
         // those citations get tagged source="attached", point at no
         // real document, and render as a 404 in the viewer.
         //
         // We index the same chunk under several normalised keys so a
-        // model emitting any of "eurlex_32016R0679", "EUR-Lex/32016R0679",
-        // "32016R0679", or "eurlex:32016R0679" still resolves.
+        // model emitting any of "au-federalregister_C2004A03712", "AU-FederalRegister/C2004A03712",
+        // "C2004A03712", or "au-federalregister:C2004A03712" still resolves.
         let mut corpus_ref_to_tag: HashMap<String, String> = HashMap::new();
         if !kb_by_tag.is_empty() {
             let doc_ids: std::collections::HashSet<String> = kb_chunks_for_citations
@@ -4445,7 +4445,7 @@ async fn stream_chat_root(
 
         // Canonical-key index over the user's FULL corpus library. Catches
         // the case where the model copies a verbatim inventory line
-        // (e.g. `[italian-legal] corte_costituzionale_1990_241`, with
+        // (e.g. `[sg-statutes] PDPA2012`, with
         // bracket and whitespace) as `doc_id` instead of the [gN]/[pN]
         // tag — and where this turn produced no KB chunks at all, so
         // `corpus_ref_to_tag` above stays empty. The canonical form
@@ -4801,7 +4801,7 @@ async fn stream_chat_root(
                         obj.insert("source".into(), Value::String("kb".to_string()));
                         obj.insert("scope".into(), Value::String(kb.scope_label.to_string()));
                         // Remap URL-shaped source_path back to the local
-                        // cache file. EUR-Lex (and any corpus that stored
+                        // cache file. Any corpus that stored
                         // the upstream URL in older indexing runs) needs
                         // this — /sync/kb-doc does std::fs::read on the
                         // value and can't take a URL.
@@ -5319,8 +5319,8 @@ async fn delete_chat(
 /// attached documents ordered as `doc-0`, `doc-1`, ….
 /// Rewrite annotations whose `path` is the upstream URL of a corpus
 /// document back to the local cache-file path the viewer can fetch via
-/// `/sync/kb-doc`. Older indexing runs (pre eurlex.rs:462 fix) stored
-/// the EUR-Lex URL as `doc_chunks.source_path`; that URL got persisted
+/// `/sync/kb-doc`. Older indexing runs stored the upstream URL
+/// as `doc_chunks.source_path`; that URL got persisted
 /// into `messages.annotations[].path`. The hot fix at write time
 /// remaps new citations, but persisted ones from old chats still carry
 /// the URL — so we apply the same remap on read.
@@ -5441,7 +5441,7 @@ async fn get_messages(
 
     // Mapping `document_id → absolute local path` for the user's corpus
     // docs. Used to rewrite annotations whose persisted `path` is the
-    // upstream URL — old chats stored those before the eurlex.rs fix.
+    // upstream URL — old chats stored those before cache-path indexing.
     let mut corpus_local_path_by_docid: HashMap<String, String> = HashMap::new();
     {
         let storage_root = std::path::PathBuf::from(
@@ -6287,7 +6287,7 @@ mod tests {
 
     #[test]
     fn extract_inline_docid_refs_picks_up_the_observed_pattern() {
-        // The exact shape the model emitted on the NIS2 report turn that
+        // The exact shape the model emitted on the long-form report turn that
         // surfaced this bug: UUID + comma + `page N` (or `page N-M`).
         let text = "**Introduzione** [doc-id: cdbe5ce0-36f1-4574-a818-64e06826e632, page 1]. \
                     Continua [doc-id: cdbe5ce0-36f1-4574-a818-64e06826e632, page 1-2] eccetera.";
@@ -6568,19 +6568,19 @@ mod tests {
     #[test]
     fn canonical_corpus_key_collapses_inventory_variants_onto_one_key() {
         // The bug we are guarding against: the model copies the
-        // `<USER LIBRARY>` line `[italian-legal] corte_costituzionale_1990_241`
+        // `<USER LIBRARY>` line `[sg-statutes] PDPA2012`
         // (with bracket + space) as `doc_id` instead of the [gN] tag.
         // The canonical form must match whatever we index on the lookup
         // side — `<corpus_id> <corpus_identifier>` — and tolerate every
         // other punctuation / case variant.
-        let canon = canonical_corpus_key("[italian-legal] corte_costituzionale_1990_241");
-        assert_eq!(canon, "italianlegalcortecostituzionale1990241");
+        let canon = canonical_corpus_key("[sg-statutes] PDPA2012");
+        assert_eq!(canon, "sgstatutespdpa2012");
         // Every reasonable alternative form must collapse to the same key.
         for variant in [
-            "italian-legal corte_costituzionale_1990_241",
-            "Italian-Legal_corte_costituzionale_1990_241",
-            "italianlegal:cortecostituzionale1990/241",
-            "[ITALIAN-LEGAL] corte_costituzionale_1990_241",
+            "sg-statutes PDPA2012",
+            "Sg-Statutes_PDPA2012",
+            "sgstatutes:pdpa/2012",
+            "[SG-STATUTES] PDPA2012",
         ] {
             assert_eq!(
                 canonical_corpus_key(variant),
@@ -6589,7 +6589,7 @@ mod tests {
             );
         }
         // Sanity: bare ASCII passes through lowercase.
-        assert_eq!(canonical_corpus_key("EurLex_32016R0679"), "eurlex32016r0679");
+        assert_eq!(canonical_corpus_key("AuFederalRegister_C2004A03712"), "aufederalregisterc2004a03712");
         // Empty / whitespace-only / punctuation-only inputs canonicalise
         // to the empty string, which the resolver must skip.
         assert_eq!(canonical_corpus_key(""), "");

@@ -116,7 +116,7 @@ pub fn schemas() -> Vec<ToolSchema> {
         fun(
             GENERATE_DOCX,
             "Produce a downloadable .docx document. Two modes:\n\
-             • **Template mode** (preferred): pass `template_id` (e.g. 'it/diffida-messa-in-mora') and `metadata` (the values for the template's `[PLACEHOLDERS]`). The body Markdown is rendered through the template's layout — typography, margins, styles all come from the template sidecar. Use `list_docx_templates` to discover templates and `describe_docx_template` to see the required metadata fields for a specific one.\n\
+             • **Template mode** (preferred): pass `template_id` (from list_docx_templates) and `metadata` (the values for the template's `[PLACEHOLDERS]`). The body Markdown is rendered through the template's layout — typography, margins, styles all come from the template sidecar. Use `list_docx_templates` to discover templates and `describe_docx_template` to see the required metadata fields for a specific one.\n\
              • **Plain mode** (legacy): omit `template_id`. Falls back to a minimal generic layout. Pass `title` for the filename.\n\
              Returns the new document id and filename.",
             json!({
@@ -124,7 +124,7 @@ pub fn schemas() -> Vec<ToolSchema> {
                 "properties": {
                     "title": { "type": "string", "description": "Document title / base filename (no extension)." },
                     "body":  { "type": "string", "description": "Document content in Markdown. Headings, bullet lists, bold/italic honoured. With a template_id, `[PLACEHOLDER]` tokens in the body are substituted against the metadata map." },
-                    "template_id": { "type": "string", "description": "Optional. The id of a docx-template from list_docx_templates (e.g. 'it/diffida-messa-in-mora'). When omitted, falls back to the plain renderer." },
+                    "template_id": { "type": "string", "description": "Optional. The id of a docx-template from list_docx_templates. When omitted, falls back to the plain renderer." },
                     "metadata": {
                         "type": "object",
                         "description": "Map of [PLACEHOLDER] name → value, e.g. { \"DEBITORE\": \"Tizio S.r.l.\", \"IMPORTO\": \"€ 12.345,67\" }. Required when template_id is supplied. Universal fields (LUOGO, DATA, MITTENTE, OGGETTO, RIF_PRATICA, ...) should always be filled.",
@@ -158,7 +158,7 @@ pub fn schemas() -> Vec<ToolSchema> {
         ),
         fun(
             LIST_DOCX_TEMPLATES,
-            "List the DOCX templates available to the closing formatter. Returns id, display_name, category, domain, automation_level, and required_metadata for each. Filter by `domain` (e.g. 'legal', 'finance', 'real_estate', 'compliance'). Call this FIRST when the user asks to produce a structured document (atto, diffida, parcella, contratto, ...) to pick the right template, then call describe_docx_template to see how to fill it, then generate_docx.",
+            "List the DOCX templates available to the closing formatter. Returns id, display_name, category, domain, automation_level, and required_metadata for each. Filter by `domain` (e.g. 'legal', 'finance', 'real_estate', 'compliance'). Call this FIRST when the user asks to produce a structured document (report, letter, invoice, contract, ...) to pick the right template, then call describe_docx_template to see how to fill it, then generate_docx.",
             json!({
                 "type": "object",
                 "properties": {
@@ -170,11 +170,11 @@ pub fn schemas() -> Vec<ToolSchema> {
         ),
         fun(
             DESCRIBE_DOCX_TEMPLATE,
-            "Get the full authoring contract for a specific DOCX template: auto-generated system-prompt block (layout + section skeleton + required fields + per-field guidance), source reference into the Prontuario, and raw sidecar JSON. Call this AFTER list_docx_templates and BEFORE generate_docx — the returned `prompt_md` is what teaches you how to write a correct body for this template.",
+            "Get the full authoring contract for a specific DOCX template: auto-generated system-prompt block (layout + section skeleton + required fields + per-field guidance), optional author-provided source reference, and raw sidecar JSON. Call this AFTER list_docx_templates and BEFORE generate_docx — the returned `prompt_md` is what teaches you how to write a correct body for this template.",
             json!({
                 "type": "object",
                 "properties": {
-                    "template_id": { "type": "string", "description": "The template id from list_docx_templates, e.g. 'it/diffida-messa-in-mora'." }
+                    "template_id": { "type": "string", "description": "The template id from list_docx_templates." }
                 },
                 "required": ["template_id"]
             }),
@@ -1091,14 +1091,8 @@ mod tests {
 
     // ── build_read_workflow_response ────────────────────────────────
 
-    fn diffida_template() -> crate::presets::docx_template::DocxTemplate {
-        let dir = crate::presets::config_subdir("docx-templates");
-        let templates =
-            crate::presets::docx_template::load_docx_templates(&dir).expect("load");
-        templates
-            .into_iter()
-            .find(|t| t.id == "it/diffida-messa-in-mora")
-            .expect("diffida present")
+    fn test_template() -> crate::presets::docx_template::DocxTemplate {
+        crate::presets::docx_template::test_template()
     }
 
     #[test]
@@ -1119,52 +1113,52 @@ mod tests {
 
     #[test]
     fn read_workflow_response_with_template_bundles_authoring_contract() {
-        let templates = vec![diffida_template()];
+        let templates = vec![test_template()];
         let payload = build_read_workflow_response(
-            "builtin-redazione-diffida",
-            "Redazione diffida",
-            "You are a lawyer. Draft a demand letter.",
-            Some("it/diffida-messa-in-mora"),
+            "test-project-workflow",
+            "Project update",
+            "Draft a concise project update.",
+            Some("test/project-update"),
             &templates,
         );
 
         // Core fields
-        assert_eq!(payload["workflow_id"], json!("builtin-redazione-diffida"));
+        assert_eq!(payload["workflow_id"], json!("test-project-workflow"));
 
         // default_output_template object present and well-formed
         let dot = payload["default_output_template"].as_object().expect("dot present");
-        assert_eq!(dot["template_id"], json!("it/diffida-messa-in-mora"));
+        assert_eq!(dot["template_id"], json!("test/project-update"));
         assert_eq!(dot["automation_level"], json!("L1"));
         // required_metadata is a non-empty array
         assert!(dot["required_metadata"].as_array().unwrap().len() >= 5);
         // prompt_md contains the layout description (anchored to a
         // stable substring from the sidecar)
         assert!(dot["prompt_md"].as_str().unwrap().contains("Calibri"));
-        // source_reference points back to the Prontuario
+        // source_reference contains the author-provided specification
         assert!(dot["source_reference"]
             .as_str()
             .unwrap()
-            .contains("TEMPLATE_PRONTUARIO"));
+            .contains("Test-only authoring specification"));
 
         // closing_instruction explicitly names generate_docx with the id
         let ci = payload["closing_instruction"].as_str().expect("closing");
         assert!(ci.contains("generate_docx"));
-        assert!(ci.contains(r#"template_id="it/diffida-messa-in-mora""#));
+        assert!(ci.contains(r#"template_id="test/project-update""#));
     }
 
     #[test]
     fn read_workflow_response_with_unknown_template_emits_missing_field() {
         let payload = build_read_workflow_response(
             "wf-id",
-            "Workflow rotto",
+            "Broken workflow",
             "...",
-            Some("it/non-esiste"),
-            &[diffida_template()],
+            Some("test/missing"),
+            &[test_template()],
         );
         let missing = payload["default_output_template_missing"]
             .as_str()
             .expect("missing field present");
-        assert!(missing.contains("it/non-esiste"));
+        assert!(missing.contains("test/missing"));
         assert!(missing.contains("config/docx-templates/"));
         // No legit template object — the wiring failed.
         assert!(payload.get("default_output_template").is_none());
@@ -1182,7 +1176,7 @@ mod tests {
             "wf-id",
             "Test",
             "...",
-            Some("it/diffida-messa-in-mora"),
+            Some("test/project-update"),
             &[],
         );
         assert!(payload["default_output_template_missing"].is_string());
@@ -1229,7 +1223,7 @@ mod tests {
             vec!["1".to_string(), "two".to_string()],
             vec!["3".to_string()], // a short row must be tolerated
         ];
-        let bytes = build_xlsx("Foglio1", &headers, &rows).expect("xlsx builds");
+        let bytes = build_xlsx("Sheet1", &headers, &rows).expect("xlsx builds");
         // An .xlsx is a ZIP container — it starts with the PK magic bytes.
         assert!(bytes.starts_with(b"PK\x03\x04"));
         assert!(bytes.len() > 100);

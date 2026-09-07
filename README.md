@@ -23,7 +23,7 @@ Concretely, the differences are:
 | **Model** | Any provider | Pre-configured to a **local OpenAI-compatible inference engine** (e.g. a local DeepSeek cluster) via `.env`; other providers still selectable |
 | **Binding** | Localhost by default | API bound to `0.0.0.0:3001` so the backend is reachable on your LAN |
 
-Everything else — the architecture and engineering — is the same as MikeRust, and is described below.
+Specter retains the upstream architecture described below, with the cleanup and APAC-specific changes recorded in [CHANGELOG](docs/CHANGELOG.md).
 
 ---
 
@@ -40,7 +40,7 @@ The technical foundation is unchanged from MikeRust and is **not** re-implemente
 - **Chat with citations** — the assistant answers and cites the underlying document; numbered citation pills (`[1]`, `[gN]`, `[pN]`) open the source in a side viewer (PDF.js text search highlights the quoted passage).
 - **Projects & documents** — organise work into projects and attach documents for review.
 - **Workflows & tabular reviews** — run structured review templates that extract and assess specific fields clause-by-clause.
-- **DOCX templates** — generate editable, print-ready `.docx` documents from templates through the pure-Rust docx engine.
+- **DOCX templates** — create or import templates to generate editable `.docx` documents through the pure-Rust docx engine. Upstream Italian report templates are not bundled.
 - **Corpora** — query official legal sources (our APAC set, see above) via the corpus plugin system; `config/corpora-plugins/*.json` are manifest-driven and extensible.
 
 ### Model providers

@@ -1,8 +1,8 @@
 {
-    "name": "Modifiche",
+    "name": "Amendment",
     "match_pattern": "\\bamendment\\b|\\bvariation\\b",
     "match_flags": "i",
     "format": "text",
     "domain": "legal",
-    "prompt": "Riassumi le clausole di modifica: con quali modalità possono essere apportate le modifiche, chi deve prestare il consenso ed eventuali requisiti di forma quali la forma scritta o la sottoscrizione."
+    "prompt": "Summarise the amendment clauses: how amendments may be made, whose consent is required, and any formal requirements such as writing or signature."
 }

@@ -64,18 +64,18 @@ describe('toCitation', () => {
   })
 
   it('uses the source label when no filename is given', () => {
-    const c = toCitation({ ref: 'p1', source: 'eurlex/32016R0679' })
-    expect(c.source).toBe('eurlex/32016R0679')
+    const c = toCitation({ ref: 'p1', source: 'sg-statutes/IA1965' })
+    expect(c.source).toBe('sg-statutes/IA1965')
   })
 
   it('keeps kb path from backend payload for KB citations', () => {
     const c = toCitation({
       ref: 'g1',
-      path: 'corpora/eurlex/32016R0679.txt',
+      path: 'corpora/sg-statutes/IA1965.txt',
       filename: '32016R0679.txt',
       quote: 'x',
     })
-    expect(c.kbPath).toBe('corpora/eurlex/32016R0679.txt')
+    expect(c.kbPath).toBe('corpora/sg-statutes/IA1965.txt')
     expect(c.scope).toBe('global')
   })
 })
