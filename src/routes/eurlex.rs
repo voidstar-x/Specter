@@ -534,9 +534,9 @@ async fn run_indexing(
                         text.len()
                     );
                     let msg = format!(
-                        "Indicizzazione completata ma nessun chunk creato \
-                         (testo: {} caratteri). Probabile problema con il chunker; \
-                         usa Riavvia per ritentare.",
+                        "Indexing completed but no chunk created \
+                         (text: {} characters). Likely a chunker problem; \
+                         use Restart to retry.",
                         text.len()
                     );
                     (0, Some(msg), "interrupted".to_string())

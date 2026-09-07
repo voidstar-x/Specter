@@ -1,4 +1,4 @@
-pub mod auth;
+﻿pub mod auth;
 pub mod corpora;
 pub mod db;
 pub mod docx;
@@ -46,7 +46,7 @@ pub async fn run_server_with_bio_tx(
 ///
 /// Tauri spawns the bundled exe with `cwd = src-tauri/`, where there's no
 /// `.env`. Plain `dotenvy::dotenv()` only checks cwd, so the env vars we
-/// rely on (DATABASE_URL, STORAGE_PATH, …) silently failed to load and
+/// rely on (DATABASE_URL, STORAGE_PATH, â€¦) silently failed to load and
 /// the DB ended up wherever the relative fallback resolved to. We walk
 /// up from both cwd and the executable directory until we find a `.env`.
 fn load_dotenv() {
@@ -101,7 +101,7 @@ fn ensure_fastembed_cache_dir() {
         .join("fastembed");
     let _ = std::fs::create_dir_all(&path);
     // SAFETY: single-threaded process startup before the runtime spins
-    // up — no concurrent reads of std::env to race with.
+    // up â€” no concurrent reads of std::env to race with.
     unsafe {
         std::env::set_var("FASTEMBED_CACHE_DIR", &path);
     }
@@ -139,7 +139,7 @@ fn ensure_hf_cache_dir() {
 /// minimum viable observability: every panic ends up in the same
 /// structured log channel as the rest of the backend, with the
 /// thread name, payload, and source location attached. Crucially the
-/// hook does NOT swallow the panic — the thread still unwinds, the
+/// hook does NOT swallow the panic â€” the thread still unwinds, the
 /// tokio task still aborts. Tasks that need survival semantics must
 /// use `tokio::task::spawn` with `catch_unwind` or the
 /// `tokio::task::JoinError::is_panic()` branch at the join site.
@@ -200,7 +200,7 @@ pub async fn run_server_with_channels(
     // Initialise the global ort runtime once. fastembed creates its
     // own `Session` via `EnvironmentBuilder` so this is a no-op for
     // that path, but gliner2-rs *requires* an explicit `ort::init()`
-    // before any engine load — see SemplificaAI/gliner2-rs README.
+    // before any engine load â€” see SemplificaAI/gliner2-rs README.
     // Safe to call when the `rag` feature is off too: ort the crate
     // is still pulled in via the `ner-pii` feature's transitive
     // dependency, so the symbol is in scope.
@@ -212,7 +212,7 @@ pub async fn run_server_with_channels(
             // would just produce a hard error. We log and let the
             // engine-specific loaders surface their own failures
             // when the runtime is actually invoked.
-            tracing::warn!("[ort] init() returned {e:?} — continuing");
+            tracing::warn!("[ort] init() returned {e:?} â€” continuing");
         }
     }
 
@@ -222,7 +222,7 @@ pub async fn run_server_with_channels(
     state.run_migrations().await?;
 
     // Startup recovery: any document still flagged as `syncing` from a
-    // previous session can't actually be in flight any more — there's
+    // previous session can't actually be in flight any more â€” there's
     // no embedding task running for it. Flip those rows to
     // `interrupted` so the UI surfaces the resync button instead of
     // leaving them stuck with a spinner that never moves.
@@ -236,7 +236,7 @@ pub async fn run_server_with_channels(
     if recovered > 0 {
         tracing::info!(
             "[startup] recovered {recovered} doc(s) from stale 'syncing' state \
-             → marked 'interrupted' (resync from the UI when ready)"
+             â†’ marked 'interrupted' (resync from the UI when ready)"
         );
     }
 
@@ -264,7 +264,7 @@ pub async fn run_server_with_channels(
                 "http://localhost:3001".to_string(),
                 "http://127.0.0.1:3000".to_string(),
                 "http://127.0.0.1:3001".to_string(),
-                // New Svelte+Vite dev server (frontend) — Vite default port
+                // New Svelte+Vite dev server (frontend) â€” Vite default port
                 "http://localhost:5173".to_string(),
                 "http://127.0.0.1:5173".to_string(),
                 // Tauri WebView origins. Tauri 2 ships three observed shapes:
@@ -334,13 +334,13 @@ pub async fn run_server_with_channels(
         .layer(global_body_limit)
         .with_state(state);
 
-    // Bind: when `port == 0`, the OS picks a free high port — we then
+    // Bind: when `port == 0`, the OS picks a free high port â€” we then
     // read it back from the listener and report it via `port_tx` so the
     // Tauri shell can forward the actual URL to the frontend (which
     // can't know it ahead of time). When `port != 0` we honour it as
     // a fixed bind (useful for standalone backend dev where the
     // frontend uses `NEXT_PUBLIC_API_BASE_URL` to find us).
-    let addr = format!("127.0.0.1:{port}");
+    let addr = format!("0.0.0.0:{port}");
     let listener = tokio::net::TcpListener::bind(&addr).await?;
     let actual_port = listener.local_addr()?.port();
     tracing::info!("API listening on 127.0.0.1:{actual_port}");

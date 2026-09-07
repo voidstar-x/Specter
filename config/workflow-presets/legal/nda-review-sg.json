@@ -1,0 +1,114 @@
+{
+  "id": "nda-review-sg",
+  "title": "NDA Review (Singapore & Common Law)",
+  "type": "tabular",
+  "domain": "legal",
+  "practice": "Review of non-disclosure / confidentiality agreements under Singapore law and general common law, covering scope, definition of confidential information, exclusions, survivorship, remedies, and enforcement.",
+  "columns_config": [
+    {
+      "index": 0,
+      "name": "Document Type",
+      "format": "tag",
+      "prompt": "What type of NDA is this — one-way, mutual, or a confidentiality clause inside a wider agreement?",
+      "tags": [
+        "Unilateral NDA (one-way)",
+        "Mutual / bilateral NDA",
+        "Multilateral NDA (3+ parties)",
+        "Employee / contractor confidentiality clause",
+        "Investor / due diligence NDA",
+        "Vendor / procurement NDA",
+        "Standing-alone confidentiality clause inside a wider contract"
+      ]
+    },
+    {
+      "index": 1,
+      "name": "Parties & Roles",
+      "format": "text",
+      "prompt": "Identify each party, which party is the discloser and which the recipient (or both, if mutual), any parent/subsidiary or affiliate carve-in, and whether any party is a Singapore entity, a foreign entity, or a data intermediary. Note if the recipient is a natural person (matters for insolvency and individual liability)."
+    },
+    {
+      "index": 2,
+      "name": "Definition of Confidential Information",
+      "format": "text",
+      "prompt": "Reproduce or closely summarise the definition of 'Confidential Information'. Assess: (a) whether it is 'information of any kind' without limits (over-broad, and per Saltman Engineering Co Ltd v Campbell Engineering Ltd the subject-matter must have the necessary quality of confidence to be enforceable at common law); (b) whether it covers oral disclosures or only written/marked information; (c) whether it covers derivative works, analyses and know-how; (d) whether it extends to information of third parties received by the discloser; and (e) whether the definition captures information that is already public or already in the recipient's possession."
+    },
+    {
+      "index": 3,
+      "name": "Exclusions",
+      "format": "text",
+      "prompt": "List the standard exclusions and assess their completeness against the common-law position: information in the public domain (and whether 'public domain' includes being generally available by theft of the discloser's data); already in the recipient's possession free of any obligation of confidence; independently developed (note the evidential burden falls on the party asserting it); lawfully received from a third party; required to be disclosed by law, court order, or regulator (and whether notice to the discloser is required first). Flag any missing exclusion and the risk it creates."
+    },
+    {
+      "index": 4,
+      "name": "Permitted Disclosures & Recipient Group",
+      "format": "text",
+      "prompt": "To whom can the recipient disclose Confidential Information without breaching: employees, professional advisers, contractors, affiliates, agents? Does the clause require those recipients to be bound by equivalent confidentiality obligations ('need to know' plus 'reasonably required'), and does responsibility for their breach rest with the recipient? Note any approval/consent step for disclosure beyond the permitted group."
+    },
+    {
+      "index": 5,
+      "name": "Purpose Limitation",
+      "format": "text",
+      "prompt": "Is use of the Confidential Information limited to a stated Purpose? Quote the purpose. Assess whether the purpose is drawn narrowly (good for discloser) or broadly ('any business purpose' - risk to discloser), and whether the recipient is prohibited from using the information for competitive advantage, recruiting the discloser's staff, or reverse engineering (common missing protections in SG commercial NDAs)."
+    },
+    {
+      "index": 6,
+      "name": "Term & Survival",
+      "format": "text",
+      "prompt": "State the term of the NDA, the duration of the confidentiality obligation after disclosure (e.g. 'for so long as the information remains confidential', a fixed period such as 3 or 5 years, or indefinitely for trade secrets), and the survival clause. Assess against the SG common-law position that trade secrets may be protected indefinitely while ordinary confidential information protection may lapse; flag if a fixed short term is inadequate for trade secrets or if an indefinite term is so broad it risks being struck down as an unreasonable restraint (less common for NDAs than non-competes, but relevant)."
+    },
+    {
+      "index": 7,
+      "name": "Return / Destruction",
+      "format": "text",
+      "prompt": "Summarise the return or destruction obligations: when they arise (on request, on termination, on completion of the Purpose), the timeframe, whether destruction must be certified, and whether copies retained in automatic backup systems, IT archives, or as required by law/regulatory retention rules (e.g. PDPA retention limitation under s 25 - data not to be kept longer than necessary) are carved out. Note the common SG practice of allowing a 'legal hold' or auditor-access carve-out."
+    },
+    {
+      "index": 8,
+      "name": "Remedies & Injunctive Relief",
+      "format": "text",
+      "prompt": "State the remedies available to the discloser: (a) express entitlement to injunctive relief and acknowledgment that damages are inadequate (aligning with common-law principles for breach of confidence where damages are not an adequate remedy); (b) liquidated damages or fixed-sum clauses (a stipulated sum is unenforceable as a penalty unless it is a genuine pre-estimate of loss or otherwise commercially justifiable - Dunlop Pneumatic Tyre Co Ltd v New Garage & Motor Co Ltd [1915] AC 79, as modernised in Cavendish Square Holding BV v Makdessi [2015] UKSC 67 and applied in Singapore, where the penalty doctrine remains a common-law/equitable rule); (c) account of profits; and (d) any waiver of consequential loss. Flag anything unenforceable as drafted."
+    },
+    {
+      "index": 9,
+      "name": "No Licence / IP Ownership",
+      "format": "text",
+      "prompt": "Does the NDA expressly state that no licence, assignment, or transfer of intellectual property rights is granted by disclosure? If silent, note the residual risk of implied licence arguments and recommend adding an express reservation of IP (copyright under the Copyright Act 2021 - assignments of copyright must be in writing signed by or on behalf of the owner (verify the current section, circa s 130), patents under the Patents Act 1994, trade marks under the Trade Marks Act 2019, registered designs under the Registered Designs Act 2014)."
+    },
+    {
+      "index": 10,
+      "name": "Non-Solicitation / Non-Circumvention",
+      "format": "text",
+      "prompt": "Does the NDA contain non-solicitation (of employees, customers or suppliers) or non-circumvention clauses? If so, assess enforceability under Singapore common law on restraints of trade: legitimate interest, reasonable scope in time and geography, and reasonableness in the circumstances (Man Financial (S) Pte Ltd v Wong Bark Chuan David [2008] 1 SLR(R) 663; Symbiosis Pte Ltd v Eden Clinic Pte Ltd [2010] SGHC 158 - courts strike overbroad restraints). Flag any restraint that would likely be void as drafted and suggest a narrower fallback."
+    },
+    {
+      "index": 11,
+      "name": "Data Protection Overlay",
+      "format": "text",
+      "prompt": "If personal data will be disclosed under or alongside this NDA, check consistency with the Personal Data Protection Act 2012: consent or a lawful basis (including the 'business improvement' and 'due diligence' exceptions in the Second Schedule), the data intermediary clauses (ss 4(2) and Part 3A) where the recipient processes personal data on the discloser's behalf, and whether the confidentiality definition and the PDPA obligations conflict or double up. Flag any gap for cross-border transfer to recipients outside Singapore (PDPA Part 6A)."
+    },
+    {
+      "index": 12,
+      "name": "Governing Law & Jurisdiction",
+      "format": "text",
+      "prompt": "State the governing law and the dispute resolution clause: exclusive jurisdiction of the Singapore courts, or arbitration (which institution, seat, rules - e.g. SIAC, ICC, IAMA). Assess whether the chosen forum matches the parties' locations and assets, and note any waiver of objection to venue or severability/entire-agreement clauses. If governing law is not Singapore law, flag the practical enforceability of an injunctive remedy in Singapore under the Foreign Judgments Act or by way of a common-law action for breach of confidence in the SG courts."
+    },
+    {
+      "index": 13,
+      "name": "Key Risks & Redlines",
+      "format": "text",
+      "prompt": "List the top 5 risks in this NDA for the party we are advising (state which side we are on if apparent from the document): over-broad definitions, missing exclusions, inadequate term for trade secrets, missing return/destruction mechanics, missing injunctive relief language, missing data-protection overlay, missing IP reservation, or unenforceable restraints. For each, state the risk to us and the specific redline language to propose."
+    },
+    {
+      "index": 14,
+      "name": "Overall Assessment",
+      "format": "tag",
+      "prompt": "Overall assessment of this NDA as drafted for our client's position:",
+      "tags": [
+        "Signable as-is",
+        "Signable with minor redlines",
+        "Needs substantial redrafting",
+        "Unacceptable - do not sign"
+      ]
+    }
+  ]
+}

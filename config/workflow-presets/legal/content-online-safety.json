@@ -1,0 +1,129 @@
+{
+  "id": "content-online-safety",
+  "title": "Content, Online Safety & AI Regulation Analysis (Singapore, with Australia comparators)",
+  "type": "tabular",
+  "domain": "legal",
+  "practice": "Analysis of obligations arising from Singapore's online-content and online-safety regime (Broadcasting Act 1994 Part 9A and the Online Safety (Miscellaneous Amendments) Act 2022, IMDA codes and directions), related content laws (POFMA, POHA, Penal Code), and non-binding AI governance instruments (IMDA/AICAI frameworks), with Australian (eSafety) comparators where relevant.",
+  "columns_config": [
+    {
+      "index": 0,
+      "name": "Document / Regime Type",
+      "format": "tag",
+      "prompt": "What kind of instrument is being analysed?",
+      "tags": [
+        "Primary statute (e.g. Broadcasting Act 1994 as amended)",
+        "Amending Act (e.g. Online Safety (Miscellaneous Amendments) Act 2022)",
+        "Code of Practice issued by IMDA",
+        "Regulator direction / order (individualised)",
+        "Regulator guidelines / advisory",
+        "Licence condition",
+        "Government framework / white paper (non-binding)",
+        "Foreign comparator (e.g. AU Online Safety Act 2021 (Cth))",
+        "Contract / terms of service being tested against the regime"
+      ]
+    },
+    {
+      "index": 1,
+      "name": "Governing Statute & Regulator",
+      "format": "tag",
+      "prompt": "Which statute/regulator is the primary anchor for this document?",
+      "tags": [
+        "SG: Broadcasting Act 1994 (Part 9A online safety) / IMDA",
+        "SG: Online Safety (Miscellaneous Amendments) Act 2022",
+        "SG: POFMA 2019 / MCI-IMDA",
+        "SG: Protection from Harassment Act 2014 (POHA)",
+        "SG: Penal Code 1871 (content offences)",
+        "SG: Films Act 1981 / class licence",
+        "AU: Online Safety Act 2021 (Cth) / eSafety Commissioner",
+        "AU: ACMA (broadcasting / telecommunications)",
+        "Non-statutory: IMDA-AICAI AI governance instruments"
+      ]
+    },
+    {
+      "index": 2,
+      "name": "Legal Force & Status",
+      "format": "tag",
+      "prompt": "What is the binding force of this instrument?",
+      "tags": [
+        "Binding (primary or subsidiary legislation)",
+        "Binding on designated entities only (code of practice)",
+        "Binding only when a direction is issued",
+        "Voluntary / co-regulatory",
+        "Non-binding guidance / framework",
+        "Not yet in force / pending commencement"
+      ]
+    },
+    {
+      "index": 3,
+      "name": "Statutory Anchoring & Mapping",
+      "format": "text",
+      "prompt": "Map the instrument to its legal source. If this is a code of practice, identify the enabling provision (e.g. Part 9A of the Broadcasting Act 1994, inserted by the Online Safety (Miscellaneous Amendments) Act 2022 (Act 43 of 2022), which empowers IMDA to issue codes of practice for regulated online services and to designate social media services as 'regulated online services'). For each obligation in the document, give the corresponding statutory basis or say whether it exists only in the code or in regulator practice. Note commencement history where visible (the 2022 amendments commenced in stages from 1 February 2023; codes of practice took effect as separately issued)."
+    },
+    {
+      "index": 4,
+      "name": "Key Definitions & Content Categories",
+      "format": "text",
+      "prompt": "List and explain the operative defined terms: 'online service', 'regulated online service', 'designated social media service', 'user-generated content', 'harmful online content' and 'egregious content' (under Part 9A of the Broadcasting Act 1994, egregious content includes content depicting sexual activity with minors, content advocating or instructing terrorism, and content inciting racial or religious violence or hatred). Where the instrument defines categories by reference to severity or audience (e.g. content that is 'likely to cause significant harm'), note the subjective element and who decides."
+    },
+    {
+      "index": 5,
+      "name": "Who Is Bound / Designation",
+      "format": "text",
+      "prompt": "State who is bound: all online service providers, only services designated by IMDA (published in the Gazette with a written notice), or only entities that receive a specific direction. Note that the Singapore regime is service-designation based (currently the major social media services are designated and must comply with the Code of Practice for Online Safety), unlike a general horizontal duty on every platform. If the document relates to a named entity, state whether it is a designated service and the date of designation."
+    },
+    {
+      "index": 6,
+      "name": "Child-Safety Obligations",
+      "format": "text",
+      "prompt": "Extract the child-safety measures required: under the Code of Practice for Online Safety for designated social media services, obligations include implementing reasonably practicable measures to mitigate the risk of children accessing harmful content, e.g. age assurance, default safety settings for child accounts, and parental tools. Distinguish obligations owed to 'children' (users under 18 under the SG code) from those owed to the general public, and identify any measures that are within the provider's discretion ('reasonably practicable' - the test is objective)."
+    },
+    {
+      "index": 7,
+      "name": "General-User Safety & Reporting Obligations",
+      "format": "text",
+      "prompt": "Summarise the safety measures owed to all users: user-reporting mechanisms, response and investigation timelines for reports of harmful content, content moderation against the service's community standards, transparency reporting to IMDA, and record-keeping. Quote any explicit timeframes (e.g. the code's required response windows) and note which obligations depend on the service's user base and risk profile."
+    },
+    {
+      "index": 8,
+      "name": "Directions, Egregious Content & Access Limiting",
+      "format": "text",
+      "prompt": "Describe the regulator's directions toolkit: IMDA's power to direct a regulated online service to disable Singapore-user access to egregious content (Part 9A of the Broadcasting Act 1994), the requirement to comply within the stated timeframe, and the processes around it (including notice, reconsideration, and non-compliance steps). Distinguish 'egregious content' directions from other directions (e.g. codes-compliance directions or directions to block content under the internet licensing regime). Note any due-process rights for the affected platform or content poster, and cross-reference the comparable Australian take-down powers of the eSafety Commissioner under the Online Safety Act 2021 (Cth) where useful."
+    },
+    {
+      "index": 9,
+      "name": "Enforcement, Penalties & Liability",
+      "format": "text",
+      "prompt": "State the enforcement mechanics and penalties: for a designated service's failure to comply with the code of practice or a direction - IMDA may compound, issue a financial penalty (the statutory maximum for a contravention by a regulated online service under Part 9A of the Broadcasting Act as amended is SGD 1 million per contravention, with continuing-contravention amounts where provided; verify the operative section number, circa s 45F), or institute prosecution; note any daily penalty and any officer-liability provision. Include the review/appeal route (appeal to the Minister and then to the General Division of the High Court where provided)."
+    },
+    {
+      "index": 10,
+      "name": "Interaction with Related Content & Technology Laws",
+      "format": "text",
+      "prompt": "Map interactions with the surrounding content/tech ecosystem: POFMA (Protection from Online Falsehoods and Manipulation Act 2019 - false statements of fact against the public interest; corrective directions to platforms and internet intermediaries), POHA (Protection from Harassment Act 2014 - including Part 3 orders against 'doxxing'-style conduct), Penal Code 1871 content offences (e.g. ss 298A/505-type provisions), the Films Act 1981 and class-licence conditions, the Telecommunications Act 1999 and the Internet Code of Practice, the Computer Misuse Act 1993, the PDPA 2012 (data used in content moderation and profiling), and the Cybersecurity Act 2018. State whether the instrument contains 'does not limit/prevail' clauses and identify where multiple regimes can apply to the same content."
+    },
+    {
+      "index": 11,
+      "name": "AI Governance Overlay",
+      "format": "text",
+      "prompt": "Identify the AI-governance instruments that apply to or inform this document: the Model AI Governance Framework for Generative AI (IMDA/AICAI, updated 2024-2025), the Model AI Governance Framework (2nd ed), AI Verify and the GenAI evaluation sandbox, the National AI Strategy 2.0, and PDPC advisory guidelines on generative AI use of personal data. For each, state its status: non-binding guidance, industry self-assessment, or incorporated into a code/contract. Flag whether the instrument imposes any binding obligations on AI system providers (e.g. transparency, testing, incident reporting) or whether such duties arise only indirectly through the PDPA, content rules on synthetic media, or platform terms."
+    },
+    {
+      "index": 12,
+      "name": "Synthetic Content & Deepfakes",
+      "format": "text",
+      "prompt": "Analyse how the instrument treats AI-generated or manipulated media (deepfakes): does it require disclosure/labelling of synthetic content, does it treat deepfakes as a subset of existing harmful-content categories, and are there specific duties on providers to detect or mitigate manipulation? Note where SG law currently reaches synthetic media through general content rules (egregious-content categories, POFMA falsehoods, POHA harassment, and the Election advertising / Parliamentary-election deepfake provisions) rather than a standalone AI-content statute, and where Australian law (eSafety's adult-content or AI deepfake powers, or the Criminal Code 1995 (Cth) non-consensual deepfake offences) goes further."
+    },
+    {
+      "index": 13,
+      "name": "Compliance Gaps & Roadmap",
+      "format": "text",
+      "prompt": "For the organisation subject to this instrument (state which entity the analysis covers): (a) list each obligation with a status of met / partially met / not met and the evidence; (b) identify the highest-risk gaps (directions exposure, child-safety measures, transparency reporting, moderation capacity); (c) propose a prioritised remediation roadmap with owners and timeframes; and (d) note any horizon obligations (pending codes, designation, statutory amendments, AI legislation) the organisation should monitor."
+    },
+    {
+      "index": 14,
+      "name": "Plain-English Summary & Confidence",
+      "format": "text",
+      "prompt": "Write a plain-English summary in no more than 200 words: WHAT the instrument regulates, WHO it binds, WHAT they must do, WHAT happens on breach, and the single most important compliance risk. Then list the conclusions you are least confident about and the specific follow-up research needed (e.g. verifying current designation status, checking the latest code revision, confirming penalty amounts against the current edition of the Act)."
+    }
+  ]
+}

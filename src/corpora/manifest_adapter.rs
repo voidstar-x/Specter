@@ -33,6 +33,8 @@ use crate::corpora::plugin::{
     HttpSearchKeywordSpec, ResponseShape,
 };
 use crate::corpora::{CorpusDocument, CorpusHit, LegalCorpusAdapter};
+#[cfg(feature = "pdf")]
+use std::io::Write;
 
 /// Owns the plugin (for the spec) + a `reqwest::Client` shared across
 /// requests. Cheap to clone; the adapter registry hands out `Arc`
@@ -204,31 +206,48 @@ impl LegalCorpusAdapter for ManifestAdapter {
             &self.spec.search_by_id.url_template,
             &[("identifier", identifier), ("lang", lang.as_str())],
         )?;
-        let body = self.fetch_text(&url).await?;
-        let title = extract_one(
-            &body,
-            self.spec.search_by_id.shape,
-            self.spec.search_by_id.title_path.as_deref(),
-        )
-        .unwrap_or_else(|| identifier.to_string());
-        let date = extract_one(
-            &body,
-            self.spec.search_by_id.shape,
-            self.spec.search_by_id.date_path.as_deref(),
-        );
-        let text = extract_one(
-            &body,
-            self.spec.search_by_id.shape,
-            Some(self.spec.search_by_id.body_path.as_str()),
-        )
-        .ok_or_else(|| {
-            anyhow!(
-                "corpus {} fetch of {}: body selector {:?} matched nothing",
-                self.plugin.id,
-                identifier,
-                self.spec.search_by_id.body_path
-            )
-        })?;
+        let shape = self.spec.search_by_id.shape;
+        let (text, title, date) = match shape {
+            #[cfg(feature = "pdf")]
+            ResponseShape::DirectPdf => {
+                // The manifest points straight at an official PDF. Download the
+                // bytes, extract the text layer with pdfium, and store plain
+                // text (the document cache below is text-only). Scanned PDFs
+                // fail loudly instead of silently storing empty bodies.
+                let text = self.fetch_pdf_text(&url, identifier).await?;
+                let title = first_nonempty_line(&text)
+                    .unwrap_or_else(|| identifier.to_string());
+                (text, title, None)
+            }
+            ResponseShape::RestHtml | ResponseShape::RestJson => {
+                let body = self.fetch_text(&url).await?;
+                let title = extract_one(
+                    &body,
+                    shape,
+                    self.spec.search_by_id.title_path.as_deref(),
+                )
+                .unwrap_or_else(|| identifier.to_string());
+                let date = extract_one(
+                    &body,
+                    shape,
+                    self.spec.search_by_id.date_path.as_deref(),
+                );
+                let text = extract_one(
+                    &body,
+                    shape,
+                    Some(self.spec.search_by_id.body_path.as_str()),
+                )
+                .ok_or_else(|| {
+                    anyhow!(
+                        "corpus {} fetch of {}: body selector {:?} matched nothing",
+                        self.plugin.id,
+                        identifier,
+                        self.spec.search_by_id.body_path
+                    )
+                })?;
+                (text, title, date)
+            }
+        };
         Ok(CorpusDocument {
             identifier: identifier.to_string(),
             title,
@@ -242,15 +261,69 @@ impl LegalCorpusAdapter for ManifestAdapter {
     }
 }
 
+/// Max bytes accepted from a corpus HTTP response (before gzip decode and
+/// after). Keeps a hostile/misbehaving endpoint from filling the disk cache.
+const MAX_BODY_BYTES: usize = 64 * 1024 * 1024;
+
 impl ManifestAdapter {
-    async fn fetch_text(&self, url: &str) -> Result<String> {
+    /// Fetch a direct-PDF document and return its extracted plain text.
+    #[cfg(feature = "pdf")]
+    async fn fetch_pdf_text(&self, url: &str, identifier: &str) -> Result<String> {
+        let bytes = self.fetch_bytes(url).await?;
+        if !bytes.starts_with(b"%PDF-") {
+            bail!(
+                "corpus {} fetch of {}: response from {url} is not a PDF ({} bytes)",
+                self.plugin.id,
+                identifier,
+                bytes.len()
+            );
+        }
+        // Pdfium reads from a real file on disk. Use a uniquely-named temp file
+        // so concurrent fetches never collide; always clean it up.
+        let nanos = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .map(|d| d.as_nanos())
+            .unwrap_or(0);
+        let path = std::env::temp_dir().join(format!(
+            "mikerust-manifest-{}-{nanos}.pdf",
+            std::process::id()
+        ));
+        if let Err(e) = std::fs::File::create(&path)
+            .and_then(|mut f| f.write_all(&bytes))
+        {
+            let _ = std::fs::remove_file(&path);
+            return Err(e).with_context(|| format!("write temp PDF for {url}"));
+        }
+        let path_for_task = path.clone();
+        let extracted = tokio::task::spawn_blocking(move || {
+            crate::pdf::extract_full_text(&path_for_task)
+        })
+        .await
+        .with_context(|| format!("PDF extraction task for {url}"))?
+        .with_context(|| format!("PDF text extraction for {url}"))?;
+        let _ = std::fs::remove_file(&path);
+        if extracted.trim().is_empty() {
+            bail!(
+                "corpus {} fetch of {}: PDF {url} yielded no extractable text                  (scanned/image-only PDF needs an OCR pass)",
+                self.plugin.id,
+                identifier
+            );
+        }
+        Ok(extracted)
+    }
+
+    /// GET `url` and return the raw (post-gzip) body bytes. Shared by the
+    /// text and direct-PDF fetch paths so both get: bounded sizes, gzip
+    /// decoding (some official portals send gzip regardless of
+    /// Accept-Encoding), and loud anti-bot challenge rejection.
+    async fn fetch_bytes(&self, url: &str) -> Result<Vec<u8>> {
         tracing::info!("[manifest] GET {url}");
         let resp = self
             .client
             .get(url)
             .header(
                 reqwest::header::ACCEPT,
-                "text/html,application/xhtml+xml,application/xml;q=0.9,application/json;q=0.9,*/*;q=0.8",
+                "application/pdf,text/html,application/xhtml+xml,application/xml;q=0.9,application/json;q=0.9,*/*;q=0.8",
             )
             .send()
             .await
@@ -259,10 +332,24 @@ impl ManifestAdapter {
         if !status.is_success() {
             bail!("HTTP {} from {url}", status.as_u16());
         }
-        let body = resp
-            .text()
+        let gzip = resp
+            .headers()
+            .get(reqwest::header::CONTENT_ENCODING)
+            .and_then(|v| v.to_str().ok())
+            .map(|v| v.to_ascii_lowercase().contains("gzip"))
+            .unwrap_or(false);
+        let raw = resp
+            .bytes()
             .await
-            .with_context(|| format!("body decode {url}"))?;
+            .with_context(|| format!("body read {url}"))?;
+        let body = if gzip {
+            decode_gzip(&raw, url)?
+        } else {
+            raw.to_vec()
+        };
+        if body.len() > MAX_BODY_BYTES {
+            bail!("response from {url} exceeds {} bytes", MAX_BODY_BYTES);
+        }
 
         // Anti-bot challenge detection. We can't solve JS-PoW
         // challenges (Cloudflare, AWS WAF) from Rust, so the only
@@ -271,7 +358,7 @@ impl ManifestAdapter {
         // poison the cache with garbage and confuse the user.
         // Same pattern as src/corpora/eurlex.rs's WAF detector,
         // generalised here for any declarative corpus.
-        if let Some(provider) = detect_anti_bot_challenge(&body) {
+        if let Some(provider) = detect_anti_bot_challenge(&String::from_utf8_lossy(&body)) {
             tracing::warn!(
                 "[manifest] {url}: {} anti-bot challenge intercepted — \
                  declarative engine cannot solve JS challenges",
@@ -287,6 +374,35 @@ impl ManifestAdapter {
         }
         Ok(body)
     }
+
+    async fn fetch_text(&self, url: &str) -> Result<String> {
+        let bytes = self.fetch_bytes(url).await?;
+        String::from_utf8(bytes).with_context(|| format!("body decode {url}"))
+    }
+}
+
+/// Decompress a gzip payload with a hard output cap.
+fn decode_gzip(body: &[u8], url: &str) -> Result<Vec<u8>> {
+    use std::io::Read;
+    let mut out = Vec::new();
+    flate2::read::GzDecoder::new(body)
+        .take(MAX_BODY_BYTES as u64 + 1)
+        .read_to_end(&mut out)
+        .with_context(|| format!("gzip decode {url}"))?;
+    if out.len() > MAX_BODY_BYTES {
+        bail!("gzip response from {url} exceeds {} bytes", MAX_BODY_BYTES);
+    }
+    Ok(out)
+}
+
+/// First non-empty trimmed line of a text body — used as the title fallback
+/// for direct-PDF documents that carry no separate metadata.
+fn first_nonempty_line(text: &str) -> Option<String> {
+    text.lines()
+        .map(str::trim)
+        .filter(|line| !line.is_empty() && !line.starts_with("[Page "))
+        .next()
+        .map(String::from)
 }
 
 /// Returns Some(provider-label) when `body` matches a known anti-bot
@@ -365,7 +481,12 @@ fn percent_encode_query(s: &str) -> String {
             | b'.'
             | b'~'
             | b'/'
-            | b':' => {
+            | b':'
+            | b'?'
+            | b'&'
+            | b'='
+            | b'+'
+            | b'%' => {
                 out.push(b as char);
             }
             _ => out.push_str(&format!("%{:02X}", b)),
@@ -408,6 +529,9 @@ fn extract_one(
     let value = match shape {
         ResponseShape::RestHtml => extract_from_html(body, raw)?,
         ResponseShape::RestJson => extract_from_json(body, raw)?,
+        // direct-pdf corpora have no selectable CSS/JSON fields.
+        #[cfg(feature = "pdf")]
+        ResponseShape::DirectPdf => return None,
     };
     Some(apply_postprocessors(value, &post))
 }
@@ -584,6 +708,9 @@ fn extract_hits(
         ResponseShape::RestJson => {
             extract_hits_json(body, spec, limit, lang)
         }
+        // direct-pdf corpora cannot run keyword searches (identifier-only).
+        #[cfg(feature = "pdf")]
+        ResponseShape::DirectPdf => Vec::new(),
     }
 }
 
@@ -886,6 +1013,101 @@ const _: () = {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+
+    fn pdf_adapter(url: &str) -> ManifestAdapter {
+        let plugin: CorpusPlugin = serde_json::from_value(serde_json::json!({
+            "id": "pdf-test", "display_name": "PDF test",
+            "languages": ["en"], "default_language": "en",
+            "supports_language_fallback": false, "identifier_label": "Path",
+            "strategy": { "kind": "http-fetch-per-id", "search_by_id": {
+                "url_template": url, "shape": "direct-pdf", "body_path": ""
+            }}
+        })).unwrap();
+        ManifestAdapter::try_from_plugin(&plugin).unwrap()
+    }
+
+    async fn serve_pdf(body: Vec<u8>) -> String {
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let addr = listener.local_addr().unwrap();
+        tokio::spawn(async move {
+            use tokio::io::{AsyncReadExt, AsyncWriteExt};
+            for _ in 0..2 {
+                let (mut stream, _) = listener.accept().await.unwrap();
+                let mut request = [0; 4096];
+                stream.read(&mut request).await.unwrap();
+                let headers = format!("HTTP/1.1 200 OK\r\nContent-Type: application/pdf\r\nContent-Length: {}\r\nConnection: close\r\n\r\n", body.len());
+                if stream.write_all(headers.as_bytes()).await.is_ok() {
+                    let _ = stream.write_all(&body).await;
+                }
+            }
+        });
+        format!("http://{addr}/{{identifier}}")
+    }
+
+    // Valid self-contained PDF fixture (xref offsets are computed from the
+    // actual objects, not a mocked extractor or a magic-header-only payload).
+    fn text_pdf(text: &str) -> Vec<u8> {
+        let stream = format!("BT /F1 12 Tf 40 100 Td ({text}) Tj ET");
+        let objects = [
+            "<< /Type /Catalog /Pages 2 0 R >>".to_string(),
+            "<< /Type /Pages /Kids [3 0 R] /Count 1 >>".to_string(),
+            "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 300 200] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>".to_string(),
+            "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>".to_string(),
+            format!("<< /Length {} >>\nstream\n{stream}\nendstream", stream.len()),
+        ];
+        let mut pdf = b"%PDF-1.4\n".to_vec();
+        let mut offsets = Vec::new();
+        for (i, object) in objects.iter().enumerate() {
+            offsets.push(pdf.len());
+            pdf.extend_from_slice(format!("{} 0 obj\n{object}\nendobj\n", i + 1).as_bytes());
+        }
+        let xref = pdf.len();
+        pdf.extend_from_slice(b"xref\n0 6\n0000000000 65535 f \n");
+        for offset in offsets {
+            pdf.extend_from_slice(format!("{offset:010} 00000 n \n").as_bytes());
+        }
+        pdf.extend_from_slice(format!("trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n{xref}\n%%EOF\n").as_bytes());
+        pdf
+    }
+
+    #[cfg(feature = "pdf")]
+    #[tokio::test]
+    async fn direct_pdf_fetch_returns_plaintext() {
+        let url = serve_pdf(text_pdf("Official law fixture: section 1.")).await;
+        let adapter = pdf_adapter(&url);
+        let doc = adapter.fetch("act.pdf", None, false).await.unwrap();
+        assert_eq!(doc.mime, "text/plain; charset=utf-8");
+        let text = String::from_utf8(doc.bytes).unwrap();
+        assert!(text.contains("Official law fixture: section 1."), "{text}");
+        assert!(!text.starts_with("%PDF"));
+        assert_eq!(doc.identifier, "act.pdf");
+        assert_eq!(doc.title, "Official law fixture: section 1.");
+        assert_eq!(doc.language, "en");
+        assert_eq!(doc.source_url, url.replace("{identifier}", "act.pdf"));
+    }
+
+    #[test]
+    fn url_substitution_keeps_verbatim_document_urls() {
+        // direct-pdf manifests substitute the whole official document URL
+        // (query string and existing percent-escapes included) into a bare
+        // {identifier} template. The encoder must not re-encode them.
+        let url = substitute_url(
+            "{identifier}",
+            &[(
+                "identifier",
+                "https://official.go.my/aktap/RECORDS%20%28DISPOSAL%29%20ACT%201955.pdf?token=aHR0cDovL2V4YW1wbGUvKz0_&x=1",
+            )],
+        )
+        .unwrap();
+        assert_eq!(
+            url,
+            "https://official.go.my/aktap/RECORDS%20%28DISPOSAL%29%20ACT%201955.pdf?token=aHR0cDovL2V4YW1wbGUvKz0_&x=1"
+        );
+        let enc =
+            substitute_url("https://x/{identifier}", &[("identifier", "a b&c")]).unwrap();
+        assert_eq!(enc, "https://x/a%20b&c");
+    }
 
     #[test]
     fn url_substitution_replaces_named_placeholders() {

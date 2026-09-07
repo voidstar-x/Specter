@@ -1106,7 +1106,7 @@ mod tests {
         let payload = build_read_workflow_response(
             "wf-id",
             "Test workflow",
-            "Sei un assistente. Aiuta l'utente.",
+            "You are an assistant. Help the user.",
             None,
             &[],
         );
@@ -1123,7 +1123,7 @@ mod tests {
         let payload = build_read_workflow_response(
             "builtin-redazione-diffida",
             "Redazione diffida",
-            "Sei un avvocato. Redigi una diffida.",
+            "You are a lawyer. Draft a demand letter.",
             Some("it/diffida-messa-in-mora"),
             &templates,
         );

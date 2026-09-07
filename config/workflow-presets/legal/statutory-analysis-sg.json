@@ -1,0 +1,138 @@
+{
+  "id": "statutory-analysis-sg",
+  "title": "Statutory Analysis & Interpretation (Singapore - Internet, Tech, Content & AI Regulation)",
+  "type": "tabular",
+  "domain": "legal",
+  "practice": "Jurisdiction-particular statutory analysis and interpretation of Singapore primary Acts, subsidiary legislation (Statutory Boards' Acts, S-numbers in the Gazette), IMDA/PDPC/CSA/MAS codes and guidelines, with emphasis on internet, technology, content, data and AI regulation. Interpretation follows the purposive approach under the Interpretation Act 1965 s 9A; commencement follows s 12. All monetary figures in Singapore dollars (S$).",
+  "columns_config": [
+    {
+      "index": 0,
+      "name": "Jurisdiction & Instrument Identification",
+      "format": "text",
+      "prompt": "Confirm this is a Singapore instrument, then identify it precisely: full short title exactly as printed, year, Act number in the form 'Act X of YYYY' (e.g. Online Safety (Relief and Accountability) Act 2023) or S-number for subsidiary legislation (e.g. Personal Data Protection Regulations 2021 (S 653/2021)), and administering Ministry or regulator. State the instrument type (primary Act, subsidiary legislation, IMDA/PDPC code or direction, or draft/consultation paper — say so explicitly if it is a draft or consultation). The consolidated current text is published on Singapore Statutes Online (sso.agc.gov.sg); if a document plugin or the official source is available and any provision, commencement date or penalty figure is uncertain, VERIFY the current text there before answering, and otherwise prefer an explicit 'verify the current provision' note to a possibly-stale pin-cite."
+    },
+    {
+      "index": 1,
+      "name": "Instrument Type & Legal Force",
+      "format": "tag",
+      "prompt": "What type of instrument is this, and what legal force does it carry — does it bind persons directly, bind only designated or licensed entities, bind only when a direction is issued, or merely guide?",
+      "tags": [
+        "Primary Act (binding)",
+        "Subsidiary legislation / regulations (binding)",
+        "Statutory code of practice (binding on designated entities)",
+        "Industry code (binds only if directed/notified)",
+        "Regulator direction or order (binds on issue)",
+        "Regulator guidelines / advisory (non-binding)",
+        "Government framework / policy paper (non-binding)",
+        "Consultation / draft for comment",
+        "Foreign or model law (reference only)"
+      ]
+    },
+    {
+      "index": 2,
+      "name": "Administering Authority",
+      "format": "tag",
+      "prompt": "Which Singapore authority administers or enforces this instrument? Name it exactly as it styles itself, and note in the answer whether it is a Ministry, a statutory board, or both acting together.",
+      "tags": [
+        "PDPC (Personal Data Protection Commission)",
+        "IMDA (Infocomm Media Development Authority)",
+        "IMDA / MCI (content, online safety, media)",
+        "Cyber Security Agency of Singapore (CSA)",
+        "MAS (Monetary Authority of Singapore)",
+        "MHA / SPF (criminal, public order, POHA)",
+        "MCI (POFMA)",
+        "Other / multiple (explain in notes)"
+      ]
+    },
+    {
+      "index": 3,
+      "name": "Commencement & Transitional Provisions",
+      "format": "text",
+      "prompt": "State the assent date and commencement date(s), including any phased or prospective commencement. Apply s 12 of the Interpretation Act 1965: an Act or subsidiary legislation commences on the day of its publication in the Gazette unless another day is appointed (commonly by commencement notification). Identify any savings and transitional provisions and state whether pre-commencement conduct is caught. If commencement is by ministerial notification and the date is not stated, say so rather than guessing."
+    },
+    {
+      "index": 4,
+      "name": "Scope of Application & Extraterritorial Reach",
+      "format": "text",
+      "prompt": "What does the instrument apply to? Identify the territorial nexus and any express extraterritorial operation (e.g. the PDPA applies to organisations outside Singapore that collect, use or disclose personal data in Singapore — PDPA 2012 s 4(2); the online-safety duties introduced by the Online Safety (Miscellaneous Amendments) Act 2022 into the Broadcasting Act 1994 apply to regulated online services with a place of business in Singapore and Singapore users). State whether an offshore platform or foreign-headquartered entity would be captured, citing the specific provision for the nexus test."
+    },
+    {
+      "index": 5,
+      "name": "Who Is Bound",
+      "format": "text",
+      "prompt": "Who is the primary regulated population under this instrument — for example all organisations in Singapore, data intermediaries only, designated online services, critical information infrastructure (CII) owners, licensees, or individuals facing offences? State whether liability extends to directors or officers, and who is expressly excluded (e.g. public agencies and individuals acting in personal capacity under the PDPA)."
+    },
+    {
+      "index": 6,
+      "name": "Key Definitions",
+      "format": "text",
+      "prompt": "List the defined terms that do the interpretive work (e.g. 'personal data' and 'data intermediary' under PDPA 2012 s 2; the online-safety content categories under Part 9A of the Broadcasting Act 1994 as amended in 2022; 'computer', 'protected computer' and 'CII' under the Cybersecurity Act 2018). Quote each statutory definition, note whether it is broad, narrow or open-textured ('reasonable', 'serious harm'), and flag definitions that drive the scope of obligations."
+    },
+    {
+      "index": 7,
+      "name": "Core Obligations",
+      "format": "text",
+      "prompt": "Set out the core affirmative obligations with pinpoint section references, stating for each WHO is bound, WHAT must be done, and WHEN (continuing duty, on request, on notification, event-triggered). Distinguish absolute duties from 'reasonable efforts/steps' standards (reasonableness is judged objectively under Singapore common law) and heightened 'best endeavours' standards. Do not conflate obligations with prohibitions."
+    },
+    {
+      "index": 8,
+      "name": "Prohibitions & Offences",
+      "format": "text",
+      "prompt": "Identify express prohibitions and criminal offences, quoting the operative words and stating the fault element where specified (e.g. reckless or knowing conduct in PDPA Do Not Call offences; Cybersecurity Act 2018 ss 15-16 unauthorised-access-type offences; content offences under POFMA 2019 and the Protection from Harassment Act 2014). Note strict-liability provisions, default penalties for continuing contravention, and whether the offence applies to bodies corporate."
+    },
+    {
+      "index": 9,
+      "name": "Exemptions & Carve-outs",
+      "format": "text",
+      "prompt": "List every exemption, exception, carve-out, safe harbour and 'public interest' / 'national interest' gateway relevant to this instrument (e.g. the PDPA Second Schedule exceptions including business contact information; the data-intermediary carve-out; exclusions and thresholds in the online-safety regime; the CII-designation limits under the Cybersecurity Act 2018). For each, state whether it is an exclusion from scope, a defence the regulated party must establish, or a regulator discretion — and who bears the burden."
+    },
+    {
+      "index": 10,
+      "name": "Enforcement Powers",
+      "format": "text",
+      "prompt": "Describe the regulator's enforcement toolkit with section references: investigation and information-gathering powers, directions and orders (e.g. PDPC directions and financial penalties under PDPA Part 5; access-limiting and online-content directions under the Broadcasting Act Part 9A as amended; CSA directions to CII owners), and any requirement that a code of practice be issued before powers bite. State the review or appeal route — in Singapore regimes this commonly runs to an appeal to the Minister and then to the General Division of the High Court where provided."
+    },
+    {
+      "index": 11,
+      "name": "Penalties & Sanctions",
+      "format": "text",
+      "prompt": "State the maximum penalties exactly as enacted in Singapore dollars (S$; do not convert or round): fines, imprisonment terms, per-day or continuing-contravention penalties, civil penalties, and licence conditions. Quote the section for each figure. State whether each penalty falls on the entity, on directors/officers, or both (e.g. officer-liability provisions such as PDPA s 60 and general deemed-liability provisions), and whether penalties are per contravention or aggregated."
+    },
+    {
+      "index": 12,
+      "name": "Rights of Affected Individuals & Private Remedies",
+      "format": "text",
+      "prompt": "Identify rights exercisable by individuals or affected parties: complaint rights (e.g. PDPC complaints), access/correction rights (PDPA ss 21-22), private rights of action (e.g. the PDPA private right of action for loss or damage from a data breach, s 48P), and common-law remedies (breach of confidence, negligence, breach of statutory duty where actionable). Distinguish administrative complaint routes from private enforcement, and state who bears the burden of proof and any damages caps."
+    },
+    {
+      "index": 13,
+      "name": "Interaction with Other Laws",
+      "format": "text",
+      "prompt": "Map how this instrument interacts with related Singapore law: its parent Act and subsidiary regulations; cross-references to other statutes (e.g. PDPA with the Computer Misuse Act 1993 and Cybersecurity Act 2018; the online-safety regime in the Broadcasting Act 1994 alongside POFMA 2019 and the Films Act 1981; AI-governance guidance with the PDPA); any express non-derogation or 'does not affect' clauses; and whether this instrument prevails or yields where regimes overlap. Flag any double-regulation or gap."
+    },
+    {
+      "index": 14,
+      "name": "Interpretation Issues & Ambiguity",
+      "format": "text",
+      "prompt": "Identify provisions that are ambiguous, novel or untested, and apply the Singapore interpretive method: the purposive approach under s 9A of the Interpretation Act 1965 (an interpretation that promotes the purpose or object underlying the written law is preferred), including the use of extrinsic material under s 9A(3) (e.g. the Ministerial statement / second-reading speech), alongside ordinary common-law canons and the courts' resistance to doubtful penalisation. State the most defensible reading, any rival reading that would change compliance outcomes, and any matter of first impression."
+    },
+    {
+      "index": 15,
+      "name": "Practical Implications & Gap Analysis",
+      "format": "text",
+      "prompt": "For a client operating in the regulated space (adapt to the instrument): (a) list the concrete compliance actions required, each tagged must-do (legal obligation) or should-do (good practice), with relative priority and effort; (b) identify gaps between what the instrument requires and typical industry practice in Singapore; (c) flag residual risks that cannot be fully mitigated; and (d) note any pending amendments, forthcoming codes or consultations worth monitoring."
+    },
+    {
+      "index": 16,
+      "name": "Plain-English Summary",
+      "format": "text",
+      "prompt": "Write a plain-English summary of this instrument in no more than 250 words, structured as: WHAT it is; WHO it binds; WHAT it requires; WHAT happens if breached; and ONE sentence on the biggest practical risk. No jargon and no unexplained defined terms — suitable for a board briefing."
+    },
+    {
+      "index": 17,
+      "name": "Confidence & Open Questions",
+      "format": "text",
+      "prompt": "State your confidence in each major conclusion (high / medium / low) and list every open question requiring further research: untested provisions, pending subsidiary legislation or codes, uncertain commencement status, and reliance on non-binding guidance. Explicitly distinguish what the statute says from what PDPC/IMDA/CSA guidance says it says. Where a provision's current wording, commencement or penalty figure is uncertain and a document plugin or Singapore Statutes Online is available, VERIFY the current provision before answering; otherwise prefer an explicit 'verify the current provision' note to a possibly-stale pin-cite."
+    }
+  ]
+}

@@ -491,6 +491,21 @@
             "regions": [],
             "_quality_note": "Professional-grade local catalogue for self-hosted OpenAI-compatible endpoints: 24GB-quantized local shortlist, constrained-laptop aliases, plus GPU-server balanced profiles.",
             "models": [
+
+                {
+                "id": "deepseek-v4-flash-vision-exp",
+                "display_name": "DeepSeek V4 Flash Vision Exp (local)",
+                "family": "deepseek",
+                "tier": "fast",
+                "context_window": 131072,
+                "max_output_tokens": 32768,
+                "supports_vision": true,
+                "supports_tools": true,
+                "supports_streaming": true,
+                "supports_prompt_cache": false,
+                "supports_extended_thinking": false,
+                "preview": false
+                },
                 {
                     "id": "qwen3.6:27b-instruct",
                     "display_name": "Qwen 3.6 27B Instruct (24GB Quantized)",

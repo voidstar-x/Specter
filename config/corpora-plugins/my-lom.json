@@ -1,0 +1,32 @@
+{
+  "id": "my-lom",
+  "display_name": "Malaysia / Laws of Malaysia (LOM)",
+  "description": "Laws of Malaysia from the Attorney General's Chambers (lom.agc.gov.my). Official source. LOM hides full text behind a signed processFile.php?token= link; the identifier is the full official document URL (processFile.php?token=... or the ilims/upload/... .pdf it resolves to). The connector downloads that PDF and extracts its text layer. Verified 2026-09-07 on Act 883 Records (Disposal) (Sarawak) Act 1955.",
+  "homepage": "https://lom.agc.gov.my/",
+  "languages": ["en", "ms"],
+  "default_language": "en",
+  "supports_language_fallback": false,
+  "identifier_label": "Full official LOM PDF URL (processFile.php?token=... harvested from the site)",
+  "identifier_example": "https://lom.agc.gov.my/ilims/upload/portal/akta/outputaktap/3552389_BI/RECORDS%20(DISPOSAL)%20(SARAWAK)%20ACT%201955%20(Revised-2026).pdf",
+  "enabled_by_default": true,
+  "available": true,
+  "strategy": {
+    "kind": "http-fetch-per-id",
+    "search_by_id": {
+      "url_template": "{identifier}",
+      "shape": "direct-pdf",
+      "title_path": "",
+      "body_path": ""
+    }
+  },
+  "capabilities": {
+    "search": false,
+    "fetch": true,
+    "documents": true,
+    "documents_delete": true,
+    "documents_resync": true,
+    "embed_progress": false,
+    "bulk_import": false,
+    "user_config": true
+  }
+}

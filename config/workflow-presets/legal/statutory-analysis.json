@@ -1,0 +1,140 @@
+{
+  "id": "statutory-analysis",
+  "title": "Statutory Analysis & Interpretation (jurisdiction-agnostic)",
+  "type": "tabular",
+  "domain": "legal",
+  "practice": "Jurisdiction-agnostic statutory analysis and interpretation of primary Acts, subsidiary legislation, regulatory codes and guidance, with emphasis on internet, technology, content, data and AI regulation. Identifies the applicable jurisdiction first rather than assuming one; every column works off the identified jurisdiction.",
+  "columns_config": [
+    {
+      "index": 0,
+      "name": "Jurisdiction Identification",
+      "format": "text",
+      "prompt": "Identify the jurisdiction whose law governs this instrument (country, and where relevant the sub-national level, e.g. a state or territory), based on the document's issuing body, citation style and legal system markers. If the jurisdiction is not clear from the document, STOP and ask which jurisdiction applies before proceeding; do not silently assume one. If analysis must proceed on a provisional basis, state the assumed jurisdiction prominently at the top of every subsequent answer and label it 'ASSUMED'. Name the controlling interpretation statute for the identified jurisdiction as part of the answer."
+    },
+    {
+      "index": 1,
+      "name": "Instrument Identification",
+      "format": "text",
+      "prompt": "Identify the instrument precisely: full short title exactly as printed, year, and the instrument's official number or gazette/reference number (use the convention of the identified jurisdiction for numbered subsidiary legislation). State the instrument type in one phrase (primary legislation / subsidiary legislation / code / guideline / direction / draft) and the official source where the consolidated current text is published, if known."
+    },
+    {
+      "index": 2,
+      "name": "Instrument Type & Legal Force",
+      "format": "tag",
+      "prompt": "What type of instrument is this, and what legal force does it carry — does it bind persons directly, bind only designated or licensed entities, bind only when a direction is issued, or merely guide?",
+      "tags": [
+        "Primary Act / statute (binding)",
+        "Subsidiary legislation / regulations (binding)",
+        "Statutory code of practice (binding on designated entities)",
+        "Regulator direction or order (binds on issue)",
+        "Regulator guidance / advisory (non-binding)",
+        "Government framework / policy paper (non-binding)",
+        "Draft / consultation paper (not yet law)"
+      ]
+    },
+    {
+      "index": 3,
+      "name": "Administering Authority",
+      "format": "tag",
+      "prompt": "Which kind of authority administers or enforces this instrument? Name the specific body exactly as it styles itself in the document, and note in the answer whether it is a government department, an independent statutory regulator, or a co-regulatory/industry body.",
+      "tags": [
+        "Government ministry / department",
+        "Independent statutory regulator",
+        "Multiple regulators (split by function)",
+        "Co-regulatory / industry body",
+        "Court or tribunal (adjudicative role)",
+        "Other / unclear (explain)"
+      ]
+    },
+    {
+      "index": 4,
+      "name": "Commencement & Transitional Provisions",
+      "format": "text",
+      "prompt": "State the assent/enactment date and the commencement date(s), including any phased, prospective or deferred commencement, and apply the default commencement rule of the identified jurisdiction's interpretation statute if the instrument is silent. Identify any transitional, saving, amendment or repeal provisions, and state whether conduct occurring before commencement is caught. If commencement is by ministerial appointment or proclamation and the date is not stated, say so rather than guessing."
+    },
+    {
+      "index": 5,
+      "name": "Scope of Application & Extraterritorial Reach",
+      "format": "text",
+      "prompt": "What does the instrument apply to? Identify the territorial nexus required (residence, establishment, place of business, carrying on activities, targeting users in the jurisdiction), any express extraterritorial operation, and any thresholds (user numbers, turnover, data volume, sector). State in plain terms whether an offshore or foreign-headquartered entity would be captured, and cite the specific provision for the nexus test."
+    },
+    {
+      "index": 6,
+      "name": "Who Is Bound",
+      "format": "text",
+      "prompt": "Who is the primary regulated population? Identify the persons or entities subject to obligations (by defined class — e.g. platforms, service providers, data controllers, licensees, designated entities), whether liability extends to directors, officers or parent entities, and who is expressly excluded or exempt from the defined class."
+    },
+    {
+      "index": 7,
+      "name": "Key Definitions",
+      "format": "text",
+      "prompt": "Which defined terms do the interpretive work in this instrument? For each, quote the statutory definition and state whether it is narrow, broad, or open-textured ('reasonable', 'significant', 'serious harm'). Flag the definitions that drive the scope of obligations or expand the instrument's reach, and any defined term left to subsidiary legislation or guidance to fill in."
+    },
+    {
+      "index": 8,
+      "name": "Core Obligations",
+      "format": "text",
+      "prompt": "Set out the core affirmative obligations with pinpoint provision references, stating for each: WHO is bound, WHAT must be done, and WHEN or on what trigger (continuing duty, periodic, on request, on notification, event-triggered). Distinguish absolute duties from qualified standards ('reasonable steps', 'best endeavours') and note how the standard is likely to be assessed. Do not conflate obligations with prohibitions."
+    },
+    {
+      "index": 9,
+      "name": "Prohibitions & Offences",
+      "format": "text",
+      "prompt": "Identify express prohibitions and criminal offences, quoting the operative words, and state the fault element where the provision specifies one (intent, knowledge, recklessness, negligence, strict or absolute liability). Note any reverse evidential burden, default penalties for continuing contravention, and whether the offence applies to bodies corporate as well as individuals."
+    },
+    {
+      "index": 10,
+      "name": "Exemptions & Carve-outs",
+      "format": "text",
+      "prompt": "List every exemption, exception, carve-out, safe harbour, threshold exclusion, and discretionary gateway ('public interest', 'national interest', 'reasonable grounds') in the instrument, with provision references. For each, state whether it is an exclusion from scope, a defence to be established by the regulated party, or a regulator discretion — and who bears the burden."
+    },
+    {
+      "index": 11,
+      "name": "Enforcement Powers",
+      "format": "text",
+      "prompt": "Describe the regulator's enforcement toolkit with provision references: information-gathering and investigation powers, inspection or entry powers, directions, notices and orders, enforceable undertakings or negotiated settlements, code-issuing powers, and any power that requires notice, hearing or review before it can be exercised. State the review or appeal route against a regulator decision and to whom."
+    },
+    {
+      "index": 12,
+      "name": "Penalties & Sanctions",
+      "format": "text",
+      "prompt": "State the maximum penalties exactly as enacted, in the original currency and unit of the instrument (do not convert currency): fines or financial penalties, imprisonment terms, per-day or continuing-contravention penalties, civil penalties, disgorgement, licence suspension or revocation, and injunctions. State whether each penalty falls on the entity, on officers, or both, and whether it is per contravention or aggregated. Quote the section for each figure."
+    },
+    {
+      "index": 13,
+      "name": "Rights of Affected Individuals & Private Remedies",
+      "format": "text",
+      "prompt": "Identify rights exercisable by individuals or affected parties: complaint rights, access/correction or erasure-type rights, private rights of action or statutory torts, and court or tribunal remedies. Distinguish administrative complaint routes from private enforcement, and state who bears the burden of proof and any damages caps or defences to private claims."
+    },
+    {
+      "index": 14,
+      "name": "Interaction with Other Laws",
+      "format": "text",
+      "prompt": "Map how this instrument interacts with related law: its parent Act and subsidiary regulations, cross-references to other statutes, overlapping or cumulative regimes covering the same conduct, and any express precedence, non-derogation or 'does not limit' clauses. State whether this instrument prevails over, yields to, or operates alongside the neighbouring regimes, and flag any gap or double-regulation risk."
+    },
+    {
+      "index": 15,
+      "name": "Interpretation Issues & Ambiguity",
+      "format": "text",
+      "prompt": "Identify provisions that are ambiguous, novel or untested, and state the interpretive method required by the identified jurisdiction (e.g. the statutory purposive rule in its interpretation act and how extrinsic materials may be used, or the common-law approach). Apply the standard canons of construction relevant to the disputed provision and state the most defensible reading, any rival reading that would change compliance outcomes, and any matter of first impression."
+    },
+    {
+      "index": 16,
+      "name": "Practical Implications & Gap Analysis",
+      "format": "text",
+      "prompt": "For a client operating in the regulated space (adapt to the instrument): (a) list the concrete compliance actions required, each tagged must-do (legal obligation) or should-do (good practice), with relative priority and effort; (b) identify the gaps between what the instrument requires and typical industry practice; (c) flag residual risks that cannot be fully mitigated; and (d) note any pending amendments or consultations worth monitoring."
+    },
+    {
+      "index": 17,
+      "name": "Plain-English Summary",
+      "format": "text",
+      "prompt": "Write a plain-English summary of this instrument in no more than 250 words, structured as: WHAT it is; WHO it binds; WHAT it requires; WHAT happens if breached; and ONE sentence on the biggest practical risk. No jargon and no unexplained defined terms — suitable for a non-lawyer executive briefing."
+    },
+    {
+      "index": 18,
+      "name": "Confidence & Open Questions",
+      "format": "text",
+      "prompt": "State your confidence in each major conclusion (high / medium / low) and list every open question requiring further research: untested provisions, pending implementing legislation or codes, uncertain commencement or in-force status, and any point where the statute is silent. Where a provision's current wording, commencement or penalty figure is uncertain and a document plugin or official consolidated source is available, VERIFY the current provision against it before answering; otherwise prefer an explicit 'verify the current provision' note to a possibly-stale pin-cite. Distinguish what the statute says from what guidance says it says."
+    }
+  ]
+}

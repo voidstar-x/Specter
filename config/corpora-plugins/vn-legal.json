@@ -1,0 +1,32 @@
+{
+  "id": "vn-legal",
+  "display_name": "Vietnam / Government Legal Documents (Chinh Phu)",
+  "description": "Full text of Vietnamese laws published by the Government of Vietnam (Cuc Thong tin va Truyen thong Chinh phu, xaydungchinhsach.chinhphu.vn). Official source. Fetch by 18-digit publication id (e.g. 119240221224513596 = Law on Land 2024). Verified 2026-09-07: HTTP 200, 259 articles extracted. Server sends gzip regardless of Accept-Encoding; the adapter decodes Content-Encoding gzip.",
+  "homepage": "https://vanban.chinhphu.vn/",
+  "languages": ["vi"],
+  "default_language": "vi",
+  "supports_language_fallback": false,
+  "identifier_label": "18-digit publication id (from xaydungchinhsach.chinhphu.vn URL)",
+  "identifier_example": "119240221224513596",
+  "enabled_by_default": true,
+  "available": true,
+  "strategy": {
+    "kind": "http-fetch-per-id",
+    "search_by_id": {
+      "url_template": "https://xaydungchinhsach.chinhphu.vn/a-{identifier}.htm",
+      "shape": "rest-html",
+      "title_path": "h1[data-role=\"title\"]",
+      "body_path": ".detail-content[data-role=\"content\"]"
+    }
+  },
+  "capabilities": {
+    "search": false,
+    "fetch": true,
+    "documents": true,
+    "documents_delete": true,
+    "documents_resync": true,
+    "embed_progress": false,
+    "bulk_import": false,
+    "user_config": true
+  }
+}

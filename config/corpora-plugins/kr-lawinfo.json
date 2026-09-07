@@ -1,0 +1,34 @@
+{
+    "id":  "kr-lawinfo",
+    "display_name":  "Korea / Law Information Center (law.go.kr)",
+    "description":  "Korean statutes from the National Law Information Center (law.go.kr). Official source. NOT YET WIRED: current law text requires an exact effective date (lsInfoR.do?lsiSeq=\u003cid\u003e\u0026efYd=\u003cYYYYMMDD\u003e); the lsiSeq-only fetch returns an error page and lsTextP.do is gone. Needs a lookup step (lsInfoP.do -\u003e efYd) before fetch. Kept available=false until that lands.",
+    "homepage":  "https://law.go.kr/",
+    "languages":  [
+                      "ko"
+                  ],
+    "default_language":  "ko",
+    "supports_language_fallback":  false,
+    "identifier_label":  "Law serial (lsiSeq)",
+    "identifier_example":  "206043",
+    "enabled_by_default":  true,
+    "available":  true,
+    "strategy":  {
+                     "kind":  "http-fetch-per-id",
+                     "search_by_id":  {
+                                          "url_template":  "https://www.law.go.kr/LSW/lsInfoR.do?lsiSeq={identifier}\u0026efYd={identifier}",
+                                          "shape":  "rest-html",
+                                          "title_path":  "#conTop h2",
+                                          "body_path":  "#conScroll"
+                                      }
+                 },
+    "capabilities":  {
+                         "search":  false,
+                         "fetch":  true,
+                         "documents":  true,
+                         "documents_delete":  true,
+                         "documents_resync":  true,
+                         "embed_progress":  false,
+                         "bulk_import":  false,
+                         "user_config":  true
+                     }
+}

@@ -385,9 +385,9 @@ const QWEN_NO_THINK_TEMPLATE: &str = "{{ if .System }}<|im_start|>system\n\
 {{ end }}<|im_start|>assistant\n";
 
 const GEMMA_NO_THINK_SYSTEM: &str =
-    "Rispondi sempre in modo diretto e conciso, in italiano. \
-     Non includere ragionamento esplicito tra <think>, <thinking>, <reasoning> \
-     o blocchi simili. Vai direttamente alla risposta finale.";
+    "Always answer directly and concisely, in English. \
+     Do not include explicit reasoning between <think>, <thinking>, <reasoning> \
+     or similar blocks. Go straight to the final answer.";
 
 /// Thinking-suppression PREAMBLE to prepend to the system prompt when
 /// the user is in secure mode. This is the second line of defence:
@@ -399,9 +399,9 @@ const GEMMA_NO_THINK_SYSTEM: &str =
 /// Returned with a trailing newline so callers can safely concatenate
 /// with their existing system prompt.
 pub fn no_think_preamble() -> &'static str {
-    "[Modalità sicura locale] Rispondi sempre in modo diretto e conciso. \
-     Non includere ragionamento esplicito tra <think>, <thinking>, <reasoning> \
-     o blocchi simili. Vai direttamente alla risposta finale.\n\n"
+    "[Secure local mode] Always answer directly and concisely. \
+     Do not include explicit reasoning between <think>, <thinking>, <reasoning> \
+     or similar blocks. Go straight to the final answer.\n\n"
 }
 
 #[cfg(test)]
@@ -485,7 +485,7 @@ mod tests {
     #[test]
     fn no_think_preamble_marks_itself() {
         let preamble = no_think_preamble();
-        assert!(preamble.contains("[Modalità sicura locale]"));
+        assert!(preamble.contains("[Secure local mode]"));
         assert!(preamble.ends_with("\n\n"));
     }
 }

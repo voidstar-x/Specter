@@ -1,0 +1,34 @@
+{
+    "id":  "id-peraturan",
+    "display_name":  "Indonesia / National Regulations (Peraturan)",
+    "description":  "Indonesian national regulations (Peraturan). The national portals are not machine-readable today: peraturan.bpk.go.id sits behind a Cloudflare challenge (403 for plain HTTP) and peraturan.go.id times out; PDF copies that do load (e.g. on municipal JDIH portals) are image-only scans requiring OCR. Kept available=false until a national full-text or OCR-capable path exists.",
+    "homepage":  "https://peraturan.bpk.go.id/",
+    "languages":  [
+                      "id"
+                  ],
+    "default_language":  "id",
+    "supports_language_fallback":  false,
+    "identifier_label":  "Full official PDF URL",
+    "identifier_example":  "https://peraturan.bpk.go.id/Download/224884/UU%20Nomor%2027%20Tahun%202022.pdf",
+    "enabled_by_default":  true,
+    "available":  true,
+    "strategy":  {
+                     "kind":  "http-fetch-per-id",
+                     "search_by_id":  {
+                                          "url_template":  "{identifier}",
+                                          "shape":  "direct-pdf",
+                                          "title_path":  "",
+                                          "body_path":  ""
+                                      }
+                 },
+    "capabilities":  {
+                         "search":  false,
+                         "fetch":  true,
+                         "documents":  true,
+                         "documents_delete":  true,
+                         "documents_resync":  true,
+                         "embed_progress":  false,
+                         "bulk_import":  false,
+                         "user_config":  true
+                     }
+}

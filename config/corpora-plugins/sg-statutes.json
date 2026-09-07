@@ -1,0 +1,32 @@
+{
+  "id": "sg-statutes",
+  "display_name": "Singapore / Statutes (Singapore Statutes Online)",
+  "description": "Current Singapore Acts and Subsidiary Legislation from the Attorney-General's Chambers, Singapore Statutes Online (sso.agc.gov.sg). Official source. Fetch by Act short code (e.g. IA1965). Verified 2026-09-07: HTTP 200 with Chrome UA, body #legisContent.",
+  "homepage": "https://sso.agc.gov.sg/",
+  "languages": ["en"],
+  "default_language": "en",
+  "supports_language_fallback": false,
+  "identifier_label": "Act short code (e.g. IA1965)",
+  "identifier_example": "IA1965",
+  "enabled_by_default": true,
+  "available": true,
+  "strategy": {
+    "kind": "http-fetch-per-id",
+    "search_by_id": {
+      "url_template": "https://sso.agc.gov.sg/Act/{identifier}",
+      "shape": "rest-html",
+      "title_path": "title:strip-suffix= - Singapore Statutes Online",
+      "body_path": "#legisContent"
+    }
+  },
+  "capabilities": {
+    "search": false,
+    "fetch": true,
+    "documents": true,
+    "documents_delete": true,
+    "documents_resync": true,
+    "embed_progress": false,
+    "bulk_import": false,
+    "user_config": true
+  }
+}

@@ -1,0 +1,137 @@
+{
+  "id": "statutory-analysis-au",
+  "title": "Statutory Analysis & Interpretation (Australia (Cth) - Internet, Tech, Content & AI Regulation)",
+  "type": "tabular",
+  "domain": "legal",
+  "practice": "Jurisdiction-particular statutory analysis and interpretation of Australian Commonwealth Acts, legislative instruments and regulations, regulator codes and guidelines (OAIC, eSafety Commissioner, ACMA, ACCC, ASIO/ASIC where relevant), with emphasis on internet, technology, content, data and AI regulation. Interpretation follows the purposive approach under s 15AA of the Acts Interpretation Act 1901 (Cth); commencement follows s 5. All monetary figures in Australian dollars (A$). NOTE: state and territory legislation varies and is out of scope unless expressly identified; flag any state/territory variation.",
+  "columns_config": [
+    {
+      "index": 0,
+      "name": "Jurisdiction & Instrument Identification",
+      "format": "text",
+      "prompt": "Confirm this is an Australian Commonwealth (Cth) instrument, then identify it precisely: full short title exactly as printed, year, Act number in the form 'Act No. X of YYYY', or the FRLI/LI number for a legislative instrument (e.g. Privacy Act 1988 (Cth); Online Safety Act 2021 (Cth)). State whether it is a primary Act, a legislative instrument made under an Act, a regulator code or guideline, or a draft/exposure draft — say so explicitly if it is a draft. The consolidated current text is published on the Federal Register of Legislation (legislation.gov.au); if a document plugin or the official source is available and any provision, commencement date or penalty figure is uncertain, VERIFY the current text there before answering, and otherwise prefer an explicit 'verify the current provision' note to a possibly-stale pin-cite. State whether the instrument is Commonwealth-only or if a state/territory counterpart exists and matters."
+    },
+    {
+      "index": 1,
+      "name": "Instrument Type & Legal Force",
+      "format": "tag",
+      "prompt": "What type of instrument is this, and what legal force does it carry — does it bind persons directly, bind only designated or registered entities, bind only when a direction is issued, or merely guide?",
+      "tags": [
+        "Primary Act (binding)",
+        "Legislative instrument / regulations (binding)",
+        "Registered industry code (binding, e.g. under the Online Safety Act 2021 (Cth))",
+        "Regulator direction or order (binds on issue)",
+        "Regulator guidelines / advisory (non-binding)",
+        "Government framework / policy paper (non-binding)",
+        "Consultation / exposure draft",
+        "Foreign or model law (reference only)"
+      ]
+    },
+    {
+      "index": 2,
+      "name": "Administering Authority",
+      "format": "tag",
+      "prompt": "Which Australian authority administers or enforces this instrument? Name it exactly as it styles itself, and note in the answer whether it is a portfolio department or an independent statutory regulator.",
+      "tags": [
+        "OAIC (Office of the Australian Information Commissioner)",
+        "eSafety Commissioner",
+        "ACMA (Australian Communications and Media Authority)",
+        "ACCC (Australian Competition and Consumer Commission)",
+        "ASIC / APRA (financial services)",
+        "Attorney-General's Department / AFP",
+        "State or territory regulator",
+        "Other / multiple (explain in notes)"
+      ]
+    },
+    {
+      "index": 3,
+      "name": "Commencement & Transitional Provisions",
+      "format": "text",
+      "prompt": "State the assent date and commencement date(s), including any phased or prospective commencement. Apply the default rules in the Acts Interpretation Act 1901 (Cth) (s 5: an Act commences 28 days after Royal Assent unless a provision fixes another day; instruments have their own default) where the instrument is silent, and note any item(s) fixed by proclamation. Identify any savings and transitional provisions and state whether pre-commencement conduct is caught. If commencement is by proclamation and the date is not stated, say so rather than guessing."
+    },
+    {
+      "index": 4,
+      "name": "Scope of Application & Extraterritorial Reach",
+      "format": "text",
+      "prompt": "What does the instrument apply to? Identify the territorial nexus and any express extraterritorial operation (e.g. the Privacy Act 1988 (Cth) applies to organisations with an Australian link under s 5B, with extraterritorial operation under s 5B for foreign organisations carrying on business in Australia; the Online Safety Act 2021 (Cth) targets services provided to Australian users, including offshore services the eSafety Commissioner can serve). State whether an offshore platform or foreign-headquartered entity would be captured, citing the specific provision for the nexus test, and flag any state/territory variation where relevant."
+    },
+    {
+      "index": 5,
+      "name": "Who Is Bound",
+      "format": "text",
+      "prompt": "Who is the primary regulated population under this instrument — for example APP entities, large online platforms above a user threshold, designated electronic services, internet service providers, licensees, or individuals facing offences? State whether liability extends to directors or officers, and who is expressly excluded (e.g. small business exemptions under the Privacy Act 1988 (Cth), and the employee-records exemption)."
+    },
+    {
+      "index": 6,
+      "name": "Key Definitions",
+      "format": "text",
+      "prompt": "List the defined terms that do the interpretive work (e.g. 'personal information' under the Privacy Act 1988 (Cth) s 6 after the 2022-2024 amendments; 'class 1A/1B/2/3 material' under the Online Safety Act 2021 (Cth); 'carriage service' and 'carriage service provider' under the Telecommunications Act 1997 (Cth); 'eligible electronic service' for online-safety industry codes). Quote each statutory definition, note whether it is broad, narrow or open-textured ('reasonable', 'serious harm'), and flag definitions that drive the scope of obligations."
+    },
+    {
+      "index": 7,
+      "name": "Core Obligations",
+      "format": "text",
+      "prompt": "Set out the core affirmative obligations with pinpoint section references, stating for each WHO is bound, WHAT must be done, and WHEN (continuing duty, on request, on notification, event-triggered). Distinguish absolute duties from 'reasonable steps' standards and any 'practicable steps' formulation. Do not conflate obligations with prohibitions."
+    },
+    {
+      "index": 8,
+      "name": "Prohibitions & Offences",
+      "format": "text",
+      "prompt": "Identify express prohibitions and criminal offences, quoting the operative words and stating the fault element where specified (e.g. strict liability or recklessness offences in the Online Safety Act 2021 (Cth) including failure to comply with a removal notice; privacy offences under the Privacy Act 1988 (Cth) including serious invasions of privacy; Criminal Code Act 1995 (Cth) offences such as the non-consensual sharing of intimate images). Note strict-liability provisions, penalty-unit sizing, default penalties for continuing contravention, and whether the offence applies to bodies corporate (with Commonwealth criminal law noting bodies corporate cannot be imprisoned)."
+    },
+    {
+      "index": 9,
+      "name": "Exemptions & Carve-outs",
+      "format": "text",
+      "prompt": "List every exemption, exception, carve-out, safe harbour and 'public interest' / 'national interest' gateway relevant to this instrument (e.g. the Privacy Act 1988 (Cth) small business exemption (s 6D), employee records exemption, the permitted-general-situation and law-enforcement-related exceptions; the 'liberal country' / 'in the public interest' style gates in content law; safe-harbour and machinery exemptions). For each, state whether it is an exclusion from scope, a defence the regulated party must establish, or a regulator discretion — and who bears the burden. Flag state/territory variation where relevant."
+    },
+    {
+      "index": 10,
+      "name": "Enforcement Powers",
+      "format": "text",
+      "prompt": "Describe the regulator's enforcement toolkit with section references: investigation and information-gathering powers (e.g. OAIC formal warnings, determinations and enforceable undertakings; the eSafety Commissioner's removal and access-prevention notices under the Online Safety Act 2021 (Cth); ACMA's directions, registering rules, and linking powers), and any requirement that a code or standard be made before powers bite. State the review or appeal route — Commonwealth decisions are commonly reviewable by the Administrative Review Tribunal (formerly the AAT) and then the Federal Court; note any merits/judicial-review distinction."
+    },
+    {
+      "index": 11,
+      "name": "Penalties & Sanctions",
+      "format": "text",
+      "prompt": "State the maximum penalties exactly as enacted in Australian dollars (A$; do not convert or round): fines (express in penalty units where so enacted and give the current penalty-unit value and the provision fixing it), imprisonment terms, per-day or continuing-contravention penalties, civil penalties, infringement notices, enforceable undertakings, and licence conditions or revocation. Quote the section for each figure. State whether each penalty falls on the entity, on directors/officers, or both (e.g. the Privacy Act 1988 (Cth) officer-attribution provisions), and whether penalties are per contravention or aggregated."
+    },
+    {
+      "index": 12,
+      "name": "Rights of Affected Individuals & Private Remedies",
+      "format": "text",
+      "prompt": "Identify rights exercisable by individuals or affected parties: complaint rights (e.g. OAIC privacy complaints; eSafety complaints for adult cyber abuse, image-based abuse and cyberbullying of children), determinations and damages on complaint, private rights of action or statutory torts (e.g. the Privacy Act 1988 (Cth) statutory torts in ss 13G and 13GA), and court remedies. Distinguish administrative complaint routes from private enforcement, and state who bears the burden of proof, any damages caps, and any requirement that the regulator be involved first."
+    },
+    {
+      "index": 13,
+      "name": "Interaction with Other Laws",
+      "format": "text",
+      "prompt": "Map how this instrument interacts with related Commonwealth law: its parent Act and legislative instruments; cross-references to other statutes (e.g. the Privacy Act 1988 (Cth) with the Telecommunications Act 1997 (Cth) and Telecommunications Regulations; the Online Safety Act 2021 (Cth) alongside the Criminal Code Act 1995 (Cth) content offences; AI-governance instruments with the Privacy Act 1988 (Cth) and the voluntary AI Safety Standard); any express non-derogation or 'does not affect' clauses; and whether this instrument prevails or yields where regimes overlap. Flag Commonwealth/state division-of-powers issues, any interstate variation, and any double-regulation or gap."
+    },
+    {
+      "index": 14,
+      "name": "Interpretation Issues & Ambiguity",
+      "format": "text",
+      "prompt": "Identify provisions that are ambiguous, novel or untested, and apply the Australian Commonwealth interpretive method: the statutory purposive rule in s 15AA of the Acts Interpretation Act 1901 (Cth) (the interpretation that best achieves the purpose or object is preferred to one that would not, whether or not the purpose is expressly stated), including use of extrinsic material under s 15AB (explanatory memoranda and second-reading speeches), alongside common-law canons and the High Court's Project Blue Sky line on construction. State the most defensible reading, any rival reading that would change compliance outcomes, and any matter of first impression."
+    },
+    {
+      "index": 15,
+      "name": "Practical Implications & Gap Analysis",
+      "format": "text",
+      "prompt": "For a client operating in the regulated space (adapt to the instrument): (a) list the concrete compliance actions required, each tagged must-do (legal obligation) or should-do (good practice), with relative priority and effort; (b) identify gaps between what the instrument requires and typical industry practice in Australia; (c) flag residual risks that cannot be fully mitigated; and (d) note any pending amendments, forthcoming codes or consultations worth monitoring. Flag state/territory variation where relevant."
+    },
+    {
+      "index": 16,
+      "name": "Plain-English Summary",
+      "format": "text",
+      "prompt": "Write a plain-English summary of this instrument in no more than 250 words, structured as: WHAT it is; WHO it binds; WHAT it requires; WHAT happens if breached; and ONE sentence on the biggest practical risk. No jargon and no unexplained defined terms — suitable for a board briefing."
+    },
+    {
+      "index": 17,
+      "name": "Confidence & Open Questions",
+      "format": "text",
+      "prompt": "State your confidence in each major conclusion (high / medium / low) and list every open question requiring further research: untested provisions, pending implementing instruments or codes, uncertain commencement status, and reliance on non-binding guidance. Explicitly distinguish what the statute says from what OAIC/eSafety/ACMA/ACCC guidance says it says. Note the high amendment rate of Australian online-safety and privacy law and verify any provision against the Federal Register of Legislation where a document plugin is available; otherwise prefer an explicit 'verify the current provision' note to a possibly-stale pin-cite."
+    }
+  ]
+}

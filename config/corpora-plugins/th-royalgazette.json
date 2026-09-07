@@ -1,0 +1,32 @@
+{
+  "id": "th-royalgazette",
+  "display_name": "Thailand / Official Law Library (PRD, Government of Thailand)",
+  "description": "Thai laws in the official legal library of the Public Relations Department of the Government of Thailand (law.prd.go.th). Official government source. The Royal Gazette portal (ratchakitcha.soc.go.th) is Cloudflare-walled; law.prd.go.th serves the same Acts as PDFs. Identifier is the full official PDF URL. Connector downloads the PDF and extracts its Thai text layer. Verified 2026-09-07 on the Personal Data Protection Act B.E. 2562 (2019).",
+  "homepage": "https://law.prd.go.th/",
+  "languages": ["th"],
+  "default_language": "th",
+  "supports_language_fallback": false,
+  "identifier_label": "Full official law.prd.go.th PDF URL",
+  "identifier_example": "https://law.prd.go.th/th/file/get/file/20231122b19b536a4647f29a6d99e228909779b4120136.PDF",
+  "enabled_by_default": true,
+  "available": true,
+  "strategy": {
+    "kind": "http-fetch-per-id",
+    "search_by_id": {
+      "url_template": "{identifier}",
+      "shape": "direct-pdf",
+      "title_path": "",
+      "body_path": ""
+    }
+  },
+  "capabilities": {
+    "search": false,
+    "fetch": true,
+    "documents": true,
+    "documents_delete": true,
+    "documents_resync": true,
+    "embed_progress": false,
+    "bulk_import": false,
+    "user_config": true
+  }
+}

@@ -855,7 +855,7 @@ async fn index_text(
             {
                 Ok(0) => {
                     let msg = format!(
-                        "Indicizzazione completata ma 0 chunk creati (testo: {} caratteri).",
+                        "Indexing completed but 0 chunks created (text: {} characters).",
                         text.len()
                     );
                     (0, Some(msg), "interrupted".to_string())

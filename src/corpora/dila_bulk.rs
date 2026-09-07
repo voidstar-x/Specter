@@ -623,7 +623,7 @@ pub async fn extract_and_index(
     set_phase(
         progress.as_ref(),
         "inserting",
-        "Indicizzazione locale…",
+        "Local indexing…",
         0,
         docs.len(),
     )
@@ -641,7 +641,7 @@ pub async fn extract_and_index(
             set_phase(
                 progress.as_ref(),
                 "inserting",
-                "Indicizzazione locale…",
+                "Local indexing…",
                 inserted,
                 docs.len(),
             )

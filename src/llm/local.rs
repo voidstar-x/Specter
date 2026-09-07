@@ -64,8 +64,8 @@ fn resolve_endpoint(params: &StreamParams) -> Result<(String, String, String)> {
         if cfg.secure_mode {
             if !is_loopback_url(&base) {
                 return Err(anyhow!(
-                    "Modalità sicura locale attiva: il provider locale può puntare \
-                     solo a localhost (URL ricevuto: {base})."
+                    "Secure local mode active: the local provider can only point \
+                     to localhost (received URL: {base})."
                 ));
             }
             // Ollama suffixes any tag-less model with `:latest` on
@@ -86,8 +86,8 @@ fn resolve_endpoint(params: &StreamParams) -> Result<(String, String, String)> {
                 .any(|m| m.id == bare_model)
             {
                 return Err(anyhow!(
-                    "Modalità sicura locale attiva: il modello `{model}` non è \
-                     nell'allowlist dei modelli curati."
+                    "Secure local mode active: model `{model}` is not \
+                     in the curated models allowlist."
                 ));
             }
             // Snap the URL to the canonical loopback form so logs /
@@ -534,7 +534,7 @@ mod tests {
         );
         let err = resolve_endpoint(&p).unwrap_err();
         assert!(
-            err.to_string().contains("Modalità sicura"),
+            err.to_string().contains("Secure local mode"),
             "secure-mode guard must mention itself in the error (got {err})"
         );
     }
@@ -595,7 +595,7 @@ mod tests {
             true,
         );
         let s = effective_system(&p);
-        assert!(s.starts_with("[Modalità sicura locale]"));
+        assert!(s.starts_with("[Secure local mode]"));
         assert!(s.contains("you are mike"));
     }
 

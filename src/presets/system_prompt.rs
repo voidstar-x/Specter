@@ -9,10 +9,10 @@
 //! Resolution fall-back chain (first hit wins):
 //!
 //!   1. requested locale + requested domain
-//!   2. `"it"` + requested domain (`it` is the primary curated
-//!      locale — MikeRust's first-class users are Italian)
-//!   3. `"en"` + requested domain (every domain ships an English
-//!      version, so this is the last-stand language fallback)
+//!   2. `"en"` + requested domain (`en` is the canonical locale —
+//!      Specter's first-class users are English-speaking)
+//!   3. `"it"` + requested domain (kept for backward compatibility,
+//!      but `en` is preferred so no non-English content leaks)
 //!   4. `None` — the caller composes a prologue without a domain body
 //!
 //! The directory hosting the files is found the same way the other
@@ -32,7 +32,7 @@
 
 use std::path::{Path, PathBuf};
 
-const FALLBACK_LOCALES: &[&str] = &["it", "en"];
+const FALLBACK_LOCALES: &[&str] = &["en", "it"];
 
 /// Locate the `config/system-prompts/` root directory. Mirrors the
 /// `presets_dir` / `config_subdir` pattern in `crate::presets` so the

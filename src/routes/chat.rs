@@ -1794,7 +1794,7 @@ async fn retrieve_kb_chunks(
     // the primary-only ranking. We deliberately don't gate the primary
     // pass on HyDE so a flaky LLM call never hides relevant chunks.
     let hyde_result = if hyde_enabled {
-        let locale = user_locale.as_deref().unwrap_or("it");
+        let locale = user_locale.as_deref().unwrap_or("en");
         // Project domain wins over user default, mirroring how the
         // domain prologue is composed in stream_chat. We re-resolve
         // here rather than threading a parameter to avoid changing the
@@ -3503,7 +3503,7 @@ async fn stream_chat_root(
                 .as_deref()
                 .map(|s| s.trim())
                 .filter(|s| !s.is_empty())
-                .unwrap_or("it")
+                .unwrap_or("en")
                 .to_string();
             // Project domain wins over user default — the project is
             // the more specific scope and almost always carries the

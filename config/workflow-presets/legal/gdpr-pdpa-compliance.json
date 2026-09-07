@@ -1,0 +1,111 @@
+{
+  "id": "gdpr-pdpa-compliance",
+  "title": "Data Protection Compliance Gap Analysis (SG PDPA 2012 + Common Law)",
+  "type": "tabular",
+  "domain": "legal",
+  "practice": "Gap analysis of an organisation's data-protection compliance against the Singapore Personal Data Protection Act 2012, its subsidiary legislation, PDPC guidance and common-law overlay, including comparison where relevant with the EU GDPR and Australian Privacy Act 1988 (Cth).",
+  "columns_config": [
+    {
+      "index": 0,
+      "name": "Organisation & Coverage",
+      "format": "text",
+      "prompt": "Identify the organisation subject to the analysis and confirm whether it is an 'organisation' under the Personal Data Protection Act 2012 (PDPA) s 2 (any individual, company, association or body of persons, whether incorporated or not, including an individual acting in a business capacity, but excluding a public agency and, for most obligations, an individual acting in a personal or domestic capacity). Note the jurisdiction of the entity (Singapore-registered? foreign but collecting data from individuals in Singapore?) and confirm PDPA territorial scope: an organisation with a presence in Singapore, or collecting/using/disclosing personal data in Singapore (s 2 and s 4(2) - note the extraterritorial scope: the Act applies to an organisation outside Singapore that collects, uses or discloses personal data in Singapore)."
+    },
+    {
+      "index": 1,
+      "name": "Data Inventory & Roles",
+      "format": "text",
+      "prompt": "Describe the personal data processed: categories (identification, financial, health, children's, employee), volume, systems and locations, and whether the organisation is a controller or data intermediary for each dataset (data intermediary = processes on behalf of another, PDPA s 2 and s 4(2)(a) exception). Confirm whether employee data is in scope (PDPA applies to employment data unless relied on the Employment Exception in the Second Schedule, Part 1). Flag whether the organisation also processes data protected by the EU GDPR, the Australian Privacy Act 1988 (Cth), or the Malaysian PDPA, creating overlapping obligations."
+    },
+    {
+      "index": 2,
+      "name": "Governance & Accountability",
+      "format": "text",
+      "prompt": "Assess the governance framework: does the organisation have (a) a designated Data Protection Officer (PDPA s 11), with the DPO's name and contact information registered on the PDPC's DPO Register and business contact publicly available; (b) a data-protection policy and processes for handling access/correction requests; (c) staff training; (d) a compliance programme with internal accountability; (e) vendor-management processes covering data intermediaries (who have their own s 24/25-type obligations under Part 3A, including the data intermediary's obligation to protect personal data in its possession or control). Note that PDPA does not prescribe a formal 'privacy by design' accountability regime equivalent to GDPR Art 24/25, so this is best-practice gap-filling."
+    },
+    {
+      "index": 3,
+      "name": "Consent & Purpose Limitation",
+      "format": "text",
+      "prompt": "Analyse consent validity: under PDPA ss 13-17 consent must be given voluntarily and with notice of purpose (Notification Obligation s 20); assess whether notices are given before collection, whether consent is opt-in for marketing (Do Not Call regime ss 40-45 prohibits sending specified messages to SG phone numbers without consent; check registration on the DNC Register), and whether the organisation can rely on the deemed-consent or exception bases (Second Schedule: contractual necessity, vital interests, public interest, business improvement, research, and the employment purpose exception under s 17(3)/Second Schedule para 3). Compare: GDPR Art 6(1)(a)-(f) legal bases vs PDPA consent/exception framework. Flag every use without consent that needs to fall within an exception."
+    },
+    {
+      "index": 4,
+      "name": "Access & Correction Requests",
+      "format": "text",
+      "prompt": "Assess processes for the Access Obligation (s 21: provide copies of personal data on request, with prescribed form and fee) and Correction Obligation (s 22: correct errors in personal data). Note timing requirements, the PDPC's prescribed request forms, exceptions to the obligations (e.g. s 21(3): if the disclosure would reveal the personal data of another individual, unless that individual consents; or would reveal confidential commercial information), and whether the organisation has a privacy policy telling individuals how to make requests. Note that unlike GDPR Art 15-16 there is no automatic 'right to be forgotten'; deletion rights arise only via withdrawal of consent or retention limitation."
+    },
+    {
+      "index": 5,
+      "name": "Protection & Retention",
+      "format": "text",
+      "prompt": "Assess compliance with the Protection Obligation (s 24: protect personal data in possession or control by reasonable security arrangements to prevent unauthorised access, collection, use, disclosure, copying, modification, disposal or similar risks - assessed objectively by reference to the nature of the data and the harm that may result) and the Retention Limitation Obligation (s 25: cease to retain personal data when no longer necessary for business or legal purposes). Recommend security controls by data class and a retention schedule with legal-hold and dispute-hold carve-outs. Compare with GDPR Art 5(1)(e) storage limitation and Art 32 security."
+    },
+    {
+      "index": 6,
+      "name": "Breach Notification",
+      "format": "text",
+      "prompt": "Assess breach-readiness: (a) does the organisation have a detection and assessment process under the Data Breach Notification regime (PDPA ss 26C-26E)? (b) is it notifying the PDPC within 3 calendar days of assessing that the breach is a notifiable data breach (must notify if the breach causes or is likely to cause significant harm to the affected individual OR significant impact on the organisation's business; notification is in two stages - initial notification within 3 days and full notification within 30 days)? (c) is it notifying affected individuals without undue delay if significant harm is likely (s 26D)? (d) is there a breach response playbook, log, and evidence of assessments even for non-notifiable breaches (assessment must still be documented - s 26C)? Compare with GDPR Art 33 (72 hours) and note the SG distinction between data intermediary and organisation notification duties."
+    },
+    {
+      "index": 7,
+      "name": "Cross-Border Transfer",
+      "format": "text",
+      "prompt": "Assess cross-border transfers under Part 6A of the PDPA (s 26A and the Data Protection (Cross-border Transfer) Regulations 2021 - transfers require that the transferor has taken appropriate steps to ensure the recipient provides a standard of protection comparable to the PDPA: rely on the PDPC's prescribed Certification (e.g. APEC CBPR/PRP or the Global CBPR/PRP recognised by the PDPC), Binding Corporate Rules approved by the PDPC, or contractual terms (a form of model clauses recognised by the PDPC), subject to the exceptions in reg 7 (e.g. the individual consents to the transfer, or the transfer is necessary for performance of a contract). If the recipient is a data intermediary of the transferor, the transfer-limitation obligations still apply unless an exception is met. Map every transfer destination and the legal basis for each. Compare with GDPR Chapter V (adequacy decisions, SCCs, derogations)."
+    },
+    {
+      "index": 8,
+      "name": "Marketing & Do Not Call",
+      "format": "text",
+      "prompt": "If the organisation conducts marketing, assess compliance with the Do Not Call regime (PDPA ss 36-50, and the DNC Regulations): (a) is there a DNC check process before sending specified messages to Singapore telephone numbers? (b) are sender ID, opt-out mechanism and other prescribed message requirements met (s 44 - e.g. no concealing of sender identity, functioning opt-out facility)? (c) is the check against the DNC Register refreshed within the prescribed period (30 days before sending)? (d) for B2B marketing is there a mechanism to capture the individual's business-role consent (the DNC regime only protects individuals; s 43 exemption for messages to a person solely in their business capacity if the message relates to their business role, subject to consent from the individual)? Flag any marketing that would need fresh opt-in consent under the 'Electronic Mail' or other provisions and any cross-over with the Spam Control Act 2007 for unsolicited emails."
+    },
+    {
+      "index": 9,
+      "name": "Children's Data",
+      "format": "text",
+      "prompt": "Assess practices involving personal data of minors. Singapore does NOT have a specific PDPA age-of-consent rule (unlike the EU GDPR Art 8 or the Australian Privacy Act's Children's Code developments), so consent is assessed on capacity at common law - flag that organisations should adopt conservative practice (parental consent / guardianship verification for under-13s or under-16s) and note the PDPC's advisory guidelines and sectoral rules (e.g. IMDA's Code of Practice for Online Safety, and the 2024-2026 AI governance work that mentions protecting minors). Recommend documenting a specific minor-protection policy."
+    },
+    {
+      "index": 10,
+      "name": "Employee Data & HR",
+      "format": "text",
+      "prompt": "Assess the treatment of employee personal data: reliance on the Employment Exception (Second Schedule paras 1-2 and the notification-waiver in s 20(4) for certain employment purposes), background screening, monitoring of workplace communications (note the interplay with the common law of privacy in the employment context - the SG courts recognise no general tort of invasion of privacy, but rely on breach of confidence and contract; the PDPC's Advisory Guidelines clarify that employer monitoring must be notified and reasonable), and cross-border HR data transfers (e.g. central HR systems hosted overseas - map the transfer basis)."
+    },
+    {
+      "index": 11,
+      "name": "Regulator Interface & Enforcement Exposure",
+      "format": "text",
+      "prompt": "Assess the enforcement exposure: PDPC enforcement powers include directions under ss 29 and 48I (including directions to pay a financial penalty of up to 10% of annual turnover in Singapore or SGD 1 million, whichever is higher, for organisations; capped at SGD 1 million for individuals and data intermediaries - s 48J as amended by the Personal Data Protection (Amendment) Act 2020), and undertakings; the Commission may also impose a separate financial penalty for breaches of the DNC regime (verify the current cap per s 48J and its regulations - amounts have been enhanced since the 2020 amendments and are stated per contravention). Review any existing enforcement history, orders, undertakings or appeals (the enforcement actions against Grab, Sephora, and the 2022-2024 round of health-sector and telecom cases are useful comparators). Advise on the realistic exposure and the practical steps (voluntary disclosure, remediation, PDPC cooperation) that mitigate penalty assessment."
+    },
+    {
+      "index": 12,
+      "name": "Common-Law & Statutory Overlay",
+      "format": "text",
+      "prompt": "Identify the common-law and other-statutory duties that sit alongside the PDPA: breach of confidence (SG common law following Coco v AN Clark and the 'necessary quality of confidence' test), the statutory confidentiality duties in the Official Secrets Act and the Computer Misuse Act 1993 (unauthorised access/use), the data-protection and confidentiality terms in sectoral regimes (MAS Notice 645 and the Monetary Authority of Singapore's guidelines; the Healthcare Services Act and HIB's data standards; the PDPA overlays in the e-payments and telco licences), and the new tort-like exposure under the Australian Privacy Act 1988 (Cth) ss 13G and 13GA (if the client also operates in Australia). Flag where the PDPA imposes less than the common law and vice versa."
+    },
+    {
+      "index": 13,
+      "name": "AI & Emerging-Tech Data Use",
+      "format": "text",
+      "prompt": "If the organisation uses AI/ML on personal data, assess: (a) whether training or fine-tuning models on personal data is a 'use' requiring consent or an exception under the PDPA (and the PDPC's 2024 'Guidelines on the Responsible Use of Generative AI' and the Model AI Governance Framework, which are non-binding but influential); (b) whether the use is covered by a purpose limitation notice; (c) data provenance and licensing of training data; (d) whether the AI output qualifies as personal data about an individual and triggers access/correction rights; and (e) any automated-decision-making profiling obligations (SG has no PDPA equivalent of GDPR Art 22; the PDPC's advisory guidance recommends transparency and human oversight). Flag that the model AI Governance Framework for Generative AI (2024 update, IMDA) and the Singapore National AI Strategy 2.0 do not create statutory obligations."
+    },
+    {
+      "index": 14,
+      "name": "Gap Register & Prioritised Roadmap",
+      "format": "text",
+      "prompt": "Produce a compliance gap register: for each obligation area (consent, notification, access, correction, protection, retention, breach notification, cross-border transfer, DNC, DPO registration, data-intermediary agreements), state: status (compliant / partial / gap / not-applicable), evidence relied on, the specific action required, ownership, and priority (high = legal exposure or regulator-visible risk; medium = best-practice gap; low = hygiene). Close with a 90-day prioritised roadmap naming the first three actions to take."
+    },
+    {
+      "index": 15,
+      "name": "Overall Compliance Rating",
+      "format": "tag",
+      "prompt": "Overall rating of this organisation's PDPA compliance posture:",
+      "tags": [
+        "Strong - minor enhancements only",
+        "Adequate - moderate gaps to close",
+        "Weak - material compliance gaps",
+        "Critical - immediate enforcement risk"
+      ]
+    }
+  ]
+}

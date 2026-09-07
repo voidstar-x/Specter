@@ -438,6 +438,13 @@ pub struct HttpSearchKeywordSpec {
 pub enum ResponseShape {
     RestHtml,
     RestJson,
+    /// Fetch returns raw bytes (currently: PDF). `fetch` extracts the
+    /// plaintext via pdfium (feature `pdf`) and stores it as a
+    /// `text/plain` `CorpusDocument`. Compiling without the `pdf`
+    /// feature drops this variant, so a `direct-pdf` manifest fails
+    /// loudly at load time (unknown variant) rather than mis-routing.
+    #[cfg(feature = "pdf")]
+    DirectPdf,
 }
 
 impl Default for ResponseShape {

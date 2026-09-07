@@ -315,13 +315,13 @@ async fn generate_rejection_summary(
          \n\
          === Documento ===\n{truncated}\n=== Fine documento ===\n\
          \n\
-         Riassunto (max 700 caratteri):"
+         Summary (max 700 characters):"
     );
 
     let params = crate::llm::types::StreamParams {
         model: model.to_string(),
-        system_prompt: "Sei un assistente che produce riassunti tecnici e \
-                        concisi. Rispondi solo con il riassunto richiesto."
+        system_prompt: "You are an assistant that produces technical and \
+                        concise summaries. Reply only with the requested summary."
             .to_string(),
         system_volatile: String::new(),
         messages: vec![crate::llm::types::Message::user(prompt)],
