@@ -1,4 +1,4 @@
-# MikeRust v0.7.0 — Nuovo settore «Fiscale» (tax/commercialista italiano)
+# Specter v0.7.0 — Nuovo settore «Fiscale» (tax/commercialista italiano)
 
 Aggiunge il dodicesimo settore professionale, **Fiscale**, dedicato a
 commercialisti e consulenti tributari italiani sul versante
@@ -79,13 +79,13 @@ arricchimento.
 
 MSI Windows precompilati:
 
-- `MikeRust_0.7.0_x64.msi` — Windows x86_64
-- `MikeRust_0.7.0_arm64.msi` — Windows ARM64, Snapdragon X Elite
+- `Specter_0.7.0_x64.msi` — Windows x86_64
+- `Specter_0.7.0_arm64.msi` — Windows ARM64, Snapdragon X Elite
 
 Sostituzione drop-in per v0.6.7.
 
 ## Licenza
 
-MikeRust è distribuito sotto **AGPL-3.0-only**. Il marchio e il logo
-Semplifica sono marchi registrati; vedi `NOTICE.md`. Il testo completo
+Specter è distribuito sotto **AGPL-3.0-only**. Il marchio e il logo
+Specter sono marchi registrati; vedi `NOTICE.md`. Il testo completo
 della licenza è disponibile in-app sotto **Impostazioni → Licenza**.

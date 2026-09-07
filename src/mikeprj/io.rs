@@ -242,7 +242,7 @@ pub async fn build_payload(
 
     let manifest = Manifest {
         schema_version: SCHEMA_VERSION,
-        exporter: format!("MikeRust {}", env!("CARGO_PKG_VERSION")),
+        exporter: format!("Specter {}", env!("CARGO_PKG_VERSION")),
         exported_at: Utc::now().to_rfc3339(),
         exported_by_display_name: None,
         contents: ManifestContents {
@@ -305,8 +305,8 @@ pub fn zip_payload(payload: &Payload) -> Result<Vec<u8>> {
         // Friendly README so the file isn't completely opaque to anyone
         // who unzips it manually (e.g. forensic recovery).
         z.start_file("README.txt", opts)?;
-        z.write_all(b"This is a MikeRust project archive (.mikeprj).\n")?;
-        z.write_all(b"It is meant to be imported via the MikeRust UI.\n")?;
+        z.write_all(b"This is a Specter project archive (.mikeprj).\n")?;
+        z.write_all(b"It is meant to be imported via the Specter UI.\n")?;
         z.write_all(b"Manual extraction is supported but you'll lose the citation links.\n")?;
 
         z.finish()?;

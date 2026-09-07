@@ -1,4 +1,4 @@
-# MikeRust — Manuale di configurazione e utilizzo
+# Specter — Manuale di configurazione e utilizzo
 
 > Manuale concettuale per l'uso quotidiano. Per la guida di setup ambiente
 > (env vars, build, packaging Tauri) vedi [PLAN.md](../PLAN.md).
@@ -8,7 +8,7 @@
 
 ## 1. Modello concettuale
 
-MikeRust ruota attorno a **cinque entità** che l'utente vede e configura:
+Specter ruota attorno a **cinque entità** che l'utente vede e configura:
 
 | Entità | Cos'è | Tabella DB |
 |---|---|---|
@@ -45,7 +45,7 @@ L'utente sceglie **uno fra questi** come `activeProvider`:
 
 Le impostazioni viaggiano per **due binari**:
 
-1. **`localStorage` browser** sotto la chiave `mikerust_llm_settings`. Le legge il
+1. **`localStorage` browser** sotto la chiave `specter_llm_settings`. Le legge il
    combo modelli della chat ([ModelToggle.tsx](../frontend/src/app/components/assistant/ModelToggle.tsx))
    per popolare le voci dinamicamente.
 2. **DB SQLite** tabella `user_settings`, attraverso `PUT /user/llm-settings`.
@@ -405,7 +405,7 @@ PUT /user/llm-settings    upsert; campi NULL nel body lasciano invariati i valor
 # Parte 2 — Guida operativa UI
 
 > Cosa cliccare, dove guardare, in quale ordine. Le sezioni che seguono
-> riproducono passo-passo l'esperienza utente nella finestra Tauri di MikeRust.
+> riproducono passo-passo l'esperienza utente nella finestra Tauri di Specter.
 
 ---
 
@@ -433,7 +433,7 @@ mostra il titolo (auto-generato dopo il primo messaggio) e il menu `…` con
 
 ### 11.2 Finestra Tauri
 
-Dimensione default 1280×800 (resizable, min 800×600), titolo "MikeRust".
+Dimensione default 1280×800 (resizable, min 800×600), titolo "Specter".
 Il dialog Windows Hello compare in primo piano grazie al fix
 `IUserConsentVerifierInterop` con HWND parent (vedi sezione 8.2).
 
@@ -495,7 +495,7 @@ Validazione client: lunghezza min, mismatch confirm. Bottone **Update PIN**:
 | `enabled: true`  | Badge verde "Enabled" + bottone **Disable Windows Hello** |
 
 Premere **Enable** triggera il dialog OS — il fix HWND interop fa apparire
-la finestra di Windows Hello in foreground sopra MikeRust.
+la finestra di Windows Hello in foreground sopra Specter.
 
 Etichetta dinamica: "Touch ID" su macOS, "Windows Hello" altrove.
 
@@ -535,7 +535,7 @@ Per **Local / OpenAI-compatible** in più:
 ### 14.3 Salvataggio
 
 Pulsante **Save settings** in fondo:
-1. Scrive in `localStorage.mikerust_llm_settings` (JSON).
+1. Scrive in `localStorage.specter_llm_settings` (JSON).
 2. Chiama `PUT /user/llm-settings` con i campi non-null mappati.
 3. Mostra "Saved ✓" per 2 secondi.
 
@@ -561,7 +561,7 @@ Modale con:
 - **Project name** [input testo, obbligatorio]
 - **Description** [textarea, opzionale]
 - (Sezioni **Members / Upload files** sono ereditate dal frontend Mike upstream
-  e nel contesto local-single-user di MikeRust **non sono operative**: il
+  e nel contesto local-single-user di Specter **non sono operative**: il
   backend ignora membership; gli upload funzionano ma vengono associati al
   progetto via `documents.project_id`.)
 
@@ -675,7 +675,7 @@ Anteprima rendering markdown sotto la textarea. **Save** chiama `POST` o
 `PUT /workflow/{id}`.
 
 > Suggerimento: scrivi il prompt in seconda persona ("Riassumi il documento
-> allegato in 5 punti…"); MikeRust lo concatena prima del messaggio utente
+> allegato in 5 punti…"); Specter lo concatena prima del messaggio utente
 > nella chat che usa il workflow.
 
 ### 17.3 Workflow nascosti
@@ -795,7 +795,7 @@ già caricati.
 ## 21. Riepilogo workflow operativo (cheat-sheet)
 
 ### A. Configurazione iniziale
-1. Apri MikeRust → **Signup**: username, PIN, display name → **Create profile**.
+1. Apri Specter → **Signup**: username, PIN, display name → **Create profile**.
 2. Sidebar → **Account** → (opzionale) **Enable Windows Hello**.
 3. **Account → Models**: seleziona Active provider, compila API Key + Model → **Save settings**.
 

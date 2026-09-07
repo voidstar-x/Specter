@@ -1,11 +1,11 @@
-# MikeRust frontend
+# Specter frontend
 
-Clean-room Svelte 5 rewrite of the MikeRust desktop UI.
+Clean-room Svelte 5 rewrite of the Specter desktop UI.
 
 - **Inception:** 2026-05-15
 - **Stack:** Tauri 2 · Svelte 5 (runes) · TypeScript · Tailwind CSS v4 · Vite 6
 - **License:** AGPL-3.0-only (see [LICENSE](LICENSE))
-- **Plan:** [../docs/mikerust-ui-rewrite-plan.md](../docs/mikerust-ui-rewrite-plan.md) v2.1
+- **Plan:** [../docs/specter-ui-rewrite-plan.md](../docs/specter-ui-rewrite-plan.md) v2.1
 
 ## Status
 
@@ -19,12 +19,12 @@ This frontend is a **clean-room rewrite**. It does NOT derive from the
 upstream "Mike" AGPL project. The legacy frontend (kept at
 `../frontendMike/` as a working reference during migration) MUST NOT be
 read while developing this one — only screenshots of the rendered UI
-and MikeRust commit messages are admissible sources. See plan §21 for
+and Specter commit messages are admissible sources. See plan §21 for
 the full anti-contamination rules.
 
 ## Develop
 
-From the **repo root** (`c:\Progetti\MikeRust`):
+From the **repo root** (`c:\Progetti\Specter`):
 
 ```pwsh
 # 1. Install dependencies (once)

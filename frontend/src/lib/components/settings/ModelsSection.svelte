@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2026 MikeRust contributors. Licensed under AGPL-3.0-only. -->
+<!-- Copyright (c) 2026 Specter contributors. Licensed under AGPL-3.0-only. -->
 <!--
   Settings → LLM models. Catalogue-driven (GET /models) editor over the
   user's LlmSettings. Four configurable providers (Anthropic, Google,
@@ -89,7 +89,7 @@
   let localModelsLoading = $state(false)
 
   let localFetchSeq = 0
-  const ACTIVE_PROVIDERS_STORAGE_KEY = 'mikerust.settings.activeProviders.v1'
+  const ACTIVE_PROVIDERS_STORAGE_KEY = 'specter.settings.activeProviders.v1'
 
   function isProviderId(v: string): v is LlmProvider {
     return ['anthropic', 'google', 'openai', 'mistral', 'local'].includes(v)
@@ -151,7 +151,7 @@
     localModelsLoading = true
 
     try {
-      // Route the model-list probe through MikeRust's own backend
+      // Route the model-list probe through Specter's own backend
       // instead of `fetch` against the Ollama / llama-server URL
       // directly. The WebView origin is `http://tauri.localhost`, and
       // external OpenAI-compatible runtimes rarely advertise that

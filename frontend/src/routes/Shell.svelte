@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2026 MikeRust contributors. Licensed under AGPL-3.0-only. -->
+<!-- Copyright (c) 2026 Specter contributors. Licensed under AGPL-3.0-only. -->
 <!--
   Authenticated app shell: sidebar (nav + collapsible chat list +
   pinned Settings) + topbar + the active feature route.
@@ -71,7 +71,7 @@
     settings: 'Common.settings',
   }
   const activeLabel = $derived(
-    titleByRoute[router.current] ? i18n.t(titleByRoute[router.current]) : 'MikeRust'
+    titleByRoute[router.current] ? i18n.t(titleByRoute[router.current]) : 'Specter'
   )
 
   const greetingName = $derived(
@@ -251,7 +251,7 @@
       {#snippet brand()}
         <div class="flex items-center gap-2 w-full">
           <Logo size={20} activity="idle" />
-          <span class="text-base font-semibold text-(--color-brand-600)">MikeRust</span>
+          <span class="text-base font-semibold text-(--color-brand-600)">Specter</span>
           <span
             class="text-[11px] font-normal text-(--color-text-secondary) tabular-nums"
             title={i18n.t('App.versionTooltip', { version: APP_VERSION })}

@@ -1,4 +1,4 @@
-# MikeRust — Piano di riscrittura UI clean-room
+# Specter — Piano di riscrittura UI clean-room
 
 > ✅ **ESEGUITO — riscrittura completata il 2026-05-17** (vedi HISTORY.md
 > «Clean-room frontend rewrite (React → Svelte 5)»). Il frontend
@@ -13,9 +13,9 @@
 > README §Frontend.
 
 **Stack target:** Tauri 2 · Svelte 5 (runes) · TypeScript · Tailwind CSS v4 · Vite
-**Obiettivo:** eliminare qualsiasi derivazione AGPL dal frontend, mantenendo backend Rust, schema DB e compatibilità workflow / template JSON / preset bundle MikeRust.
+**Obiettivo:** eliminare qualsiasi derivazione AGPL dal frontend, mantenendo backend Rust, schema DB e compatibilità workflow / template JSON / preset bundle Specter.
 
-> Il documento è ground-truth rispetto al backend `c:\Progetti\MikeRust` (commit `1e809c4` o successivi). Tutti i contratti API, le rotte e il comportamento descritti sono **letti direttamente dal sorgente Rust**, non inferiti dal frontend AGPL esistente.
+> Il documento è ground-truth rispetto al backend `c:\Progetti\Specter` (commit `1e809c4` o successivi). Tutti i contratti API, le rotte e il comportamento descritti sono **letti direttamente dal sorgente Rust**, non inferiti dal frontend AGPL esistente.
 
 ---
 
@@ -38,7 +38,7 @@ In un'app Tauri il frontend viene **bundlato nell'eseguibile finale** (vedi [src
 | Template DOCX JSON (`config/docx-templates/`) | ✅ Pulito | Contenuto editoriale, non codice |
 | Catalogo modelli LLM (`config/model.json`) | ✅ Pulito | Dati strutturati, non codice |
 | Manifest corpora (`config/corpora/*.yaml`) | ✅ Pulito | Specifiche dichiarative |
-| Pacchetti i18n string (`frontendMike/messages/*.json`) | ✅ Pulito (parte MikeRust) / ⚠️ misto | Le **chiavi e stringhe scritte ex-novo in MikeRust** (commit `0b575ca`, `f78c8bb`, `94ed69f`, `407c296`, `16c8308`, `3faa20d`) sono copyright del proprietario → riutilizzabili. Le **stringhe ereditate da Mike** (chiavi pre-fork) vanno rigenerate o riformulate. Vedi §14 per la procedura di bonifica selettiva. |
+| Pacchetti i18n string (`frontendMike/messages/*.json`) | ✅ Pulito (parte Specter) / ⚠️ misto | Le **chiavi e stringhe scritte ex-novo in Specter** (commit `0b575ca`, `f78c8bb`, `94ed69f`, `407c296`, `16c8308`, `3faa20d`) sono copyright del proprietario → riutilizzabili. Le **stringhe ereditate da Mike** (chiavi pre-fork) vanno rigenerate o riformulate. Vedi §14 per la procedura di bonifica selettiva. |
 
 ### Cosa è contaminato
 | Componente | Problema |
@@ -52,7 +52,7 @@ In un'app Tauri il frontend viene **bundlato nell'eseguibile finale** (vedi [src
 ### Soluzione: clean-room rewrite
 Riscrivere il frontend da zero in un nuovo linguaggio (Svelte 5 vs React) su un nuovo repository, **senza copiare una singola riga** dal frontend attuale. Il cambio di linguaggio (React → Svelte) e il cambio di paradigma (Next.js App Router → SPA Tauri pura) sono la prova più forte dell'assenza di derivazione.
 
-L'unico contatto consentito con `frontend/` è la **lettura degli screenshot** del prodotto finito (look & feel) e dei **commit di MikeRust** (`git log -- frontend/`) per identificare **quali feature** sono state aggiunte rispetto a Mike, senza guardarne l'implementazione.
+L'unico contatto consentito con `frontend/` è la **lettura degli screenshot** del prodotto finito (look & feel) e dei **commit di Specter** (`git log -- frontend/`) per identificare **quali feature** sono state aggiunte rispetto a Mike, senza guardarne l'implementazione.
 
 ---
 
@@ -112,10 +112,10 @@ L'unico contatto consentito con `frontend/` è la **lettura degli screenshot** d
 
 ## 3. Struttura del nuovo repository
 
-**Decisione finale (vedi §23 Q1):** il nuovo codice vive in **`MikeRust/frontend/`** (sostituisce il vecchio). Il frontend AGPL attuale viene **rinominato `MikeRust/frontendMike/`** per consentire uno **switch rapido** tra vecchio (di backup, ancora funzionante) e nuovo durante lo sviluppo. Lo switch avviene a livello Tauri tramite due file di configurazione paralleli — vedi §7.4 e §18.
+**Decisione finale (vedi §23 Q1):** il nuovo codice vive in **`Specter/frontend/`** (sostituisce il vecchio). Il frontend AGPL attuale viene **rinominato `Specter/frontendMike/`** per consentire uno **switch rapido** tra vecchio (di backup, ancora funzionante) e nuovo durante lo sviluppo. Lo switch avviene a livello Tauri tramite due file di configurazione paralleli — vedi §7.4 e §18.
 
 ```
-MikeRust/
+Specter/
 ├── frontend/                           ← NUOVO codice clean-room (Svelte 5)
 │   ├── src/                              … (struttura descritta sotto)
 │   ├── dist/                             ← Vite build output (Tauri prod)
@@ -337,9 +337,9 @@ frontend/ (alberatura interna)
 
 ## 4. Design system — token CSS
 
-### 4.1 Brand audit (sorgente: sito marketing MikeRust + screenshot app)
+### 4.1 Brand audit (sorgente: sito marketing Specter + screenshot app)
 
-Esecuzione del `web_fetch` sul sito MikeRust ha confermato:
+Esecuzione del `web_fetch` sul sito Specter ha confermato:
 
 - **Font:** il sito non hosta font custom; usa lo stack `-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif`. L'app condivide visivamente lo stesso "system-clean". Scelta per la nuova UI: **Geist** (MIT, Vercel) come default + system-stack come fallback — visivamente identico al sistema attuale ma con controllo cross-platform Windows/macOS. *Niente download font runtime.*
 - **Palette:**
@@ -467,7 +467,7 @@ Tema scuro/chiaro **manuale** sopra il `prefers-color-scheme`: store `theme.svel
 
 ## 5. Mappatura schermate → componenti nuovi
 
-### 5.1 Boot / Auth (nuove route MikeRust-specifiche)
+### 5.1 Boot / Auth (nuove route Specter-specifiche)
 
 | Schermata | Componente | Trigger backend |
 |---|---|---|
@@ -558,7 +558,7 @@ Settings è la sezione più densa. Sotto-pagine in tab orizzontale gestite da `S
 
 ## 6. HTTP API surface (contratto completo)
 
-> Il backend MikeRust **NON espone comandi Tauri** per le funzioni di dominio: tutto passa via axum su `http://127.0.0.1:<port>` (porta scoperta a runtime — vedi §7). I soli comandi Tauri esistenti sono `api_base_url` e `open_external_url`.
+> Il backend Specter **NON espone comandi Tauri** per le funzioni di dominio: tutto passa via axum su `http://127.0.0.1:<port>` (porta scoperta a runtime — vedi §7). I soli comandi Tauri esistenti sono `api_base_url` e `open_external_url`.
 
 ### 6.1 Mount table (da [src/lib.rs](src/lib.rs))
 
@@ -786,9 +786,9 @@ Tauri 2 accetta il flag `--config <path>` su `cargo tauri dev` e `cargo tauri bu
 ```jsonc
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "MikeRust",
+  "productName": "Specter",
   "version": "0.1.0",
-  "identifier": "ai.semplifica.mikerust",
+  "identifier": "ai.semplifica.specter",
   "build": {
     "frontendDist": "../frontend/dist",
     "devUrl": "http://localhost:5173",
@@ -797,7 +797,7 @@ Tauri 2 accetta il flag `--config <path>` su `cargo tauri dev` e `cargo tauri bu
   },
   "app": {
     "windows": [{
-      "title": "MikeRust",
+      "title": "Specter",
       "width": 1280, "height": 800,
       "minWidth": 960, "minHeight": 640,
       "resizable": true,
@@ -829,7 +829,7 @@ Identico al precedente eccetto:
 }
 ```
 
-#### Wrapper script (root `package.json` di MikeRust)
+#### Wrapper script (root `package.json` di Specter)
 
 ```jsonc
 {
@@ -842,7 +842,7 @@ Identico al precedente eccetto:
 }
 ```
 
-> Per evitare di installare `pnpm` come dipendenza di MikeRust quando si lavora solo sul legacy: gli script default usano `cargo tauri ...` direttamente; `npm` continua a essere usato nel legacy come prima. Il nuovo frontend richiede `pnpm` per coerenza con lo scaffolding Tauri.
+> Per evitare di installare `pnpm` come dipendenza di Specter quando si lavora solo sul legacy: gli script default usano `cargo tauri ...` direttamente; `npm` continua a essere usato nel legacy come prima. Il nuovo frontend richiede `pnpm` per coerenza con lo scaffolding Tauri.
 
 #### Workflow durante la migrazione
 
@@ -872,10 +872,10 @@ cargo tauri build --config src-tauri/tauri.legacy.conf.json  # produce installer
 |---|---|---|
 | `tauri-plugin-single-instance` | **MVP — Fase 8** (crate Rust, no API JS) | Previene doppio launch (porta 3001 collide). Decisione Q3. Si aggiunge in `src-tauri/Cargo.toml`, NON con `pnpm add`. |
 | `tauri-plugin-stronghold` | **MVP — Fase 3** | Persistenza cifrata del token "Mantieni accesso" (decisione Q10). Master-password derivata dal PIN. |
-| `tauri-plugin-updater` | **Post-MVP** (schema endpoint definito ora — §23 Q4) | Endpoint `https://updates.mikerust.app/{target}/{current_version}`, firma minisign. Generare chiave pubblica e committarla nel conf quando si attiva. |
+| `tauri-plugin-updater` | **Post-MVP** (schema endpoint definito ora — §23 Q4) | Endpoint `https://updates.specter.app/{target}/{current_version}`, firma minisign. Generare chiave pubblica e committarla nel conf quando si attiva. |
 | `tauri-plugin-dialog` | **MVP — Fase 5** | File picker nativo per `.mikeprj` import (più ergonomico di `<input type=file>` in Tauri WebView). |
 | `tauri-plugin-window-state` | **MVP — Fase 8** | Persistere size/position della window tra restart. |
-| `tauri-plugin-os` | **Post-MVP** | Branding "MikeRust su Windows 11 ARM64" in About. |
+| `tauri-plugin-os` | **Post-MVP** | Branding "Specter su Windows 11 ARM64" in About. |
 | `tauri-plugin-fs` | **Non aggiungere** | Sconsigliato — preferire endpoint HTTP che validano i path (vedi `storage::safe_path_under`). |
 
 ---
@@ -1140,7 +1140,7 @@ export async function downloadAs(url: string, filename?: string) {
 In Mike, workflow e template erano **importati come moduli ES** nel bundle frontend → parte del codice AGPL.
 
 ### 11.2 Nuova architettura
-Tutti i JSON vivono nel backend (`config/` del repo MikeRust) e vengono **letti a runtime in memoria** all'avvio:
+Tutti i JSON vivono nel backend (`config/` del repo Specter) e vengono **letti a runtime in memoria** all'avvio:
 
 ```
 config/
@@ -1326,18 +1326,18 @@ App.svelte espone il dispatcher (vedi snippet originale §8 del piano). Aggiunte
 
 ## 14. I18n — 6 locali con fallback (decisione Q8)
 
-MikeRust supporta **`en` canonica** + `it`, `fr`, `de`, `es`, `pt` come traduzioni. Backend persiste la scelta utente (`/user/locale`).
+Specter supporta **`en` canonica** + `it`, `fr`, `de`, `es`, `pt` come traduzioni. Backend persiste la scelta utente (`/user/locale`).
 
-### 14.1 Riuso del bundle i18n MikeRust
+### 14.1 Riuso del bundle i18n Specter
 
-Il bundle in `frontendMike/messages/*.json` (770+ chiavi su 6 locali) è stato **scritto ex-novo** dal proprietario di MikeRust nei commit:
+Il bundle in `frontendMike/messages/*.json` (770+ chiavi su 6 locali) è stato **scritto ex-novo** dal proprietario di Specter nei commit:
 `0b575ca` (i18n iniziale), `f78c8bb` (fr full), `94ed69f` (Domains namespace), `407c296` (Account → Generali), `16c8308` / `3faa20d` (refine), e successivi su preset bundle (medical/commercialista/insurance).
 
 → **Copyright del proprietario** → **riutilizzabile integralmente** nel nuovo frontend.
 
 **Procedura di import:**
 1. Copiare `frontendMike/messages/{en,it,fr,de,es,pt}.json` → `frontend/locales/`
-2. Bonifica: per ogni chiave, verificare con `git blame frontendMike/messages/en.json` che la riga sia stata **introdotta in MikeRust** (commit con autore proprietario), non ereditata da un commit pre-fork. Quelle pre-fork si **rifrasano** (cambiare wording mantenendo significato).
+2. Bonifica: per ogni chiave, verificare con `git blame frontendMike/messages/en.json` che la riga sia stata **introdotta in Specter** (commit con autore proprietario), non ereditata da un commit pre-fork. Quelle pre-fork si **rifrasano** (cambiare wording mantenendo significato).
 3. Rinominare le chiavi se vuoi distanziarti ulteriormente (es. `chat.send` → `chat.action_send`). Non strettamente necessario perché i nomi-chiave sono fact descriptors, non opera creativa.
 4. Adattare alla nuova struttura namespace (vedi §14.3).
 5. Rimuovere le chiavi orfane (UI che non rifaremo, ad es. mode-specifici di Mike) — `Vitest` check parità chiavi le rivela.
@@ -1351,7 +1351,7 @@ Il bundle in `frontendMike/messages/*.json` (770+ chiavi su 6 locali) è stato *
 ```
 {
   "Common": { "save": "Salva", "cancel": "Annulla", ... },
-  "Auth":   { "unlock_title": "Sblocca MikeRust", ... },
+  "Auth":   { "unlock_title": "Sblocca Specter", ... },
   "Chat":   { ... },
   "Domains": {
     "legal": "Legale", "medical": "Medico", "finance": "Finanza",
@@ -1390,10 +1390,10 @@ function createI18n() {
 export const i18n = createI18n()
 ```
 
-> **Regola di scrittura stringhe**: ogni nuovo testo UI **deve** essere aggiunto in **tutte e 6 le lingue** (regola pre-esistente di MikeRust). In dev, una check Vitest scansiona i `t(...)` e assicura la parità di chiavi.
+> **Regola di scrittura stringhe**: ogni nuovo testo UI **deve** essere aggiunto in **tutte e 6 le lingue** (regola pre-esistente di Specter). In dev, una check Vitest scansiona i `t(...)` e assicura la parità di chiavi.
 
 ### 14.5 Identificatori canonici inglesi
-Convenzione MikeRust (vedi memoria persistente): identificatori di schema (enum value, JSON keys, route params) restano in **inglese snake_case**; le 6 lingue traducono solo i **label display**. Esempio: il valore `Domain` su rete è `legal`, l'UI mostra `"Legal"` (en, canonica) / `"Legale"` (it) / `"Juridique"` (fr).
+Convenzione Specter (vedi memoria persistente): identificatori di schema (enum value, JSON keys, route params) restano in **inglese snake_case**; le 6 lingue traducono solo i **label display**. Esempio: il valore `Domain` su rete è `legal`, l'UI mostra `"Legal"` (en, canonica) / `"Legale"` (it) / `"Juridique"` (fr).
 
 ---
 
@@ -1536,10 +1536,10 @@ Coda LRU di max 5 toast (vecchi auto-dismiss dopo 6s, danger sticky finché chiu
 ## 18. Piano di migrazione a fasi
 
 ### Fase 0 — Setup (1-2 giorni)
-- [x] **Rename** `MikeRust/frontend/` → `MikeRust/frontendMike/` con `git mv` (preserva la history)
+- [x] **Rename** `Specter/frontend/` → `Specter/frontendMike/` con `git mv` (preserva la history)
 - [x] Creare `src-tauri/tauri.legacy.conf.json` che punta a `frontendMike/out` (porta 3000)
 - [x] Aggiornare `src-tauri/tauri.conf.json` perché punti a `frontend/dist` (porta 5173) — diventerà il default
-- [x] Aggiungere wrapper script (`dev` / `dev:legacy` / `build` / `build:legacy`) in `package.json` di MikeRust root (creare se assente)
+- [x] Aggiungere wrapper script (`dev` / `dev:legacy` / `build` / `build:legacy`) in `package.json` di Specter root (creare se assente)
 - [ ] Scaffolding nuovo `frontend/` con `pnpm create tauri-app@latest . -- --template svelte-ts --manager pnpm` (eseguito **da dentro `frontend/` vuota**, senza ri-generare il `src-tauri`)
 - [ ] Configurare Tailwind CSS v4 con `@tailwindcss/vite`
 - [ ] Configurare `tsconfig.json` strict, `eslint`, `prettier`
@@ -1551,7 +1551,7 @@ Coda LRU di max 5 toast (vecchi auto-dismiss dopo 6s, danger sticky finché chiu
 - [ ] `tauri/commands.ts` (api_base_url, open_external_url)
 - [ ] `api/client.ts` + `ApiError`
 - [ ] `routes/Boot.svelte` (port discovery + /healthz + /auth/status)
-- [ ] Aggiornare `src-tauri/tauri.conf.json` di MikeRust con nuovi `frontendDist`/`devUrl` (vedi §7.4)
+- [ ] Aggiornare `src-tauri/tauri.conf.json` di Specter con nuovi `frontendDist`/`devUrl` (vedi §7.4)
 - [ ] Verifica end-to-end: shell Tauri lancia Vite dev → frontend riceve URL backend → /healthz risponde
 
 ### Fase 2 — Design system primitivi (3-5 giorni)
@@ -1602,7 +1602,7 @@ Coda LRU di max 5 toast (vecchi auto-dismiss dopo 6s, danger sticky finché chiu
   - import + export progetto
   - sync folder + scan
   - probe MCP server
-- [ ] Contract tests (Vitest) contro un backend MikeRust live in CI
+- [ ] Contract tests (Vitest) contro un backend Specter live in CI
 - [ ] Build Windows x64 + arm64
 - [ ] Build macOS arm64 + x64
 - [ ] **Verifica assenza file Mike nel bundle finale**: `unzip -l mike-tauri.exe | grep -i mike-frontend` ⇒ 0 risultati
@@ -1615,7 +1615,7 @@ Coda LRU di max 5 toast (vecchi auto-dismiss dopo 6s, danger sticky finché chiu
 ### Fase 8 — Rimozione frontend legacy & cleanup (1 giorno)
 - [ ] Dopo conferma parità feature in Fase 6-7, rimuovere `frontendMike/` in un singolo commit "remove AGPL legacy frontend"
 - [ ] Eliminare `src-tauri/tauri.legacy.conf.json` e gli script `dev:legacy` / `build:legacy`
-- [ ] Aggiornare `README.md`, `HISTORY.md`, `NOTICE.md` di MikeRust riflettendo il cambio di licenza frontend
+- [ ] Aggiornare `README.md`, `HISTORY.md`, `NOTICE.md` di Specter riflettendo il cambio di licenza frontend
 - [ ] Smoke test runtime finale: `/healthz` ritorna i preset corretti, boot → unlock → assistant → invio messaggio → upload doc → render template → import .mikeprj → search EUR-Lex → scan folder
 - [ ] Tag release `v1.0-svelte` sul commit di rimozione, come bookmark "primo bundle pulito da AGPL"
 
@@ -1628,15 +1628,15 @@ Coda LRU di max 5 toast (vecchi auto-dismiss dopo 6s, danger sticky finché chiu
 # Prerequisito: il rename git mv frontend frontendMike è già stato eseguito (vedi script Fase 0).
 
 # 1. Scaffolding dentro frontend/ (cartella vuota dopo il rename)
-cd c:\Progetti\MikeRust
+cd c:\Progetti\Specter
 New-Item -ItemType Directory -Path frontend -Force | Out-Null
 cd frontend
 pnpm create tauri-app@latest . -- `
   --template svelte-ts `
   --manager pnpm `
-  --identifier ai.semplifica.mikerust
+  --identifier ai.semplifica.specter
 # NB: lo scaffolder propone di generare anche un src-tauri/ — RIFIUTARLO
-# (lo shell Tauri esiste già nel root del progetto MikeRust).
+# (lo shell Tauri esiste già nel root del progetto Specter).
 
 # 2. Pulire src-tauri/ generato per errore (se creato)
 Remove-Item -Recurse -Force src-tauri -ErrorAction SilentlyContinue
@@ -1734,31 +1734,31 @@ Implicazioni operative:
 
 ## 21. Regole anti-contaminazione (da applicare sempre)
 
-1. **Nessun file copiato** dal repo Mike o da `frontend/` di MikeRust, nemmeno parzialmente
-2. **Nessuna ispirazione strutturale dal codice** — guardare gli screenshot della UI è ok; guardare il sorgente del frontend (sia Mike che MikeRust attuale) **non lo è**
-3. **Conoscenza features MikeRust solo via commit log** — `git log -- frontend/` per leggere i message dei commit MikeRust (descrivono *cosa* fa la feature), mai il diff
+1. **Nessun file copiato** dal repo Mike o da `frontend/` di Specter, nemmeno parzialmente
+2. **Nessuna ispirazione strutturale dal codice** — guardare gli screenshot della UI è ok; guardare il sorgente del frontend (sia Mike che Specter attuale) **non lo è**
+3. **Conoscenza features Specter solo via commit log** — `git log -- frontend/` per leggere i message dei commit Specter (descrivono *cosa* fa la feature), mai il diff
 4. **Naming indipendente** — scegliere nomi di variabili e funzioni senza guardare nessun codice frontend
 5. **Dipendenze diverse** dove possibile (es. Lucide al posto di qualsiasi icon set usato in Mike; Marked al posto di altri md parser)
 6. **Git history pulita** — primo commit = scaffolding Tauri/Svelte, mai un fork/copy
 7. **Header copyright** su ogni file `.svelte` e `.ts` con data di creazione e autore
 8. **Documentare tutto** — ogni decisione architetturale nel README, con data, come prova di sviluppo indipendente
-9. **Stringhe i18n** — il bundle `frontendMike/messages/*.json` è in larga parte opera MikeRust (770+ chiavi, vedi commit elencati in §14.1). **È riutilizzabile** dopo bonifica via `git blame`: si tengono le chiavi/righe introdotte in commit MikeRust, si **rifrasano** quelle ereditate da commit pre-fork (origine Mike).
-10. **PR review checklist** include "questo PR contiene snippet dal frontend Mike/MikeRust?" — se sì, rifiutare
+9. **Stringhe i18n** — il bundle `frontendMike/messages/*.json` è in larga parte opera Specter (770+ chiavi, vedi commit elencati in §14.1). **È riutilizzabile** dopo bonifica via `git blame`: si tengono le chiavi/righe introdotte in commit Specter, si **rifrasano** quelle ereditate da commit pre-fork (origine Mike).
+10. **PR review checklist** include "questo PR contiene snippet dal frontend Mike/Specter?" — se sì, rifiutare
 
 ---
 
 ## 22. Checklist finale pre-distribuzione
 
 - [ ] `pnpm license-audit` → zero licenze GPL/AGPL/LGPL
-- [ ] `git log --all --source` su `mikerust-ui` → nessun commit con file da Mike o da `frontend/` di MikeRust
-- [ ] Tutti i file hanno header copyright MikeRust con data ≥ inizio progetto
+- [ ] `git log --all --source` su `specter-ui` → nessun commit con file da Mike o da `frontend/` di Specter
+- [ ] Tutti i file hanno header copyright Specter con data ≥ inizio progetto
 - [ ] `LICENSE` presente nella root
 - [ ] `NOTICE` con elenco completo dipendenze open source + licenze
 - [ ] Build Windows x64 testata su macchina pulita (no Node installato)
-- [ ] Build Windows arm64 testata (verifica integrazione con ort load-dynamic + onnxruntime 1.24.2 DLL — vedi memoria persistente MikeRust)
+- [ ] Build Windows arm64 testata (verifica integrazione con ort load-dynamic + onnxruntime 1.24.2 DLL — vedi memoria persistente Specter)
 - [ ] Build macOS arm64 testata su macchina pulita
 - [ ] Parità feature con frontend attuale verificata con checklist tester (NB: lista test ex-novo, non basata sul codice attuale ma sugli screenshot)
-- [ ] `/healthz` ritorna `presets: { workflows: ≥56, columns: ≥30, docx_templates: ≥9, model_providers: 4 }` (smoke check copertura MikeRust additions)
+- [ ] `/healthz` ritorna `presets: { workflows: ≥56, columns: ≥30, docx_templates: ≥9, model_providers: 4 }` (smoke check copertura Specter additions)
 - [ ] Smoke E2E: setup → unlock → invio messaggio chat con streaming → upload PDF → creazione workflow custom → render template DOCX → import .mikeprj → scan folder → search EUR-Lex
 - [ ] Parere legale ottenuto prima della distribuzione pubblica
 
@@ -1768,11 +1768,11 @@ Implicazioni operative:
 
 > Punti dove la mia scelta è ragionata ma non ancora confermata dal product owner. Default proposto in **grassetto**; pronto a cambiare se preferisci diversamente.
 
-1. **Repo strategy.** **DECISO**: in-place dentro `MikeRust/`. Vecchio frontend rinominato in `frontendMike/`, nuovo in `frontend/`, switch via doppio `tauri.conf.json` (vedi §7.4). Rimozione di `frontendMike/` in Fase 8 dopo parità feature.
+1. **Repo strategy.** **DECISO**: in-place dentro `Specter/`. Vecchio frontend rinominato in `frontendMike/`, nuovo in `frontend/`, switch via doppio `tauri.conf.json` (vedi §7.4). Rimozione di `frontendMike/` in Fase 8 dopo parità feature.
 2. **CSP.** **DECISO**: lasciare `csp: null` durante Fasi 0-5 per non bloccare HMR; **attivare CSP non-null in Fase 6** dopo verifica che Vite/Tailwind/marked non chiedano `'unsafe-eval'` in produzione. Policy raccomandata: `default-src 'self'; connect-src 'self' http://127.0.0.1:*; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; script-src 'self'`.
 3. **Single-instance plugin.** **DECISO**: aggiungere `tauri-plugin-single-instance` in Fase 8 (~1 ora). Previene doppio launch (e doppio bind sulla porta 3001 → conflitto SQLite/embeddings).
 4. **Updater.** **DECISO**: il **plugin `tauri-plugin-updater` è post-MVP**, ma lo **schema dell'endpoint si definisce subito** così il primo bundle è già pronto a riceverlo. Spec endpoint:
-   - **URL canonico (TBD hosting):** `https://updates.mikerust.app/{target}/{current_version}` — il client invia `User-Agent: mikerust/<version> <os>-<arch>`.
+   - **URL canonico (TBD hosting):** `https://updates.specter.app/{target}/{current_version}` — il client invia `User-Agent: specter/<version> <os>-<arch>`.
    - **Response 204 No Content** = nessun aggiornamento. **Response 200** = nuovo update disponibile, JSON:
      ```jsonc
      {
@@ -1782,7 +1782,7 @@ Implicazioni operative:
        "platforms": {
          "windows-x86_64": {
            "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IC...",   // base64 minisign
-           "url":       "https://updates.mikerust.app/dl/0.2.0/mikerust_0.2.0_x64-setup.nsis.zip"
+           "url":       "https://updates.specter.app/dl/0.2.0/specter_0.2.0_x64-setup.nsis.zip"
          },
          "windows-aarch64": { … },
          "darwin-aarch64":  { … },
@@ -1790,7 +1790,7 @@ Implicazioni operative:
        }
      }
      ```
-   - **Firma binari:** `minisign` (chiave pubblica bundlata nel `tauri.conf.json` sotto `plugins.updater.pubkey` quando il plugin sarà attivato). Generare la coppia ora: `cargo tauri signer generate -w ~/.tauri/mikerust.key`.
+   - **Firma binari:** `minisign` (chiave pubblica bundlata nel `tauri.conf.json` sotto `plugins.updater.pubkey` quando il plugin sarà attivato). Generare la coppia ora: `cargo tauri signer generate -w ~/.tauri/specter.key`.
    - **Hosting:** S3 + CloudFront, o GitHub Releases come fallback economico (URL `https://github.com/.../releases/download/...`).
    - **Telemetria check:** opt-in in Settings → "Controlla aggiornamenti all'avvio" (default off finché endpoint non è live).
 5. **PDF viewer.** **DECISO**: **`pdfjs-dist`** (Apache-2.0, ~1 MB) wrappato in `components/documents/PdfViewer.svelte`. Più controllo dell'iframe Chromium (toolbar custom, ricerca testo coerente, zoom binding, dark mode). Caricato lazy solo quando l'utente apre il viewer.
@@ -1805,11 +1805,11 @@ Implicazioni operative:
    - **Error inline** (`error` event) → banner rosso con bottoni "Riprova" / "Cambia provider" (link a settings se `key missing`)
    - **Heartbeat watchdog** lato client: >90 s senza eventi → mostra "Connessione lenta?" + offer "Riprova"
 7. **License finale.** **DECISO**: **AGPL-3.0 per la prima release.** Come sole copyright holder, il proprietario può rilasciare versioni future sotto qualsiasi licenza (Apache 2.0, MIT, BSL, commerciale, dual). Vincolo: le release **già distribuite** restano sotto AGPL per chi le ha ricevute — il cambio si applica solo da release N+1. Strategia: AGPL ora, valutare passaggio a Apache 2.0 / BSL quando si vorrà permettere uso commerciale chiuso da parte di terzi.
-8. **Locale canonica.** **DECISO**: **inglese canonica**, le altre 5 lingue sono traduzioni (it/fr/de/es/pt). **Riuso del bundle i18n MikeRust** (770+ chiavi, commit `0b575ca`, `f78c8bb`, `94ed69f`, `407c296`, `16c8308`, `3faa20d`): è **opera originale del proprietario di MikeRust**, copyright proprio → riutilizzabile integralmente. Vedi §1 e §14.
+8. **Locale canonica.** **DECISO**: **inglese canonica**, le altre 5 lingue sono traduzioni (it/fr/de/es/pt). **Riuso del bundle i18n Specter** (770+ chiavi, commit `0b575ca`, `f78c8bb`, `94ed69f`, `407c296`, `16c8308`, `3faa20d`): è **opera originale del proprietario di Specter**, copyright proprio → riutilizzabile integralmente. Vedi §1 e §14.
 9. **MCP UX.** **DECISO**: il form server MCP mostra **solo URL + API key + nome** al primo livello; transport rilevato automaticamente via `/user/mcp-servers/probe`. Override esplicito (`http`/`sse`/`stdio`) in una sezione "Avanzate" collassata.
    - **Activity indicator ("spia" MCP)**: badge persistente in `StatusBar.svelte` (e mini-icona accanto al `ModelSelector` durante una chat) che pulsa quando un tool MCP è in volo. Tooltip mostra "Sto chiamando `<tool>` su `<server>`" con conteggio aggregato. Sorgente eventi: SSE chat (`tool_call_start` / `tool_call_end`).
 10. **Token storage.** **DECISO**: token vive **in memoria** durante la sessione (volatile, immune da XSS-su-localStorage). **Persistenza opt-in** in Settings → "Mantieni accesso fra riavvii": al toggle ON, il token è salvato in **`tauri-plugin-stronghold`** (cifratura at-rest con master-password derivata dal PIN/biometrico). Al successivo avvio, sblocca con PIN/biometrico → decifra → restore in memoria. **Niente `localStorage`** (coerente con regola persistente "prefer data/storage over localStorage"). Nessun `sessionStorage` neanche, per evitare leak XSS.
 
 ---
 
-*MikeRust UI Rewrite Plan v2.1 — 2026-05-15 — decisioni Q1-Q10 congelate, pronto per Fase 0*
+*Specter UI Rewrite Plan v2.1 — 2026-05-15 — decisioni Q1-Q10 congelate, pronto per Fase 0*

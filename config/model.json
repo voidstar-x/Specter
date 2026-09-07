@@ -1,6 +1,6 @@
 {
     "$schema_version": 1,
-    "_note": "Catalogue of LLM providers, models and regions MikeRust can talk to. Loaded at startup (planned: `crate::presets::model`). Source of truth lives on disk — drop a new entry, restart, available models update in the Settings → Modelli LLM page. Preview models are global-only by spec (Anthropic/Google/OpenAI): the consumer code gates the region selector accordingly when `preview: true` is set on the model.",
+    "_note": "Catalogue of LLM providers, models and regions Specter can talk to. Loaded at startup (planned: `crate::presets::model`). Source of truth lives on disk — drop a new entry, restart, available models update in the Settings → Modelli LLM page. Preview models are global-only by spec (Anthropic/Google/OpenAI): the consumer code gates the region selector accordingly when `preview: true` is set on the model.",
     "providers": [
         {
             "id": "anthropic",
@@ -563,7 +563,7 @@
                     "preview": false
                 },
                 {
-                    "id": "mikerust-qwen35-4b:ctx16k",
+                    "id": "specter-qwen35-4b:ctx16k",
                     "display_name": "Qwen 3.5 4B (Local tuned 16K)",
                     "family": "qwen3.5",
                     "tier": "fast",
@@ -577,7 +577,7 @@
                     "preview": false
                 },
                 {
-                    "id": "mikerust-qwen35-9b:ctx8k",
+                    "id": "specter-qwen35-9b:ctx8k",
                     "display_name": "Qwen 3.5 9B (Local tuned 8K)",
                     "family": "qwen3.5",
                     "tier": "standard",
@@ -591,7 +591,7 @@
                     "preview": false
                 },
                 {
-                    "id": "mikerust-gemma4-e2b:ctx8k",
+                    "id": "specter-gemma4-e2b:ctx8k",
                     "display_name": "Gemma 4 e2b (Local tuned 8K)",
                     "family": "gemma4",
                     "tier": "fast",

@@ -1,4 +1,4 @@
-// Copyright (c) 2026 MikeRust contributors. Licensed under AGPL-3.0-only.
+// Copyright (c) 2026 Specter contributors. Licensed under AGPL-3.0-only.
 
 import { invoke } from '@tauri-apps/api/core'
 
@@ -58,7 +58,7 @@ export async function openExternal(url: string): Promise<void> {
 /**
  * Open a *file path* with the OS's default associated application.
  * Backed by the `open_external_path` Tauri command, which validates
- * the path against the user's MikeRust storage root before launching
+ * the path against the user's Specter storage root before launching
  * — see src-tauri/src/lib.rs for the security model. Used by the
  * DocViewerPanel "Open in Word" button so the user can run Word's
  * native track-changes accept/reject workflow on a model-generated

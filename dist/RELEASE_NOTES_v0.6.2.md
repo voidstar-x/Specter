@@ -1,8 +1,8 @@
-# MikeRust v0.6.2 — Mistral concurrency semaphore + JS console diagnostics
+# Specter v0.6.2 — Mistral concurrency semaphore + JS console diagnostics
 
 Hotfix on top of v0.6.1. The retry-with-backoff added there
 addressed one-off 429 spikes but didn't fix the root cause:
-MikeRust fires several Mistral calls per turn (main chat + title
+Specter fires several Mistral calls per turn (main chat + title
 generation + HyDE retrieval + tabular cell extraction), and on
 the free Experiment tier (1 req/s) they all 429 simultaneously.
 Retrying doesn't help when 8 callers retry at the same time —
@@ -15,11 +15,11 @@ v0.6.2 adds the proper fix.
 ### Process-global Mistral concurrency cap
 
 A `tokio::sync::Semaphore` with **1 permit** now gates every
-Mistral request. Every Mistral call across the whole MikeRust
+Mistral request. Every Mistral call across the whole Specter
 process (chat / tabular / HyDE / title gen) acquires the permit
 before issuing the HTTP request and releases it on completion.
 Combined with v0.6.1's retry-with-backoff this ensures we never
-exceed 1 RPS to Mistral regardless of how many MikeRust subsystems
+exceed 1 RPS to Mistral regardless of how many Specter subsystems
 try to call it concurrently.
 
 The cap is **fair (FIFO)** so tabular cells process row-by-row in
@@ -65,13 +65,13 @@ svelte-check 0 errors.
 
 Pre-built MSIs for Windows:
 
-- `MikeRust_0.6.2_x64.msi` — Windows x86_64
-- `MikeRust_0.6.2_arm64.msi` — Windows ARM64, Snapdragon X Elite
+- `Specter_0.6.2_x64.msi` — Windows x86_64
+- `Specter_0.6.2_arm64.msi` — Windows ARM64, Snapdragon X Elite
 
 Drop-in replacement for v0.6.1.
 
 ## License
 
-MikeRust is distributed under **AGPL-3.0-only**. The Semplifica
+Specter is distributed under **AGPL-3.0-only**. The Specter
 wordmark and logo are trademarks; see `NOTICE.md`. The full
 licence text is available in-app under **Settings → Licenza**.

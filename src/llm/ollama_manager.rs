@@ -21,7 +21,7 @@
 //!     Settings "Rimuovi" button.
 //!
 //! Why the `mike-…-fast` prefix on every curated id: every curated
-//! variant is a **MikeRust-owned Modelfile derivation** on top of an
+//! variant is a **Specter-owned Modelfile derivation** on top of an
 //! upstream Ollama or HuggingFace model. The derivation carries the
 //! thinking-suppression configuration (stop sequences, `/no_think`
 //! token injection in the chat template, "rispondi direttamente"
@@ -57,12 +57,12 @@ pub enum ThinkingStrategy {
     GemmaStopSequences,
 }
 
-/// One curated model entry — everything MikeRust needs to (a) describe
+/// One curated model entry — everything Specter needs to (a) describe
 /// the variant in the Settings UI and (b) materialise it in Ollama via
 /// a Modelfile if the user clicks "Install".
 #[derive(Debug, Clone, Serialize)]
 pub struct CuratedModel {
-    /// MikeRust-side id. This is what gets stored in
+    /// Specter-side id. This is what gets stored in
     /// `user_settings.local_model`, what the chat composer's model
     /// picker shows, and what the local provider checks against the
     /// allowlist. Always prefixed with `mike-` and suffixed with `-fast`
@@ -422,7 +422,7 @@ mod tests {
             assert!(
                 m.id.starts_with("mike-") && m.id.ends_with("-fast"),
                 "curated id `{}` must be `mike-…-fast` (the prefix encodes \
-                 'this is a MikeRust-owned Modelfile derivation' and the \
+                 'this is a Specter-owned Modelfile derivation' and the \
                  suffix encodes 'thinking is disabled')",
                 m.id,
             );

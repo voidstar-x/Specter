@@ -10,7 +10,7 @@
 //!   - serialised first-use via a tokio mutex
 //!   - `Arc<RwLock<NerStatus>>` for non-blocking status reads
 //!
-//! Cache layout: `<HF_HOME>/mikerust-gliner2/<sanitized_repo>/<variant>/<file>`.
+//! Cache layout: `<HF_HOME>/specter-gliner2/<sanitized_repo>/<variant>/<file>`.
 //! Side-by-side with the hf-hub cache (`~/.cache/huggingface/...`)
 //! the gliner2 crate would otherwise use, but in our own flat
 //! folder so `Gliner2Engine::new(Gliner2Config { models_dir })`
@@ -70,7 +70,7 @@ fn cache_dir(repo_id: &str, variant: &str) -> Result<PathBuf> {
         .or_else(default_data_dir)
         .ok_or_else(|| anyhow!("no HF_HOME nor home dir for gliner2 cache"))?;
     let dir = base
-        .join("mikerust-gliner2")
+        .join("specter-gliner2")
         .join(repo_id.replace('/', "--"))
         .join(variant);
     std::fs::create_dir_all(&dir)
@@ -82,7 +82,7 @@ fn default_data_dir() -> Option<PathBuf> {
     let home = std::env::var("USERPROFILE")
         .ok()
         .or_else(|| std::env::var("HOME").ok())?;
-    Some(PathBuf::from(home).join("mikerust-data").join("gliner2"))
+    Some(PathBuf::from(home).join("specter-data").join("gliner2"))
 }
 
 /// Bootstrap singleton — handle to status + serialised download.
@@ -159,7 +159,7 @@ impl NerBootstrap {
         tracing::info!("[ner] confirmed under lock — proceeding to download phase");
 
         let client = reqwest::Client::builder()
-            .user_agent(format!("mikerust/{}", env!("CARGO_PKG_VERSION")))
+            .user_agent(format!("specter/{}", env!("CARGO_PKG_VERSION")))
             .build()
             .context("reqwest client")?;
 

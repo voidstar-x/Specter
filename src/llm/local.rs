@@ -485,7 +485,7 @@ mod tests {
     ) -> StreamParams {
         StreamParams {
             model: model.to_string(),
-            system_prompt: "you are mike".into(),
+            system_prompt: "you are Specter".into(),
             system_volatile: String::new(),
             messages: vec![Message::user("hi".to_string())],
             tools: vec![],
@@ -596,14 +596,14 @@ mod tests {
         );
         let s = effective_system(&p);
         assert!(s.starts_with("[Secure local mode]"));
-        assert!(s.contains("you are mike"));
+        assert!(s.contains("you are Specter"));
     }
 
     #[test]
     fn effective_system_unchanged_off_secure_mode() {
         let p = params_with_local("http://localhost:11434", "anything", false);
         let s = effective_system(&p);
-        assert_eq!(s, "you are mike");
+        assert_eq!(s, "you are Specter");
     }
 
     #[test]

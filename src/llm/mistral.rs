@@ -57,7 +57,7 @@ use crate::llm::BoxStream;
 /// 1s still produce 7 failures, then 6 after 2s, etc.
 ///
 /// The semaphore lives at module scope so it spans the whole
-/// MikeRust process — chat / tabular / HyDE / title gen all
+/// Specter process — chat / tabular / HyDE / title gen all
 /// queue through the same gate. The cap of 1 is safe for
 /// Experiment tier (1 RPS) and only mildly underutilises paid
 /// Scale tier (typically 4-8 RPS); paid users rarely 429 anyway,

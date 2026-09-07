@@ -1,4 +1,4 @@
-// Copyright (c) 2026 MikeRust contributors. Licensed under AGPL-3.0-only.
+// Copyright (c) 2026 Specter contributors. Licensed under AGPL-3.0-only.
 
 /**
  * Light / dark / system theme (plan §4).
@@ -15,7 +15,7 @@
  */
 export type ThemeMode = 'light' | 'dark' | 'system'
 
-const STORAGE_KEY = 'mikerust.theme'
+const STORAGE_KEY = 'specter.theme'
 const MODES: ThemeMode[] = ['light', 'dark', 'system']
 
 function isThemeMode(v: unknown): v is ThemeMode {

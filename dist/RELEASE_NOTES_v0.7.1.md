@@ -1,4 +1,4 @@
-# MikeRust v0.7.1 — Localizzazione italiana del verticale legale
+# Specter v0.7.1 — Localizzazione italiana del verticale legale
 
 Traduce in italiano i workflow e i column-preset del **settore legale**,
 ultimo contenuto rimasto in inglese nel catalogo (i preset legali
@@ -63,12 +63,12 @@ legale appare in italiano e il settore Fiscale (v0.7.0) è disponibile.
 
 MSI Windows precompilati:
 
-- `MikeRust_0.7.1_x64.msi` — Windows x86_64
-- `MikeRust_0.7.1_arm64.msi` — Windows ARM64, Snapdragon X Elite
+- `Specter_0.7.1_x64.msi` — Windows x86_64
+- `Specter_0.7.1_arm64.msi` — Windows ARM64, Snapdragon X Elite
 
 Sostituzione drop-in per v0.6.7 (supera v0.7.0, non distribuito come MSI).
 
 ## Licenza
 
-MikeRust è distribuito sotto **AGPL-3.0-only**. Il marchio e il logo
-Semplifica sono marchi registrati; vedi `NOTICE.md`.
+Specter è distribuito sotto **AGPL-3.0-only**. Il marchio e il logo
+Specter sono marchi registrati; vedi `NOTICE.md`.

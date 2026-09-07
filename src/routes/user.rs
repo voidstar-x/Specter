@@ -865,7 +865,7 @@ async fn probe_mcp_server(
         "params": {
             "protocolVersion": "2024-11-05",
             "capabilities": {},
-            "clientInfo": { "name": "MikeRust", "version": "0.1" }
+            "clientInfo": { "name": "Specter", "version": "0.1" }
         }
     });
 

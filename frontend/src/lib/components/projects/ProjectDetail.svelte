@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2026 MikeRust contributors. Licensed under AGPL-3.0-only. -->
+<!-- Copyright (c) 2026 Specter contributors. Licensed under AGPL-3.0-only. -->
 <!--
   Project detail: header (name, domain, retrieval-scope toggle, export)
   plus three tabs — Documents, Conversations and Tabular reviews. The

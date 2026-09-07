@@ -83,7 +83,7 @@ fn load_dotenv() {
 /// trigger the file watcher repeatedly during the download.
 ///
 /// Honours `FASTEMBED_CACHE_DIR` if the user already set it in `.env`;
-/// otherwise points at `<userdata>/mikerust-data/fastembed`. Either
+/// otherwise points at `<userdata>/specter-data/fastembed`. Either
 /// way the directory is created so fastembed doesn't fail on first
 /// `try_new`.
 ///
@@ -97,7 +97,7 @@ fn ensure_fastembed_cache_dir() {
         .or_else(|_| std::env::var("HOME"))
         .unwrap_or_else(|_| ".".to_string());
     let path = std::path::PathBuf::from(home)
-        .join("mikerust-data")
+        .join("specter-data")
         .join("fastembed");
     let _ = std::fs::create_dir_all(&path);
     // SAFETY: single-threaded process startup before the runtime spins
@@ -110,7 +110,7 @@ fn ensure_fastembed_cache_dir() {
 
 /// Pin `hf-hub`'s cache (used by `gliner2_inference` and any other
 /// HuggingFace downloader we add later) under
-/// `~/mikerust-data/gliner2/` so the ~500 MB GLiNER2 weights live
+/// `~/specter-data/gliner2/` so the ~500 MB GLiNER2 weights live
 /// next to the rest of our heavy artefacts instead of leaking into
 /// the user's `~/.cache/huggingface/` directory. Honours an existing
 /// `HF_HOME` env var so power users keep control.
@@ -123,7 +123,7 @@ fn ensure_hf_cache_dir() {
         .or_else(|_| std::env::var("HOME"))
         .unwrap_or_else(|_| ".".to_string());
     let path = std::path::PathBuf::from(home)
-        .join("mikerust-data")
+        .join("specter-data")
         .join("gliner2");
     let _ = std::fs::create_dir_all(&path);
     // SAFETY: single-threaded process startup, same as
@@ -206,7 +206,7 @@ pub async fn run_server_with_channels(
     // dependency, so the symbol is in scope.
     #[cfg(any(feature = "rag", feature = "ner-pii"))]
     {
-        if let Err(e) = ort::init().with_name("MikeRust").commit() {
+        if let Err(e) = ort::init().with_name("Specter").commit() {
             // Non-fatal: a re-init from a different code path or
             // a feature-flag combination that double-initialises
             // would just produce a hard error. We log and let the

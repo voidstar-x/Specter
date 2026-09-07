@@ -18,7 +18,7 @@ pub const SCHEMA_VERSION: u32 = 1;
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Manifest {
     pub schema_version: u32,
-    /// Free-form, e.g. "MikeRust 0.1.0".
+    /// Free-form, e.g. "Specter 0.1.0".
     pub exporter: String,
     /// ISO-8601 UTC timestamp.
     pub exported_at: String,
@@ -145,7 +145,7 @@ mod tests {
     fn manifest_roundtrips_through_json() {
         let m = Manifest {
             schema_version: SCHEMA_VERSION,
-            exporter: "MikeRust 0.1.0".into(),
+            exporter: "Specter 0.1.0".into(),
             exported_at: "2026-05-06T10:30:00Z".into(),
             exported_by_display_name: Some("Dario".into()),
             contents: ManifestContents {
@@ -160,7 +160,7 @@ mod tests {
         let s = serde_json::to_string(&m).unwrap();
         let back: Manifest = serde_json::from_str(&s).unwrap();
         assert_eq!(back.schema_version, SCHEMA_VERSION);
-        assert_eq!(back.exporter, "MikeRust 0.1.0");
+        assert_eq!(back.exporter, "Specter 0.1.0");
         assert_eq!(back.contents.document_count, 3);
         assert_eq!(back.contents.includes_chats, false);
         assert_eq!(back.exported_by_display_name.as_deref(), Some("Dario"));

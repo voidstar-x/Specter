@@ -1,4 +1,4 @@
-//! `.mikeprj` — portable project archive for sharing between MikeRust users.
+//! `.mikeprj` — portable project archive for sharing between Specter users.
 //!
 //! ## File format (v1)
 //!
@@ -31,7 +31,7 @@
 //! ## Sharing model (v1 = "weak email pinning")
 //!
 //! The exporter types the recipient's email; the file is encrypted with a
-//! key derived from that email. On import, the recipient's MikeRust
+//! key derived from that email. On import, the recipient's Specter
 //! checks whether the email associated with their local account hashes
 //! to the same value as the one in the file header. If so, the file is
 //! decrypted; otherwise the import is refused with a clear message.

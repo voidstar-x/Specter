@@ -1,6 +1,6 @@
-# MikeRust v0.6.7 — Sidebar active-domain selector
+# Specter v0.6.7 — Sidebar active-domain selector
 
-Adds a compact domain picker next to the MikeRust brand at the top
+Adds a compact domain picker next to the Specter brand at the top
 of the sidebar — always visible, default-initialised from the
 user's `default_domain` setting (chosen at sign-up, editable in
 Settings → Generale), and persisted server-side on every change.
@@ -23,7 +23,7 @@ brand is a big quality-of-life win.
 
 ```
 ┌──────────────────────────────────────┐
-│ ⬛ MikeRust v0.6.7  [Assicurazioni ▾] │
+│ ⬛ Specter v0.6.7  [Assicurazioni ▾] │
 ├──────────────────────────────────────┤
 │ 💬 Assistente                    +   │
 │ 📁 Progetti                          │
@@ -53,13 +53,13 @@ Frontend-only change; svelte-check 0 errors. Backend untouched.
 
 Pre-built MSIs for Windows:
 
-- `MikeRust_0.6.7_x64.msi` — Windows x86_64
-- `MikeRust_0.6.7_arm64.msi` — Windows ARM64, Snapdragon X Elite
+- `Specter_0.6.7_x64.msi` — Windows x86_64
+- `Specter_0.6.7_arm64.msi` — Windows ARM64, Snapdragon X Elite
 
 Drop-in replacement for v0.6.6.
 
 ## License
 
-MikeRust is distributed under **AGPL-3.0-only**. The Semplifica
+Specter is distributed under **AGPL-3.0-only**. The Specter
 wordmark and logo are trademarks; see `NOTICE.md`. The full
 licence text is available in-app under **Settings → Licenza**.

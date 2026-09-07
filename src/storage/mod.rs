@@ -30,11 +30,11 @@ pub struct LocalStorage {
 /// Default base directory for `LocalStorage` when `STORAGE_PATH` is
 /// unset. Mirrors `db::default_db_url` and `lib::ensure_data_dir`:
 /// everything we persist that isn't shipped read-only with the binary
-/// lives under `<home>/mikerust-data/`. The old default was
+/// lives under `<home>/specter-data/`. The old default was
 /// `./data/storage`, a cwd-relative path that worked in `cargo run`
 /// (cwd = workspace root) but blew up the moment the user double-
 /// clicked the installed MSI — Windows resolves the relative path
-/// against the launch cwd (often `C:\Program Files\MikeRust\` for a
+/// against the launch cwd (often `C:\Program Files\Specter\` for a
 /// shortcut, sometimes `C:\Windows\System32` when launched through
 /// "Run"), neither of which is writable by a non-admin user. The
 /// first storage `put` then failed with `os error 5` (ACCESS_DENIED)
@@ -46,7 +46,7 @@ pub fn default_storage_path() -> String {
         .or_else(|_| std::env::var("HOME"))
         .unwrap_or_else(|_| ".".to_string());
     PathBuf::from(home)
-        .join("mikerust-data")
+        .join("specter-data")
         .join("storage")
         .display()
         .to_string()

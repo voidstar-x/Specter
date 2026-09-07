@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2026 MikeRust contributors. Licensed under AGPL-3.0-only. -->
+<!-- Copyright (c) 2026 Specter contributors. Licensed under AGPL-3.0-only. -->
 <!--
   Internal dev-only reference page exercising every UI primitive.
   Reached via `?playground` in the URL. Not part of the shipped routes.
@@ -58,7 +58,7 @@
   <div class="max-w-4xl mx-auto space-y-8">
     <header class="space-y-1">
       <h1 class="text-2xl font-semibold text-(--color-text-primary)">
-        MikeRust — UI Playground
+        Specter — UI Playground
       </h1>
       <p class="text-sm text-(--color-text-secondary)">
         Fase 1 design system primitives. Append <code class="font-mono">?playground</code>

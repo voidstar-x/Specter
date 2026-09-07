@@ -1,12 +1,12 @@
-# MikeRust — Development Plan
+# Specter — Development Plan
 
 > **Last updated:** May 2026 — consolidated document (the former `PLAN.md`
 > and `PLAN_MISSING.md` were merged here).
 >
-> **Purpose.** MikeRust is a clean-room rewrite of the
+> **Purpose.** Specter is a clean-room rewrite of the
 > [willchen96/mike](https://github.com/willchen96/mike) project, geared toward
 > **local and sovereign** use: no cloud, no mandatory external service, a
-> single desktop executable. This document describes what MikeRust is, how it
+> single desktop executable. This document describes what Specter is, how it
 > is built, how it starts, and maintains the **functional specification** area
 > by area together with its progress status.
 >
@@ -21,7 +21,7 @@
 
 ---
 
-## 1. What MikeRust is
+## 1. What Specter is
 
 A desktop-first, fully local AI assistant for documents. A single Tauri
 executable bundles: the axum backend, the SQLite database, the Svelte
@@ -61,7 +61,7 @@ webview as `api_base_url`. In standalone development it can be fixed via
 ## 3. Workspace structure
 
 ```text
-MikeRust/
+Specter/
 ├── Cargo.toml          ← workspace (members: "." and "src-tauri"), edition 2024
 ├── src/                ← crate `mike` (library + standalone bin)
 │   ├── lib.rs          ← run_server(port); exposes the axum app
@@ -177,7 +177,7 @@ standalone dev the frontend points to the backend via the known port.
 
 ## 8. Differences from the original Mike
 
-| Aspect | Mike (original) | MikeRust |
+| Aspect | Mike (original) | Specter |
 |---|---|---|
 | Backend | Express + TypeScript | **Rust axum** |
 | Auth | Supabase Auth | **Argon2id PIN + Windows Hello / Touch ID** |
@@ -395,7 +395,7 @@ largest missing features.
 
 ### Expected behaviour
 
-> **License note.** This feature is a customization specific to MikeRust. It
+> **License note.** This feature is a customization specific to Specter. It
 > must be built with JS rendering libraries only (e.g. `pdf.js`), **without**
 > system plugins.
 

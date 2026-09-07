@@ -1,13 +1,13 @@
-# MikeRust — Dominio: Pubblica Amministrazione Italiana
+# Specter — Dominio: Pubblica Amministrazione Italiana
 
 > Piano workflow, tabelle di output e template di prompt per l'analisi documentale nella PA italiana.
-> Struttura compatibile con l'architettura JSON `config/` di MikeRust.
+> Struttura compatibile con l'architettura JSON `config/` di Specter.
 
 ---
 
 ## 1. Premessa e perimetro
 
-La pubblica amministrazione italiana è uno dei casi d'uso più forti per MikeRust per ragioni strutturali: produce volumi enormi di atti eterogenei con struttura ricorrente, riferimenti normativi obbligatori e obbligo di tracciabilità documentale. Esattamente il problema che il modello "carica → seleziona workflow → aspetta" risolve senza complessità agentiche.
+La pubblica amministrazione italiana è uno dei casi d'uso più forti per Specter per ragioni strutturali: produce volumi enormi di atti eterogenei con struttura ricorrente, riferimenti normativi obbligatori e obbligo di tracciabilità documentale. Esattamente il problema che il modello "carica → seleziona workflow → aspetta" risolve senza complessità agentiche.
 
 ### Principi operativi
 
@@ -21,7 +21,7 @@ La pubblica amministrazione italiana è uno dei casi d'uso più forti per MikeRu
 
 ### Corpus da indicizzare
 
-| Fonte | Tipo | Stato in MikeRust |
+| Fonte | Tipo | Stato in Specter |
 |---|---|---|
 | Normattiva | Leggi e decreti italiani | In pipeline (Italian Legal Corpus) |
 | EUR-Lex | Direttive e regolamenti UE | ✅ Già disponibile (GDPR, AI Act, Direttive appalti) |
@@ -419,4 +419,4 @@ Dominio ad alta specializzazione, da sviluppare con corpus EUR-Lex già indicizz
 
 ---
 
-*Documento generato per MikeRust — SemplificaAI — Dominio PA Italiana v1.0*
+*Documento generato per Specter — Specter — Dominio PA Italiana v1.0*

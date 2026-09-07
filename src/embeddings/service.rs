@@ -1,6 +1,6 @@
 //! Embedding + vector store service (sqlite-vec backend).
 //!
-//! Same SQLite file as the rest of MikeRust (`mike.db`). Vectors live
+//! Same SQLite file as the rest of Specter (`mike.db`). Vectors live
 //! in the `doc_chunks` virtual table created by the sqlite-vec extension
 //! (see migration 0009). Atomic transactions, single-file backup,
 //! shared connection pool with the rest of the app — no separate store,
@@ -655,7 +655,7 @@ struct ModelFiles {
 
 /// Where the model bytes live on disk. Honours `FASTEMBED_CACHE_DIR`
 /// (set by `lib::ensure_fastembed_cache_dir` at startup so it points
-/// at `<userdata>/mikerust-data/fastembed/`), falling back to a sane
+/// at `<userdata>/specter-data/fastembed/`), falling back to a sane
 /// per-user default. Never returns a path inside the workspace tree.
 fn resolve_fastembed_cache_dir() -> PathBuf {
     if let Ok(p) = std::env::var("FASTEMBED_CACHE_DIR") {
@@ -664,7 +664,7 @@ fn resolve_fastembed_cache_dir() -> PathBuf {
     let home = std::env::var("USERPROFILE")
         .or_else(|_| std::env::var("HOME"))
         .unwrap_or_else(|_| ".".to_string());
-    PathBuf::from(home).join("mikerust-data").join("fastembed")
+    PathBuf::from(home).join("specter-data").join("fastembed")
 }
 
 /// Files we need from `Xenova/multilingual-e5-base` on HuggingFace.

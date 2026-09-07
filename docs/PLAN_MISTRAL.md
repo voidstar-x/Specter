@@ -1,8 +1,8 @@
-# Plan: Integrazione Mistral in MikeRust
+# Plan: Integrazione Mistral in Specter
 
 ## Contesto
 
-MikeRust supporta già i provider OpenAI, Anthropic, Vertex AI e Ollama tramite una trait astratta `LlmProvider`. Mistral viene aggiunto come quinto provider cloud, con parità funzionale rispetto agli altri: chat completion, streaming SSE, tool calling, e configurazione via UI nella sezione Impostazioni → Modelli LLM.
+Specter supporta già i provider OpenAI, Anthropic, Vertex AI e Ollama tramite una trait astratta `LlmProvider`. Mistral viene aggiunto come quinto provider cloud, con parità funzionale rispetto agli altri: chat completion, streaming SSE, tool calling, e configurazione via UI nella sezione Impostazioni → Modelli LLM.
 
 Mistral è un provider cloud EU-hosted (server in Francia), compatibile con i requisiti GDPR dei clienti legali. Supporta tool calling nativo con lo stesso schema OpenAI, quindi l'integrazione è a bassa frizione rispetto alla trait esistente.
 
@@ -23,7 +23,7 @@ Mistral è un provider cloud EU-hosted (server in Francia), compatibile con i re
 
 ## Modelli supportati
 
-| Identificatore API | Uso consigliato in MikeRust |
+| Identificatore API | Uso consigliato in Specter |
 |---|---|
 | `mistral-medium-3-5` | Default — document intelligence, analisi legale |
 | `mistral-small-4` | Workflow leggeri, riduzione costi |
@@ -113,7 +113,7 @@ Content-Type: application/json
 }
 ```
 
-Il campo `parallel_tool_calls` va impostato a `false` per MikeRust: i workflow legali sono sequenziali e la prevedibilità è prioritaria rispetto alla velocità.
+Il campo `parallel_tool_calls` va impostato a `false` per Specter: i workflow legali sono sequenziali e la prevedibilità è prioritaria rispetto alla velocità.
 
 ### 5. Tool calling
 

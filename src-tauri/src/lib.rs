@@ -27,7 +27,7 @@ impl ApiBaseUrl {
     }
 }
 
-/// Resolve `<home>/mikerust-data/` and ensure it exists. Used for
+/// Resolve `<home>/specter-data/` and ensure it exists. Used for
 /// both the SQLite DB (`mike.db`, owned by the `mike` crate) and the
 /// release-build log file (`mike-tauri.log`, set up below). Returning
 /// `None` is non-fatal — callers fall back to "no extra logging" so a
@@ -36,7 +36,7 @@ fn ensure_data_dir() -> Option<std::path::PathBuf> {
     let home = std::env::var("USERPROFILE")
         .or_else(|_| std::env::var("HOME"))
         .ok()?;
-    let dir = std::path::PathBuf::from(home).join("mikerust-data");
+    let dir = std::path::PathBuf::from(home).join("specter-data");
     std::fs::create_dir_all(&dir).ok()?;
     Some(dir)
 }
@@ -89,7 +89,7 @@ pub fn run() {
     //     `cargo run`); detached in MSI installs because main.rs sets
     //     `windows_subsystem = "windows"`.
     //   - file (`tracing-appender::rolling::never`) — writes to
-    //     `<home>/mikerust-data/mike-tauri.log`, always on. This is
+    //     `<home>/specter-data/mike-tauri.log`, always on. This is
     //     the only sink that survives the windowed release build, so
     //     "the backend died silently" can finally be triaged by
     //     opening the log file. We keep the worker guard alive for
@@ -167,7 +167,7 @@ pub fn run() {
         let rt = match tokio::runtime::Runtime::new() {
             Ok(rt) => rt,
             Err(e) => {
-                eprintln!("[mikerust:fatal] failed to build tokio runtime: {e}");
+                eprintln!("[specter:fatal] failed to build tokio runtime: {e}");
                 tracing::error!("[tauri] failed to build tokio runtime: {e}");
                 return;
             }
@@ -193,7 +193,7 @@ pub fn run() {
                 }
                 let joined = chain.join(" -> ");
                 tracing::error!("[tauri] axum server failed: {joined}");
-                eprintln!("[mikerust:fatal] axum server failed: {joined}");
+                eprintln!("[specter:fatal] axum server failed: {joined}");
             }
         });
     });
@@ -364,7 +364,7 @@ fn open_external_url(url: String) -> Result<(), String> {
 /// model generated.
 ///
 /// Security model: the path is validated against the user's storage
-/// root (`<home>/mikerust-data/storage/`, the same base
+/// root (`<home>/specter-data/storage/`, the same base
 /// `LocalStorage` uses) plus the OS temp dir as a permitted prefix.
 /// Anything pointing elsewhere — a network share, `C:\Windows`, a
 /// crafted path with `..` segments that escape the base — is
@@ -385,7 +385,7 @@ fn open_external_path(path: String) -> Result<(), String> {
     let home = std::env::var("USERPROFILE")
         .or_else(|_| std::env::var("HOME"))
         .map_err(|_| "USERPROFILE/HOME not set".to_string())?;
-    let storage_default = PathBuf::from(home).join("mikerust-data").join("storage");
+    let storage_default = PathBuf::from(home).join("specter-data").join("storage");
     let storage_override = std::env::var("STORAGE_PATH").ok().map(PathBuf::from);
 
     let mut allowed: Vec<PathBuf> = vec![storage_default];

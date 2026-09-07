@@ -1,4 +1,4 @@
-# MikeRust v0.6.1 — Mistral 429 retry-with-backoff
+# Specter v0.6.1 — Mistral 429 retry-with-backoff
 
 Single-fix release on top of v0.6.0. The dedicated Mistral provider
 that landed in v0.6.0 surfaces an immediate error when Mistral
@@ -48,13 +48,13 @@ tree. No schema migration. No API contract change. No UI change.
 
 Pre-built MSIs for Windows:
 
-- `MikeRust_0.6.1_x64.msi` — Windows x86_64
-- `MikeRust_0.6.1_arm64.msi` — Windows ARM64, Snapdragon X Elite
+- `Specter_0.6.1_x64.msi` — Windows x86_64
+- `Specter_0.6.1_arm64.msi` — Windows ARM64, Snapdragon X Elite
 
 Drop-in replacement for v0.6.0.
 
 ## License
 
-MikeRust is distributed under **AGPL-3.0-only**. The Semplifica
+Specter is distributed under **AGPL-3.0-only**. The Specter
 wordmark and logo are trademarks; see `NOTICE.md`. The full
 licence text is available in-app under **Settings → Licenza**.

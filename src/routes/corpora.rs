@@ -777,7 +777,7 @@ async fn generic_preview(
             ));
         };
         let client = reqwest::Client::builder()
-            .user_agent("MikeRust/0.1 (italian-legal-corpus preview)")
+            .user_agent("Specter/0.1 (italian-legal-corpus preview)")
             .build()
             .map_err(|e| err(StatusCode::INTERNAL_SERVER_ERROR, &e.to_string()))?;
         let (hf_title, text) =

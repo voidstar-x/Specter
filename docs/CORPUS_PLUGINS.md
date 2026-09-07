@@ -1,6 +1,6 @@
 # Corpus plugin manifests
 
-MikeRust discovers legal-corpus connectors through **JSON manifest
+Specter discovers legal-corpus connectors through **JSON manifest
 files** in [`config/corpora-plugins/`](../corpora-plugins). One file per
 corpus. The runtime parses them at startup, validates them, and
 exposes the registry to the UI (`GET /corpora`) and the chat's
@@ -320,7 +320,7 @@ Two things to notice:
    [`src/corpora/plugin.rs`](../src/corpora/plugin.rs).
 3. Drop a manifest in `config/corpora-plugins/<id>.json` with
    `"strategy": { "kind": "builtin", "builtin_id": "<your-id>" }`.
-4. Restart MikeRust. `GET /corpora` will include the new entry,
+4. Restart Specter. `GET /corpora` will include the new entry,
    and the settings panel will list it.
 
 ### Path B — pure JSON (when declarative strategies land)
@@ -336,7 +336,7 @@ Once `http-fetch-per-id` ships, this is the entire flow:
 ## Registry semantics
 
 - **Read-only at runtime**: hot reload is not supported. To pick up
-  manifest changes, restart MikeRust. (The hook would be cheap to add
+  manifest changes, restart Specter. (The hook would be cheap to add
   if needed — file-watcher on the plugins directory — but it changes
   the failure mode of misconfigured manifests, so we're keeping it
   explicit for now.)
@@ -350,7 +350,7 @@ Once `http-fetch-per-id` ships, this is the entire flow:
 
 ## ⚠️ Security — only point plugins at sources you trust
 
-A corpus manifest is a routing instruction: it tells MikeRust where to
+A corpus manifest is a routing instruction: it tells Specter where to
 fetch bytes from and how to parse them. **Two of the supported parsers
 have known unfixed-upstream advisories that only manifest under
 attacker-controlled input**, and a malicious manifest is the easiest

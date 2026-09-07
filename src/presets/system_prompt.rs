@@ -1,4 +1,4 @@
-// Copyright (c) 2026 MikeRust contributors. Licensed under AGPL-3.0-only.
+// Copyright (c) 2026 Specter contributors. Licensed under AGPL-3.0-only.
 
 //! Domain-aware system-prompt **prologue**. Read once at chat-turn
 //! time from `config/system-prompts/<locale>/<domain>.md` and

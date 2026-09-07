@@ -1,27 +1,27 @@
 # Notice — trademarks and brand assets
 
-The source code of MikeRust is distributed under the AGPL-3.0
+The source code of Specter is distributed under the AGPL-3.0
 license (see [LICENSE](LICENSE)). This file clarifies what is **not**
 covered by that license, to prevent confusion when the project is
 forked or redistributed.
 
 ## Trademarks
 
-The following names and visual marks are **trademarks of Semplifica
+The following names and visual marks are **trademarks of Specter
 s.r.l.**, and are **not** licensed under AGPL-3.0:
 
-- The word mark **Semplifica**, in any stylisation.
-- The corporate suffix **Semplifica s.r.l.**
+- The word mark **Specter**, in any stylisation.
+- The corporate suffix **Specter s.r.l.**
 - The logo asset shipped at
   [`frontend/public/semplifica/logo.png`](frontend/public/semplifica/logo.png)
   (and its source under [`src/assets/`](src/assets/)).
 - Any visual identity, colour scheme, or wordmark that identifies a
-  build of this software as the original Semplifica distribution
+  build of this software as the original Specter distribution
   (the "Trade Dress").
 
-The brand mark **MikeRust** is also reserved by Semplifica s.r.l. to
+The brand mark **Specter** is also reserved by Specter s.r.l. to
 identify the upstream of this repository. Forks are encouraged to
-keep "based on MikeRust" attribution but to choose a distinct name
+keep "based on Specter" attribution but to choose a distinct name
 for the redistributed binary if their changes are substantial.
 
 ## What this means for downstream users
@@ -34,10 +34,10 @@ corresponding source).
 You do **not** automatically receive a trademark licence. If you
 redistribute or fork this project, please:
 
-1. **Remove or replace the Semplifica wordmark, logo, and any link
+1. **Remove or replace the Specter wordmark, logo, and any link
    to https://semplifica.ai** if your distribution carries
    substantive modifications — to avoid implying endorsement by
-   Semplifica s.r.l.
+   Specter s.r.l.
 2. Keep AGPL attribution intact (the source file headers, the
    `LICENSE` file, and the legal notices the application surfaces
    to its users).
@@ -66,6 +66,6 @@ owners — listed here for clarity, not as a claim:
 
 ## Contact
 
-For trademark questions or permission to use the Semplifica wordmark
+For trademark questions or permission to use the Specter wordmark
 in a redistribution, write to
-[git@semplifica.ai](mailto:git@semplifica.ai).
+[xusihan@gmail.com](mailto:xusihan@gmail.com).

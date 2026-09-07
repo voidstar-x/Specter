@@ -1,6 +1,6 @@
 //! Corpus plugin manifests — JSON-driven registry for legal corpora.
 //!
-//! Goal: every corpus MikeRust knows about (EUR-Lex, Italian legal,
+//! Goal: every corpus Specter knows about (EUR-Lex, Italian legal,
 //! future Légifrance/BOE/Retsinformation/...) is described by a JSON
 //! manifest file. The runtime scans a directory at startup, parses
 //! each manifest, and exposes a registry the UI and chat system
@@ -112,7 +112,7 @@ pub struct CorpusPlugin {
     #[serde(default = "default_true")]
     pub available: bool,
 
-    /// How MikeRust actually fetches and indexes documents from
+    /// How Specter actually fetches and indexes documents from
     /// this corpus. Discriminated union — see `CorpusStrategy`.
     pub strategy: CorpusStrategy,
 

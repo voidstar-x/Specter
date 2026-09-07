@@ -22,7 +22,7 @@
             "index": 2,
             "name": "Regime",
             "format": "tag",
-            "prompt": "Una sola tra: `Ordinario`, `Semplificato`, `Forfettario`, `Startup innovativa`, `ETS` (Ente del Terzo Settore), `Cooperativa`, `Agricolo`. Per società di capitali tipicamente `Ordinario`. Per persone fisiche con P.IVA verificare il regime applicato."
+            "prompt": "Una sola tra: `Ordinario`, `Specterto`, `Forfettario`, `Startup innovativa`, `ETS` (Ente del Terzo Settore), `Cooperativa`, `Agricolo`. Per società di capitali tipicamente `Ordinario`. Per persone fisiche con P.IVA verificare il regime applicato."
         },
         {
             "index": 3,

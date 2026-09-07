@@ -654,7 +654,7 @@ Gestione strutturata del portafoglio clienti per adempimenti ricorrenti: dichiar
 | Cliente | Tipo soggetto | Regime | Responsabile | Dichiaz. Redditi | IVA annuale | 770 | Acconti | DURC | Stato generale |
 |---------|-------------|--------|-------------|-----------------|------------|-----|--------|------|---------------|
 | Alfa Srl | Soc. capitali | Ordinario | Dott. X | ✓ Inviata | ✓ Inviata | ✓ | ✓ Versato | ✓ | 🟢 OK |
-| Beta Snc | Soc. persone | Semplificato | Sig.ra Y | ⏳ In lavoraz. | ✓ Inviata | — | ⚠ Atteso | — | 🟡 Parziale |
+| Beta Snc | Soc. persone | Specterto | Sig.ra Y | ⏳ In lavoraz. | ✓ Inviata | — | ⚠ Atteso | — | 🟡 Parziale |
 | Gamma PF | Pers. fisica | Forfettario | Dott. X | ✗ Docs mancanti | — | — | ⏳ | — | 🔴 Blocco |
 | … | … | … | … | … | … | … | … | … | … |
 
@@ -765,7 +765,7 @@ Gestione strutturata del portafoglio clienti per adempimenti ricorrenti: dichiar
 | DPR 322/1998 | Termini e modalità dichiarazioni fiscali |
 | D.Lgs. 241/1997 | Versamenti F24 e compensazione |
 | L. 190/2014 e succ. | Regime forfettario |
-| D.Lgs. 175/2014 | Semplificazioni fiscali |
+| D.Lgs. 175/2014 | Specterzioni fiscali |
 
 ---
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2026 MikeRust contributors. Licensed under AGPL-3.0-only.
+// Copyright (c) 2026 Specter contributors. Licensed under AGPL-3.0-only.
 
 /**
  * i18n store (plan §14). English is the canonical locale and the
@@ -7,7 +7,7 @@
  * All six dictionaries are imported statically and bundled — for a
  * desktop app the ~35 KB/locale cost is negligible and it avoids
  * async locale-loading flicker. The translation files themselves are
- * reused from the previous MikeRust frontend (frontendMike/messages),
+ * reused from the previous Specter frontend (frontendMike/messages),
  * which is original work of the project owner (plan §14.1).
  */
 

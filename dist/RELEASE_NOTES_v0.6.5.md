@@ -1,4 +1,4 @@
-# MikeRust v0.6.5 — Mistral "Fast" profile preset
+# Specter v0.6.5 — Mistral "Fast" profile preset
 
 Adds a third Mistral profile preset alongside the existing
 "Equilibrato" and "Premium" buttons in
@@ -41,13 +41,13 @@ Frontend-only change; svelte-check 0 errors. No backend changes
 
 Pre-built MSIs for Windows:
 
-- `MikeRust_0.6.5_x64.msi` — Windows x86_64
-- `MikeRust_0.6.5_arm64.msi` — Windows ARM64, Snapdragon X Elite
+- `Specter_0.6.5_x64.msi` — Windows x86_64
+- `Specter_0.6.5_arm64.msi` — Windows ARM64, Snapdragon X Elite
 
 Drop-in replacement for v0.6.4.
 
 ## License
 
-MikeRust is distributed under **AGPL-3.0-only**. The Semplifica
+Specter is distributed under **AGPL-3.0-only**. The Specter
 wordmark and logo are trademarks; see `NOTICE.md`. The full
 licence text is available in-app under **Settings → Licenza**.

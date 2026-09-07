@@ -40,12 +40,12 @@
     "expand": "Expand"
   },
   "App": {
-    "title": "MikeRust",
+    "title": "Specter",
     "tagline": "Local legal AI assistant",
-    "versionTooltip": "MikeRust v{version}"
+    "versionTooltip": "Specter v{version}"
   },
   "Login": {
-    "heading": "Sign in to MikeRust",
+    "heading": "Sign in to Specter",
     "subheading": "Enter your PIN or use biometric authentication",
     "pinLabel": "PIN",
     "pinPlaceholder": "Enter your PIN",
@@ -61,7 +61,7 @@
     "errorBiometric": "Biometric authentication failed"
   },
   "Signup": {
-    "heading": "Create your MikeRust account",
+    "heading": "Create your Specter account",
     "subheading": "Set a PIN to protect your data",
     "usernameLabel": "Username",
     "usernamePlaceholder": "Pick a username",
@@ -88,7 +88,7 @@
     "tabularReviews": "Tabular reviews",
     "docxTemplates": "DOCX templates",
     "account": "Account",
-    "semplifica": "Semplifica s.r.l.",
+    "semplifica": "Specter s.r.l.",
     "semplificaTitle": "Open semplifica.ai in your browser",
     "recentChats": "Recent chats",
     "noChats": "No chats",
@@ -196,7 +196,7 @@
   "ProjectExport": {
     "exportButton": "Export project",
     "title": "Export project",
-    "subtitle": "Create an encrypted .mikeprj file your colleague can import into their MikeRust. The file can only be opened if the recipient is registered with the email below.",
+    "subtitle": "Create an encrypted .mikeprj file your colleague can import into their Specter. The file can only be opened if the recipient is registered with the email below.",
     "recipientEmail": "Recipient email",
     "recipientEmailPlaceholder": "colleague@firm.com",
     "includeChats": "Include chat history",
@@ -552,7 +552,7 @@
       "acknowledge": "I understand, continue",
       "statusLoading": "Loading PII model… first run downloads ~500 MB from HuggingFace, then loads the ONNX session.",
       "statusFailed": "Could not load the PII model",
-      "statusUnavailable": "PII protection requested but this build of MikeRust was compiled without the ner-pii feature — the document will be sent unredacted."
+      "statusUnavailable": "PII protection requested but this build of Specter was compiled without the ner-pii feature — the document will be sent unredacted."
     }
   },
   "DocViewer": {
@@ -1126,16 +1126,16 @@
   },
   "Boot": {
     "cannotReach": "Cannot reach the backend",
-    "cannotReachHint": "Make sure the MikeRust backend is running. In dev, launch it from the repo root with",
-    "connecting": "Connecting to MikeRust…"
+    "cannotReachHint": "Make sure the Specter backend is running. In dev, launch it from the repo root with",
+    "connecting": "Connecting to Specter…"
   },
   "Auth": {
     "welcome": "Welcome, {name}",
     "welcomeBack": "Welcome back, {name}",
-    "setupTitle": "Welcome to MikeRust",
+    "setupTitle": "Welcome to Specter",
     "setupSubtitle": "Create your local profile. Everything stays on this machine.",
     "setupPinNote": "Your PIN protects local access. There is no password recovery — keep it somewhere safe.",
-    "unlockTitle": "Unlock MikeRust",
+    "unlockTitle": "Unlock Specter",
     "unlockTitleNamed": "Unlock, {name}",
     "unlockSubtitle": "Enter your PIN to continue.",
     "username": "Username",
@@ -1152,7 +1152,7 @@
     "createProfile": "Create profile",
     "unlock": "Unlock",
     "useBiometric": "Use biometric unlock",
-    "biometricReason": "Unlock MikeRust with your biometric",
+    "biometricReason": "Unlock Specter with your biometric",
     "lockout": "Too many attempts — retry in {secs}s"
   },
   "Ui": {
@@ -1301,12 +1301,12 @@
     "pinResetReason": "Verify your identity to reset your PIN",
     "pinResetHint": "If you don't remember your current PIN, you can set a new one by verifying with Windows Hello / Touch ID.",
     "license": "License",
-    "licenseIntro": "MikeRust is free software distributed under the GNU Affero General Public License v3 (AGPL-3.0-only). You can use, modify and redistribute it freely; if you offer it as a network service, the modified source code must be made available to the users of that service.",
+    "licenseIntro": "Specter is free software distributed under the GNU Affero General Public License v3 (AGPL-3.0-only). You can use, modify and redistribute it freely; if you offer it as a network service, the modified source code must be made available to the users of that service.",
     "licenseSpdx": "SPDX identifier",
     "licenseFullText": "Full license text",
     "retrieval": "Retrieval",
     "retrievalTitle": "Document retrieval",
-    "retrievalIntro": "Behavioural knobs that change how the assistant searches your library at chat time. Each one is opt-in and can be turned off without restarting MikeRust.",
+    "retrievalIntro": "Behavioural knobs that change how the assistant searches your library at chat time. Each one is opt-in and can be turned off without restarting Specter.",
     "retrievalHydeLabel": "HyDE — Hypothetical Document Embeddings",
     "retrievalHydeDescription": "Before searching, the assistant drafts a short pseudo-answer in the register of the active domain (legal / medical / finance / …) and uses it as a second probe. The two rankings are merged. Tends to recover passages that match the answer's phrasing rather than the question's.",
     "retrievalHydeCost": "Adds one extra LLM call per chat turn. Cost is paid on your active provider (Anthropic / Gemini / OpenAI / local), not local compute.",

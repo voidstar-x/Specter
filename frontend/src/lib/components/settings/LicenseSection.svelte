@@ -1,8 +1,8 @@
-<!-- Copyright (c) 2026 MikeRust contributors. Licensed under AGPL-3.0-only. -->
+<!-- Copyright (c) 2026 Specter contributors. Licensed under AGPL-3.0-only. -->
 <!--
   Settings → License panel.
 
-  Renders the product's identity (MikeRust + the running version) and
+  Renders the product's identity (Specter + the running version) and
   the full AGPL-3.0 licence text bundled with the binary. The licence
   text is the canonical `LICENSE` file at the repo root, pulled in via
   Vite's `?raw` import so it ships as a string constant in the bundle
@@ -26,7 +26,7 @@
            bg-(--color-surface-0) px-5 py-4"
   >
     <h3 class="text-base font-semibold text-(--color-text-primary)">
-      MikeRust
+      Specter
       <span class="ml-2 text-sm font-normal text-(--color-text-secondary) tabular-nums">
         v{APP_VERSION}
       </span>

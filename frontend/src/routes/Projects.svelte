@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2026 MikeRust contributors. Licensed under AGPL-3.0-only. -->
+<!-- Copyright (c) 2026 Specter contributors. Licensed under AGPL-3.0-only. -->
 <!--
   Projects screen. List + create + edit + delete over /project.
   Export / import .mikeprj is a later phase.

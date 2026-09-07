@@ -44,7 +44,7 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 # ort::init…) used to vanish into the void — a failure before
 # `axum::serve` left the user with a generic "Failed to fetch" screen
 # and no way to diagnose it. tracing-appender now writes the same
-# event stream to `<home>/mikerust-data/mike-tauri.log` so a crashing
+# event stream to `<home>/specter-data/mike-tauri.log` so a crashing
 # install can be triaged from the log file directly.
 tracing-appender = "0.2"
 anyhow = "1"

@@ -190,7 +190,7 @@ async fn discover_one_mcp(server: McpServerOut) -> Option<McpDiscovered> {
             "params": {
                 "protocolVersion": "2024-11-05",
                 "capabilities": {},
-                "clientInfo": { "name": "MikeRust", "version": "0.1" }
+                "clientInfo": { "name": "Specter", "version": "0.1" }
             }
         }))
         .send()
@@ -3486,7 +3486,7 @@ async fn stream_chat_root(
         // Domain-aware prologue (see crate::presets::system_prompt).
         // The domain resolves from the chat's project (if any) →
         // user_settings.default_domain → "others". The locale comes
-        // from user_settings.locale → "it" (MikeRust's primary
+        // from user_settings.locale → "it" (Specter's primary
         // language). Prepended FIRST so it sets the role before the
         // generic Mike tool-use / citation rules.
         let domain_locale: (String, String) = {

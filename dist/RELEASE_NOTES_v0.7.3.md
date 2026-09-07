@@ -1,4 +1,4 @@
-# MikeRust v0.7.3 — Workflow cross-dominio + analisi cespiti e libri contabili
+# Specter v0.7.3 — Workflow cross-dominio + analisi cespiti e libri contabili
 
 Aggiunge due workflow del commercialista (analisi cespiti e controlli
 libri contabili) e il meccanismo di **registrazione cross-dominio**:
@@ -50,11 +50,11 @@ Finanza grazie a `also_applicable_to`.
 
 ## Download
 
-- `MikeRust_0.7.3_x64.msi` — Windows x86_64
-- `MikeRust_0.7.3_arm64.msi` — Windows ARM64, Snapdragon X Elite
+- `Specter_0.7.3_x64.msi` — Windows x86_64
+- `Specter_0.7.3_arm64.msi` — Windows ARM64, Snapdragon X Elite
 
 Sostituzione drop-in per v0.7.2.
 
 ## Licenza
 
-AGPL-3.0-only. Il marchio e il logo Semplifica sono marchi registrati.
+AGPL-3.0-only. Il marchio e il logo Specter sono marchi registrati.

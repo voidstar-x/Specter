@@ -1,6 +1,6 @@
 # History
 
-Release notes for MikeRust. Tagged releases (`v0.1.0` and later) collect
+Release notes for Specter. Tagged releases (`v0.1.0` and later) collect
 the work into shippable semver bumps; the entries between tags are
 ordered by the date the work landed on `main` (Europe/Rome), most recent
 first. Each entry follows a light Keep-a-Changelog shape (Added /
@@ -287,7 +287,7 @@ svelte-check 0 errors.
 
 ## v0.6.7 — 2026-06-08 (sidebar active-domain selector)
 
-Adds a compact domain picker next to the MikeRust brand at the
+Adds a compact domain picker next to the Specter brand at the
 top of the sidebar. Always visible, default-initialised from the
 user's `default_domain` setting (set at sign-up time and
 configurable in Settings → Generale), persisted server-side on
@@ -316,7 +316,7 @@ takes a 6-click flow down to one.
 ### Implementation
 
 * `Shell.svelte` brand snippet rebuilt as a flex row: Logo +
-  "MikeRust" + version + `<Select>` aligned right (`ml-auto`,
+  "Specter" + version + `<Select>` aligned right (`ml-auto`,
   `max-w-[10rem]`).
 * Options derived from `userStore.effectiveEnabledDomains` so
   domains the user has hidden in Settings → Generale stay
@@ -591,7 +591,7 @@ Every Mistral call (chat / tabular / HyDE / title gen) acquires
 the permit before issuing the HTTP request and releases it on
 completion. Combined with v0.6.1's retry-with-backoff, this
 ensures we never exceed 1 RPS to Mistral regardless of how many
-MikeRust subsystems try to call it concurrently.
+Specter subsystems try to call it concurrently.
 
 The cap of 1 is the safe default for Experiment tier (1 RPS limit).
 For paid Scale-tier users (4-8 RPS) this is mildly conservative
@@ -601,7 +601,7 @@ behaviour is the right trade-off. Future work: expose a
 users on paid tiers.
 
 The semaphore lives in `src/llm/mistral.rs` at module scope as a
-`LazyLock<Semaphore>` so it spans the entire MikeRust process
+`LazyLock<Semaphore>` so it spans the entire Specter process
 lifetime. Acquisition is fair (FIFO) so tabular cells process
 row-by-row in the order the worker pool fires them — useful
 because the per-row pill rendering reads better in deterministic
@@ -879,7 +879,7 @@ New toggle in Settings → Modelli LLM → "Modalità sicura locale".
 URL and free-form model id intact. When ON the local provider
 locks to `http://localhost:11434` and the chat picker collapses
 to two curated entries (Qwen 3.5 4B `q4_K_M` and Gemma 4 E2B IT
-GGUF `Q4_K_M`) derived through Modelfiles MikeRust creates on
+GGUF `Q4_K_M`) derived through Modelfiles Specter creates on
 demand with thinking suppression baked in (Qwen `/no_think` token
 in the chat template; Gemma `<think>` / `<thinking>` /
 `<reasoning>` stop sequences + "rispondi direttamente" preamble).
@@ -1790,9 +1790,9 @@ distributed under.
 
 ### What changed
 
-- **Sidebar brand**: `MikeRust` in [`Shell.svelte`](frontend/src/routes/Shell.svelte) now renders next to a tiny `v{version}` badge in muted secondary text. The version is pulled at runtime from the Tauri bundle via `@tauri-apps/api/app::getVersion`, so it always matches `tauri.svelte.conf.json` — not whatever `package.json` happens to show in a checked-out source tree.
+- **Sidebar brand**: `Specter` in [`Shell.svelte`](frontend/src/routes/Shell.svelte) now renders next to a tiny `v{version}` badge in muted secondary text. The version is pulled at runtime from the Tauri bundle via `@tauri-apps/api/app::getVersion`, so it always matches `tauri.svelte.conf.json` — not whatever `package.json` happens to show in a checked-out source tree.
 - **New `app-version` store** ([`stores/app-version.svelte.ts`](frontend/src/lib/stores/app-version.svelte.ts)) caches the result of the single `getVersion()` call. Sync accessor returns `null` until resolved; callers render nothing in that window rather than block.
-- **New Settings → License panel** ([`LicenseSection.svelte`](frontend/src/lib/components/settings/LicenseSection.svelte)) shows MikeRust + version, the SPDX identifier (`AGPL-3.0-only`), an introductory paragraph explaining the AGPL terms in plain language, and the full LICENSE file in a scrollable monospace block. The text is the canonical [`LICENSE`](LICENSE) at the repo root, inlined at build time via Vite's `?raw` import — no runtime fetch, no missing-file risk.
+- **New Settings → License panel** ([`LicenseSection.svelte`](frontend/src/lib/components/settings/LicenseSection.svelte)) shows Specter + version, the SPDX identifier (`AGPL-3.0-only`), an introductory paragraph explaining the AGPL terms in plain language, and the full LICENSE file in a scrollable monospace block. The text is the canonical [`LICENSE`](LICENSE) at the repo root, inlined at build time via Vite's `?raw` import — no runtime fetch, no missing-file risk.
 - **`vite.config.ts`**: `server.fs.allow: ['..']` lets the dev server resolve the LICENSE one directory above the frontend project root.
 
 ### Settings nav
@@ -2011,7 +2011,7 @@ chat turn (per [`chat::load_attached_docs`](src/routes/chat.rs)).
 
 ### The canonical 8-step lifecycle, now fully observable
 
-1. MikeRust generates a docx from a template.
+1. Specter generates a docx from a template.
 2. The user can reject it and write a motive (≥10 chars).
 3. Backend pulls the cached extracted text, runs a one-shot LLM
    summary anchored on the motive, and persists
@@ -2061,7 +2061,7 @@ At `stream_chat` time the backend resolves:
 - **Domain** — `project.domain` if the chat is in a project,
   otherwise `user_settings.default_domain`, otherwise `"others"`.
 - **Locale** — `user_settings.locale` (set in Settings → General),
-  otherwise `"it"` (MikeRust's primary user base).
+  otherwise `"it"` (Specter's primary user base).
 - **Default country** — derived from the locale via a fixed map
   (`it → Italy`, `fr → France`, `de → Germany`, `es → Spain`,
   `pt → Portugal`, `en → "unspecified (ask the user)"`).
@@ -2149,8 +2149,8 @@ rejection, prologue wrapping, country mapping). `cargo check
 
 ### Installer artefacts
 
-- `dist/MikeRust_0.4.0_x64.msi` — Windows x86_64
-- `dist/MikeRust_0.4.0_arm64.msi` — Windows ARM64
+- `dist/Specter_0.4.0_x64.msi` — Windows x86_64
+- `dist/Specter_0.4.0_arm64.msi` — Windows ARM64
 
 ---
 
@@ -2225,8 +2225,8 @@ and the model apologised instead of finishing the workflow.
 
 ### Installer artefacts
 
-- `dist/MikeRust_0.3.6_x64.msi` — Windows x86_64
-- `dist/MikeRust_0.3.6_arm64.msi` — Windows ARM64
+- `dist/Specter_0.3.6_x64.msi` — Windows x86_64
+- `dist/Specter_0.3.6_arm64.msi` — Windows ARM64
 
 ---
 
@@ -2290,7 +2290,7 @@ in a different chat — that gets its own fresh decision row.
 
 - New IPC command `open_external_path` in `src-tauri/src/lib.rs`.
   Accepts an absolute path; canonicalises it; rejects anything
-  that doesn't sit under `<home>/mikerust-data/storage/`,
+  that doesn't sit under `<home>/specter-data/storage/`,
   `$STORAGE_PATH`, or the OS temp dir; hands the rest to
   `open::that` so Word / LibreOffice picks up the file with its
   native Track Changes UI. Frontend never fabricates the path:
@@ -2337,8 +2337,8 @@ in a different chat — that gets its own fresh decision row.
 
 ### Installer artefacts
 
-- `dist/MikeRust_0.3.5_x64.msi` — Windows x86_64
-- `dist/MikeRust_0.3.5_arm64.msi` — Windows ARM64
+- `dist/Specter_0.3.5_x64.msi` — Windows x86_64
+- `dist/Specter_0.3.5_arm64.msi` — Windows ARM64
 
 ---
 
@@ -2375,8 +2375,8 @@ section the user is happy with; the inline markers were dead weight.
   this note is the user-facing documentation.
 
 ### Installer artefacts
-- `dist/MikeRust_0.3.4_x64.msi` — Windows x86_64
-- `dist/MikeRust_0.3.4_arm64.msi` — Windows ARM64
+- `dist/Specter_0.3.4_x64.msi` — Windows x86_64
+- `dist/Specter_0.3.4_arm64.msi` — Windows ARM64
 
 ---
 
@@ -2438,8 +2438,8 @@ match the rest of the UI's lucide-svelte icon family.
 
 ### Installer artefacts
 
-- `dist/MikeRust_0.3.2_x64.msi` — Windows x86_64
-- `dist/MikeRust_0.3.2_arm64.msi` — Windows ARM64
+- `dist/Specter_0.3.2_x64.msi` — Windows x86_64
+- `dist/Specter_0.3.2_arm64.msi` — Windows ARM64
 
 ---
 
@@ -2477,8 +2477,8 @@ no `config/` tree.
 
 ### Installer artefacts
 
-- `dist/MikeRust_0.3.1_x64.msi` — Windows x86_64
-- `dist/MikeRust_0.3.1_arm64.msi` — Windows ARM64
+- `dist/Specter_0.3.1_x64.msi` — Windows x86_64
+- `dist/Specter_0.3.1_arm64.msi` — Windows ARM64
 
 ---
 
@@ -2490,12 +2490,12 @@ Symptom in the installed MSI: uploading a document, opening the
 viewer, or reading the chat document cache surfaced
 "Could not load document — Accesso negato. (os error 5)" with the
 backend logging `ACCESS_DENIED` on file-system writes. Reproduced
-from `<home>/mikerust-data/mike-tauri.log` (v0.2.2 file logger) —
+from `<home>/specter-data/mike-tauri.log` (v0.2.2 file logger) —
 the storage layer tried to `create_dir_all` `./data/storage/`, a
 cwd-relative path. For a developer running `cargo run` from the
-workspace root that resolves to `C:\Progetti\MikeRust\data\storage\`
+workspace root that resolves to `C:\Progetti\Specter\data\storage\`
 and works. For an MSI launched from a Start-menu shortcut the cwd
-is often `C:\Program Files\MikeRust\` (or `C:\Windows\System32` via
+is often `C:\Program Files\Specter\` (or `C:\Windows\System32` via
 "Run"), neither of which is writable by a non-admin user. The
 first `put` then failed with `os error 5` and `/document` /
 `/upload` returned HTTP 500.
@@ -2503,7 +2503,7 @@ first `put` then failed with `os error 5` and `/document` /
 - [src/storage/mod.rs](src/storage/mod.rs) `LocalStorage::new()`
   falls back to a new helper `default_storage_path()` instead of
   `"./data/storage"`. The default now mirrors `db::default_db_url`:
-  `<USERPROFILE | HOME>/mikerust-data/storage/`. Same user-writable
+  `<USERPROFILE | HOME>/specter-data/storage/`. Same user-writable
   directory the SQLite DB and the v0.2.5 PII cache already live
   under, so a full backup is one folder copy. The
   `STORAGE_PATH` env override is preserved for tests, fixtures,
@@ -2511,8 +2511,8 @@ first `put` then failed with `os error 5` and `/document` /
 
 ### Installer artefacts
 
-- `dist/MikeRust_0.3.0_x64.msi` — Windows x86_64
-- `dist/MikeRust_0.3.0_arm64.msi` — Windows ARM64
+- `dist/Specter_0.3.0_x64.msi` — Windows x86_64
+- `dist/Specter_0.3.0_arm64.msi` — Windows ARM64
 
 ---
 
@@ -2567,8 +2567,8 @@ sidestepping every redaction layer.
 
 ### Installer artefacts
 
-- `dist/MikeRust_0.2.7_x64.msi` — Windows x86_64
-- `dist/MikeRust_0.2.7_arm64.msi` — Windows ARM64
+- `dist/Specter_0.2.7_x64.msi` — Windows x86_64
+- `dist/Specter_0.2.7_arm64.msi` — Windows ARM64
 
 ---
 
@@ -2617,8 +2617,8 @@ framings (`targa`, `azienda`).
 
 ### Installer artefacts
 
-- `dist/MikeRust_0.2.6_x64.msi` — Windows x86_64
-- `dist/MikeRust_0.2.6_arm64.msi` — Windows ARM64
+- `dist/Specter_0.2.6_x64.msi` — Windows x86_64
+- `dist/Specter_0.2.6_arm64.msi` — Windows ARM64
 
 ---
 
@@ -2668,8 +2668,8 @@ label combinations don't clash.
 
 ### Installer artefacts
 
-- `dist/MikeRust_0.2.5_x64.msi` — Windows x86_64
-- `dist/MikeRust_0.2.5_arm64.msi` — Windows ARM64
+- `dist/Specter_0.2.5_x64.msi` — Windows x86_64
+- `dist/Specter_0.2.5_arm64.msi` — Windows ARM64
 
 ---
 
@@ -2703,8 +2703,8 @@ was actually exercised.
 
 ### Installer artefacts
 
-- `dist/MikeRust_0.2.4_x64.msi` — Windows x86_64
-- `dist/MikeRust_0.2.4_arm64.msi` — Windows ARM64
+- `dist/Specter_0.2.4_x64.msi` — Windows x86_64
+- `dist/Specter_0.2.4_arm64.msi` — Windows ARM64
 
 ---
 
@@ -2712,10 +2712,10 @@ was actually exercised.
 
 ### Fixed — frontend → backend race on cold MSI launch
 
-Symptom: on a freshly installed MSI, opening MikeRust showed the Svelte
+Symptom: on a freshly installed MSI, opening Specter showed the Svelte
 "Impossibile raggiungere il backend — Network error: Failed to fetch"
 banner. The new v0.2.2 file logger
-(`<home>/mikerust-data/mike-tauri.log`) made the diagnosis instant: the
+(`<home>/specter-data/mike-tauri.log`) made the diagnosis instant: the
 backend actually started fine, bound `127.0.0.1:59209` and reported
 the URL via `api_base_url`, but only after ~1 s of preset loading
 (81 workflow presets + 30 column presets + 13 docx templates + 5
@@ -2740,8 +2740,8 @@ which was guaranteed to refuse the connection.
 
 ### Installer artefacts
 
-- `dist/MikeRust_0.2.3_x64.msi` — Windows x86_64
-- `dist/MikeRust_0.2.3_arm64.msi` — Windows ARM64
+- `dist/Specter_0.2.3_x64.msi` — Windows x86_64
+- `dist/Specter_0.2.3_arm64.msi` — Windows ARM64
 
 ---
 
@@ -2763,13 +2763,13 @@ down but had no way to know *why*.
 
 - `tracing-appender = "0.2"` added to `mike-tauri`'s deps. The
   shell now installs an additional non-blocking file layer that
-  writes every event to `<home>/mikerust-data/mike-tauri.log` —
+  writes every event to `<home>/specter-data/mike-tauri.log` —
   same directory as the SQLite DB so we know it's user-writable.
   The worker guard is `Box::leak`'d at startup so the writer
   keeps flushing for the lifetime of the process (a few KB of
   heap, freed at exit). Stdout/stderr layer stays on top for
   `tauri dev` / `cargo run` where stdout *is* attached.
-- `[tauri] tracing → C:\Users\<name>\mikerust-data\mike-tauri.log`
+- `[tauri] tracing → C:\Users\<name>\specter-data\mike-tauri.log`
   now prints at startup, so a user reporting a problem can paste
   the log path back without having to know the convention.
 - `axum server error: …` rewritten to walk the full
@@ -2777,19 +2777,19 @@ down but had no way to know *why*.
   `axum server failed: <top> -> <middle> -> <root>` — previously
   only the topmost wrapper was visible, hiding the concrete cause
   (file-not-found, addr-in-use, sqlite-open-failed…).
-- `eprintln!("[mikerust:fatal] …")` as a last-resort sink for
+- `eprintln!("[specter:fatal] …")` as a last-resort sink for
   catastrophic startup failures (tokio runtime build, axum
   bind/serve) — visible to anyone running the installed exe from
   a console even if the file logger itself failed to open.
-- `ensure_data_dir()` helper creates `<home>/mikerust-data/` up
+- `ensure_data_dir()` helper creates `<home>/specter-data/` up
   front so the log file open never races the SQLite open.
 
 ### Changed — embedded axum picks an explicit random ephemeral port
 
 Symptom: with several Tauri / Electron desktop apps that all bind
-axum on localhost (e.g. the upstream `mike` and MikeRust running
+axum on localhost (e.g. the upstream `mike` and Specter running
 side by side), there was a non-zero chance that the OS's port-0
-ephemeral pool would hand MikeRust a port another desktop app had
+ephemeral pool would hand Specter a port another desktop app had
 freed milliseconds ago and was about to rebind.
 
 - `rand = "0.9"` added to `mike-tauri`'s deps.
@@ -2808,8 +2808,8 @@ freed milliseconds ago and was about to rebind.
 
 ### Installer artefacts
 
-- `dist/MikeRust_0.2.2_x64.msi` — Windows x86_64
-- `dist/MikeRust_0.2.2_arm64.msi` — Windows ARM64
+- `dist/Specter_0.2.2_x64.msi` — Windows x86_64
+- `dist/Specter_0.2.2_arm64.msi` — Windows ARM64
 
 Same lean ~24 MB shape as v0.2.1 — the gliner2_inference v0.5.1
 slim-ort fix carries over.
@@ -2829,8 +2829,8 @@ entries below collect the per-topic detail.
 
 ### Installer artefacts
 
-- `dist/MikeRust_0.2.1_x64.msi` — Windows x86_64
-- `dist/MikeRust_0.2.1_arm64.msi` — Windows ARM64
+- `dist/Specter_0.2.1_x64.msi` — Windows x86_64
+- `dist/Specter_0.2.1_arm64.msi` — Windows ARM64
 
 Both ship the matching `onnxruntime.dll` 1.20.0 + `pdfium.dll` under
 `resources/libs/{onnxruntime,pdfium}/win-<arch>/` (loaded dynamically
@@ -2968,7 +2968,7 @@ char level.
   out of the box.
 - `gliner2_inference = { git = "SemplificaAI/gliner2-rs", tag = "v0.5.0" }` —
   the Rust binding around GLiNER2 ONNX inference, pinned to the
-  same `ort = "=2.0.0-rc.9"` MikeRust already uses for embeddings.
+  same `ort = "=2.0.0-rc.9"` Specter already uses for embeddings.
   Cargo dedupes the runtime so a single onnxruntime DLL (1.20.0)
   powers both passes.
 - `crate::ner::mask_pii(text, labels, progress)` — the public
@@ -3002,11 +3002,11 @@ char level.
   takes a third `Option<InferenceParams>` argument. Our `Entity`
   type drops start/end and relies on the literal text for
   global text replace.
-- `ort::init().with_name("MikeRust").commit()` is called once at
+- `ort::init().with_name("Specter").commit()` is called once at
   startup before any embedding or NER work — gliner2-rs requires
   it. The call is a no-op when both `rag` and `ner-pii` are off.
 - The `HF_HOME` env var is redirected to
-  `%USERPROFILE%/mikerust-data/gliner2/` so the model weights live
+  `%USERPROFILE%/specter-data/gliner2/` so the model weights live
   next to the embedding cache and the Tauri watcher never sees
   them.
 
@@ -3033,7 +3033,7 @@ the UI renders identically to the fastembed download bar.
     files on re-check).
   - `ensure_files(repo_id, variant)` HEAD-passes for the total
     byte budget, then streams 8 ONNX shards + `tokenizer.json`
-    into `<HF_HOME>/mikerust-gliner2/<repo>--<repo>/<variant>/`
+    into `<HF_HOME>/specter-gliner2/<repo>--<repo>/<variant>/`
     with 1 MB tick granularity and `.part` → atomic rename on
     success.
   - Variant auto-detection: respects `GLINER2_NO_IOBINDING=1`
@@ -3660,7 +3660,7 @@ lifting accessories, connected IoT machinery).
 - The brief is **distinct from the roadmap item "compliance-aware
   model evaluation"**. That item is about scoring LLMs on per-provider
   compliance metadata (serving region, DPA, EULA). The brief is a
-  product vertical that *uses* MikeRust to validate customer
+  product vertical that *uses* Specter to validate customer
   documentation. Different work; don't conflate.
 - Two issues flagged during the analysis on 2026-05-21:
   "Prompt B0" referenced in §15 but never defined (typo); the archive
@@ -3714,7 +3714,7 @@ the binary**. Operator zero-touch.
 ### Install layout post-MSI
 
 ```
-C:\Program Files\MikeRust\
+C:\Program Files\Specter\
 ├── mike-tauri.exe
 └── resources\
     └── libs\
@@ -4083,7 +4083,7 @@ follow-up batch.
 
 ## 2026-05-20 — NIS2 compliance pack: docx template + assistant workflow + tabular review
 
-Translated `docs/nis2-prompts.md` into three ready-to-ship MikeRust
+Translated `docs/nis2-prompts.md` into three ready-to-ship Specter
 artefacts, all anchored to the **compliance** domain and to the Italian
 NIS2 transposition (D.Lgs. 138/2024).
 
@@ -4387,8 +4387,8 @@ re-checked manually.
   via `ollama show`).
 - `config/model.json` local provider now includes tuned alias IDs
   aligned to those profiles:
-  `mikerust-qwen35-4b:ctx16k`, `mikerust-qwen35-9b:ctx8k`,
-  `mikerust-gemma4-e2b:ctx8k`.
+  `specter-qwen35-4b:ctx16k`, `specter-qwen35-9b:ctx8k`,
+  `specter-gemma4-e2b:ctx8k`.
 - Fixed `src-tauri/tauri.svelte.conf.json` dev/build commands pathing
   for repository-root launches: `pnpm --dir ../frontend ...` ->
   `pnpm --dir ./frontend ...`, avoiding accidental resolution to
@@ -4396,7 +4396,7 @@ re-checked manually.
 - Fixed Settings → Model roles provider-filter logic so local models are
   visible in role dropdowns when a local endpoint is configured
   (`local_base_url` set). This unblocks selection of local tuned aliases
-  like `mikerust-qwen35-4b:ctx16k` as `main_model`.
+  like `specter-qwen35-4b:ctx16k` as `main_model`.
 - Fixed broader Settings provider/model coherence to prevent cross-provider
   mismatches (e.g. local model accidentally sent to Gemini):
   - Active provider chips are now toggle-style multi-select (non-exclusive),
@@ -4767,7 +4767,7 @@ chat keeps raising:
 ### Added — Medico-legale toolkit (11 workflow-presets + 1 DOCX template)
 
 Maps the 7 operational modules of `docs/piano_toolkit_medico_legale.md`
-into MikeRust's preset registry under the canonical `medical` domain.
+into Specter's preset registry under the canonical `medical` domain.
 All assets load automatically at the next backend boot. Designed to
 chain: each workflow references the `DOC-NN` codes minted by the
 inventario, so the entire perizia flows from one tabella inventario
@@ -5574,7 +5574,7 @@ by the user's `docs/insurance-workflows-plan.md`):
 
 ### Changed (late afternoon)
 
-- Workflow list "Origine" column renamed `Mike` → `MikeRust` for
+- Workflow list "Origine" column renamed `Mike` → `Specter` for
   system-shipped rows. The two sibling labels `Myself` / `Shared`
   that were also hardcoded got i18n'd to
   `Workflows.originSelf` / `originShared` in it/en/fr.
@@ -5592,12 +5592,12 @@ Forensic verification of the GitHub remote (every branch, every
 historical blob, `git log -p -S "AIzaSy"` over all refs) confirmed
 **no `.db` file or API-key fragment has ever been pushed** — the
 runtime DB lives outside the project tree by design
-(`<user-home>/mikerust-data/mike.db`) and `.gitignore` had already
+(`<user-home>/specter-data/mike.db`) and `.gitignore` had already
 been excluding `*.db` and `data/`. Three defensive tidy-ups landed
 anyway so the safeguard is explicit and survives future refactors:
 
 - **Legacy `data/mike.db` removed from the working tree.** The stub
-  was a leftover from the pre-MikeRust upstream layout (only migration
+  was a leftover from the pre-Specter upstream layout (only migration
   0001 applied, no user data), but a SQLite file sitting in the
   project root is a `git add .` accident waiting to happen.
 - **`.gitignore` annotated with a "DO NOT REMOVE" rationale** above
@@ -5609,7 +5609,7 @@ anyway so the safeguard is explicit and survives future refactors:
   Mike would have landed the DB next to the executable (i.e. inside
   the project tree if run from the repo root). Now the variable is
   commented out so the code's secure default
-  (`<user-home>/mikerust-data/mike.db`) wins by default; same
+  (`<user-home>/specter-data/mike.db`) wins by default; same
   treatment for `STORAGE_PATH`.
 
 ### Added — German, Spanish, Portuguese locales (evening)
@@ -5688,9 +5688,9 @@ anyway so the safeguard is explicit and survives future refactors:
 
 ### Added — branding & docs
 
-- **`NOTICE.md`** — trademark policy alongside AGPL-3.0: the Semplifica
+- **`NOTICE.md`** — trademark policy alongside AGPL-3.0: the Specter
   wordmark, corporate name, and logo are reserved trademarks of
-  Semplifica s.r.l. Forks with substantive changes are asked to drop the
+  Specter s.r.l. Forks with substantive changes are asked to drop the
   marks and rename the binary. Same pattern as GitLab CE, Mastodon,
   Nextcloud, Element, Plausible ([`0709f6d`](#)).
 - **README rewrite** of the "Authoritative legal corpora" section:
@@ -5698,7 +5698,7 @@ anyway so the safeguard is explicit and survives future refactors:
   with an explicit trade-off table comparing it against an MCP-backend
   alternative that is under evaluation for connectors the manifest
   cannot express declaratively (PISTE OAuth, multi-step approval flows,
-  etc.). Maintainer attribution to Semplifica s.r.l. + a collaboration
+  etc.). Maintainer attribution to Specter s.r.l. + a collaboration
   invite (GitHub issues / PRs / email) added near the top
   ([`42ad45f`](#)).
 - **`docs/CORPUS_PLUGINS.md`** — full schema reference and "how to add
@@ -5718,7 +5718,7 @@ anyway so the safeguard is explicit and survives future refactors:
 
 ### Changed
 
-- Sidebar user-pill dropdown now carries a Semplifica brand link to
+- Sidebar user-pill dropdown now carries a Specter brand link to
   `https://semplifica.ai`; the link opens the user's OS default browser
   via Tauri's `open_external_url` command (avoids navigating the
   in-app WebView). Logo image dropped per design feedback; the asset
@@ -5763,7 +5763,7 @@ and the README gets its first screenshot pair.
 
 ### Added — MCP
 
-- **Auto-chain `request_*` → `get_*`** for the Edge / Semplifica.Edge
+- **Auto-chain `request_*` → `get_*`** for the Edge / Specter.Edge
   async pattern: when an MCP tool returns `{status: "pending",
   session_id: ...}`, the dispatcher polls the matching `get_*` tool
   until completion or timeout, transparently to the model
@@ -5809,7 +5809,7 @@ and the README gets its first screenshot pair.
 - README gains the chat-with-citations and EUR-Lex-sync screenshot pair
   ([`6de8073`](#)) and a frank note that MCP async multi-step flows are
   partial ([`aa174da`](#)).
-- New `docs/` diagrams: local-MCP-gatekeeper flow and the MikeRust
+- New `docs/` diagrams: local-MCP-gatekeeper flow and the Specter
   architectural-stack overview ([`d093369`](#), [`615a4dc`](#),
   [`01dd8cc`](#)).
 
@@ -5825,9 +5825,9 @@ and the README gets its first screenshot pair.
 
 ---
 
-## 2026-05-08 — Initial release: MikeRust fork from `willchen96/mike`
+## 2026-05-08 — Initial release: Specter fork from `willchen96/mike`
 
-The starting point. MikeRust forks `willchen96/mike` (an AGPL-3.0
+The starting point. Specter forks `willchen96/mike` (an AGPL-3.0
 TypeScript / Express / Supabase / S3 / LibreOffice cloud-native AI
 legal assistant), keeps the Next.js frontend largely intact, and
 replaces the backend with a Rust + axum implementation designed to run

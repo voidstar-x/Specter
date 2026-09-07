@@ -32,7 +32,7 @@ use fastembed::{
     UserDefinedEmbeddingModel,
 };
 
-/// Resolve a cached model directory under `<USERPROFILE>/mikerust-data/
+/// Resolve a cached model directory under `<USERPROFILE>/specter-data/
 /// fastembed/<subdir>/`. Skips the test (via `Result<…, &'static str>`)
 /// when the directory is missing so the test is a no-op on machines
 /// that haven't downloaded the model yet.
@@ -41,7 +41,7 @@ fn cache_dir(subdir: &str) -> Result<PathBuf, &'static str> {
         .or_else(|_| std::env::var("HOME"))
         .map_err(|_| "no USERPROFILE or HOME env var")?;
     let p = PathBuf::from(home)
-        .join("mikerust-data")
+        .join("specter-data")
         .join("fastembed")
         .join(subdir);
     if !p.is_dir() {

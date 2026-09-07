@@ -40,12 +40,12 @@
     "expand": "Expandir"
   },
   "App": {
-    "title": "MikeRust",
+    "title": "Specter",
     "tagline": "Asistente jurídico de IA local",
-    "versionTooltip": "MikeRust v{version}"
+    "versionTooltip": "Specter v{version}"
   },
   "Login": {
-    "heading": "Inicie sesión en MikeRust",
+    "heading": "Inicie sesión en Specter",
     "subheading": "Introduzca su PIN o utilice la autenticación biométrica",
     "pinLabel": "PIN",
     "pinPlaceholder": "Introduzca su PIN",
@@ -61,7 +61,7 @@
     "errorBiometric": "La autenticación biométrica ha fallado"
   },
   "Signup": {
-    "heading": "Cree su cuenta de MikeRust",
+    "heading": "Cree su cuenta de Specter",
     "subheading": "Establezca un PIN para proteger sus datos",
     "usernameLabel": "Nombre de usuario",
     "usernamePlaceholder": "Elija un nombre de usuario",
@@ -88,7 +88,7 @@
     "tabularReviews": "Revisiones tabulares",
     "docxTemplates": "Plantillas DOCX",
     "account": "Cuenta",
-    "semplifica": "Semplifica s.r.l.",
+    "semplifica": "Specter s.r.l.",
     "semplificaTitle": "Abrir semplifica.ai en el navegador",
     "recentChats": "Chats recientes",
     "noChats": "Sin chats",
@@ -196,7 +196,7 @@
   "ProjectExport": {
     "exportButton": "Exportar proyecto",
     "title": "Exportar proyecto",
-    "subtitle": "Cree un archivo .mikeprj cifrado que su colega podrá importar en su MikeRust. El archivo solo se puede abrir si el destinatario está registrado con el correo electrónico indicado a continuación.",
+    "subtitle": "Cree un archivo .mikeprj cifrado que su colega podrá importar en su Specter. El archivo solo se puede abrir si el destinatario está registrado con el correo electrónico indicado a continuación.",
     "recipientEmail": "Correo del destinatario",
     "recipientEmailPlaceholder": "colega@bufete.com",
     "includeChats": "Incluir el historial de chats",
@@ -1108,16 +1108,16 @@
   },
   "Boot": {
     "cannotReach": "No se puede conectar con el backend",
-    "cannotReachHint": "Asegúrate de que el backend de MikeRust esté en ejecución. En desarrollo, inícialo desde la raíz del repositorio con",
-    "connecting": "Conectando con MikeRust…"
+    "cannotReachHint": "Asegúrate de que el backend de Specter esté en ejecución. En desarrollo, inícialo desde la raíz del repositorio con",
+    "connecting": "Conectando con Specter…"
   },
   "Auth": {
     "welcome": "Bienvenido, {name}",
     "welcomeBack": "Bienvenido de nuevo, {name}",
-    "setupTitle": "Te damos la bienvenida a MikeRust",
+    "setupTitle": "Te damos la bienvenida a Specter",
     "setupSubtitle": "Crea tu perfil local. Todo permanece en este equipo.",
     "setupPinNote": "Tu PIN protege el acceso local. No hay recuperación de contraseña — guárdalo en un lugar seguro.",
-    "unlockTitle": "Desbloquear MikeRust",
+    "unlockTitle": "Desbloquear Specter",
     "unlockTitleNamed": "Desbloquear, {name}",
     "unlockSubtitle": "Introduce tu PIN para continuar.",
     "username": "Nombre de usuario",
@@ -1134,7 +1134,7 @@
     "createProfile": "Crear perfil",
     "unlock": "Desbloquear",
     "useBiometric": "Usar desbloqueo biométrico",
-    "biometricReason": "Desbloquea MikeRust con tu identificación biométrica",
+    "biometricReason": "Desbloquea Specter con tu identificación biométrica",
     "lockout": "Demasiados intentos — reinténtalo en {secs}s"
   },
   "Ui": {
@@ -1283,12 +1283,12 @@
     "enabledDomainsError": "No se han podido actualizar los dominios",
     "atLeastOneDomain": "Al menos un dominio debe permanecer activo",
     "license": "Licencia",
-    "licenseIntro": "MikeRust es software libre distribuido bajo la GNU Affero General Public License v3 (AGPL-3.0-only). Puedes usarlo, modificarlo y redistribuirlo libremente; si lo ofreces como servicio en red, el código fuente modificado debe ponerse a disposición de los usuarios de ese servicio.",
+    "licenseIntro": "Specter es software libre distribuido bajo la GNU Affero General Public License v3 (AGPL-3.0-only). Puedes usarlo, modificarlo y redistribuirlo libremente; si lo ofreces como servicio en red, el código fuente modificado debe ponerse a disposición de los usuarios de ese servicio.",
     "licenseSpdx": "Identificador SPDX",
     "licenseFullText": "Texto completo de la licencia",
     "retrieval": "Recuperación",
     "retrievalTitle": "Recuperación de documentos",
-    "retrievalIntro": "Ajustes de comportamiento que cambian cómo el asistente busca en tu biblioteca durante el chat. Cada uno es opt-in y se puede desactivar sin reiniciar MikeRust.",
+    "retrievalIntro": "Ajustes de comportamiento que cambian cómo el asistente busca en tu biblioteca durante el chat. Cada uno es opt-in y se puede desactivar sin reiniciar Specter.",
     "retrievalHydeLabel": "HyDE — Hypothetical Document Embeddings",
     "retrievalHydeDescription": "Antes de buscar, el asistente redacta una breve pseudo-respuesta en el registro del dominio activo (legal / médico / finanzas / …) y la usa como segunda sonda. Los dos rankings se fusionan. Ayuda a recuperar pasajes formulados como respuesta en lugar de como pregunta.",
     "retrievalHydeCost": "Añade una llamada LLM extra por turno de chat. El coste se paga en tu proveedor activo (Anthropic / Gemini / OpenAI / local), no en cómputo local.",
@@ -1326,7 +1326,7 @@
       "acknowledge": "Entendido, continuar",
       "statusLoading": "Cargando modelo PII… el primer arranque descarga ~500 MB de HuggingFace y luego inicializa la sesión ONNX.",
       "statusFailed": "No se ha podido cargar el modelo PII",
-      "statusUnavailable": "Protección PII solicitada pero esta versión de MikeRust se ha compilado sin la función ner-pii — el documento se enviará sin redactar."
+      "statusUnavailable": "Protección PII solicitada pero esta versión de Specter se ha compilado sin la función ner-pii — el documento se enviará sin redactar."
     }
   },
   "NerStatus": {

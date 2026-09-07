@@ -1,6 +1,6 @@
-<!-- Copyright (c) 2026 MikeRust contributors. Licensed under AGPL-3.0-only. -->
+<!-- Copyright (c) 2026 Specter contributors. Licensed under AGPL-3.0-only. -->
 <!--
-  MikeRust mark — the 3×3 rust-gradient grid (src/assets/mikerust_logo_3x3.svg).
+  Specter mark — the 3×3 rust-gradient grid (src/assets/specter_logo_3x3.svg).
   `activity` runs a three-phase pulse over the grid and recolours it:
     · idle     — static, native rust palette
     · thinking — pulsing, rust (an LLM call is in flight)
@@ -26,7 +26,7 @@
 
   let { size = 40, activity = 'idle', class: extraClass = '' }: Props = $props()
 
-  // Grid geometry mirrors mikerust_logo_3x3.svg (group translated to 250,250).
+  // Grid geometry mirrors specter_logo_3x3.svg (group translated to 250,250).
   const COORD = [-135, -45, 45]
   const FILLS = [
     ['#431407', '#7C2D0A', '#9A3412'],
@@ -60,7 +60,7 @@
   height={size}
   viewBox="105 105 280 280"
   role="img"
-  aria-label="MikeRust"
+  aria-label="Specter"
 >
   <g transform="translate(250,250)">
     {#each cells as c (`${c.x},${c.y}`)}

@@ -1,4 +1,4 @@
-<!-- Copyright (c) 2026 MikeRust contributors. Licensed under AGPL-3.0-only. -->
+<!-- Copyright (c) 2026 Specter contributors. Licensed under AGPL-3.0-only. -->
 <script lang="ts">
   import Badge from '$lib/components/ui/Badge.svelte'
   import Logo from '$lib/components/ui/Logo.svelte'

@@ -1,4 +1,4 @@
-# MikeRust v0.7.2 — Settore Fiscale: analisi del bilancio ai fini fiscali
+# Specter v0.7.2 — Settore Fiscale: analisi del bilancio ai fini fiscali
 
 Colma un buco emerso in test: il settore **Fiscale** non aveva
 workflow sul bilancio, costringendo a usare la «Riclassificazione
@@ -40,12 +40,12 @@ tabular).
 
 ## Download
 
-- `MikeRust_0.7.2_x64.msi` — Windows x86_64
-- `MikeRust_0.7.2_arm64.msi` — Windows ARM64, Snapdragon X Elite
+- `Specter_0.7.2_x64.msi` — Windows x86_64
+- `Specter_0.7.2_arm64.msi` — Windows ARM64, Snapdragon X Elite
 
 Sostituzione drop-in per v0.7.1.
 
 ## Licenza
 
-AGPL-3.0-only. Il marchio e il logo Semplifica sono marchi
+AGPL-3.0-only. Il marchio e il logo Specter sono marchi
 registrati; vedi `NOTICE.md`.

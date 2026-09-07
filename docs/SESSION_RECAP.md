@@ -1,4 +1,4 @@
-# MikeRust — riepilogo sessione
+# Specter — riepilogo sessione
 
 > Cronistoria tecnica di quanto sviluppato in questa sessione, organizzata per area
 > con riferimenti puntuali ai file. Pensato come documento di "consegna" che
@@ -24,7 +24,7 @@
 Login, signup, account general/models/mcp/sync, sidebar, error/not-found, projects overview, project page, project export modal + import drag&drop, workflow list, tabular reviews list, AddNewTRModal, NewProjectModal, NewWorkflowModal, ChatInput, InitialView, ModelToggle, ApiKeyMissingModal, DeleteChatsModal, OwnerOnlyModal, CreditsExhaustedModal, AssistantMessage (thinking-phrases ruotanti, Reading/Found/Creating/Replicating/Editing/etc.), AssistantWorkflowModal, AddDocButton, EditCard, DocPanel headers, AssistantSidePanel, useAssistantChat (cancelText/genericError).
 
 ### Memoria persistente
-- [feedback_ui_i18n.md](C:/Users/df/.claude/projects/c--Progetti-MikeRust/memory/feedback_ui_i18n.md): regola "ogni modifica UI deve includere chiavi i18n" salvata.
+- [feedback_ui_i18n.md](C:/Users/df/.claude/projects/c--Progetti-Specter/memory/feedback_ui_i18n.md): regola "ogni modifica UI deve includere chiavi i18n" salvata.
 
 ### Surfaces tradotte (medium/low-impact, batch successivo)
 - [DisplayWorkflowModal.tsx](../frontend/src/app/components/workflows/DisplayWorkflowModal.tsx): Select project, No projects found, Workflow Prompt, Columns, No columns defined, Tags, Prompt, _No prompt defined._.
@@ -59,14 +59,14 @@ Login, signup, account general/models/mcp/sync, sidebar, error/not-found, projec
 
 ### Spostamento dati fuori dal repo
 Il rebuild-loop di Tauri dev era causato da SQLite WAL/SHM scritti dentro `src-tauri/`. Sistemato:
-- `.env` aggiornato con `DATABASE_URL=sqlite:C:/Users/df/mikerust-data/mike.db` e `STORAGE_PATH=C:/Users/df/mikerust-data/storage` (forward slashes obbligatori per sqlx URI).
-- Fallback nel codice: [src/db/mod.rs](../src/db/mod.rs) `default_db_url()` → `%USERPROFILE%/mikerust-data/mike.db`. Crea la cartella parent se manca.
+- `.env` aggiornato con `DATABASE_URL=sqlite:C:/Users/df/specter-data/mike.db` e `STORAGE_PATH=C:/Users/df/specter-data/storage` (forward slashes obbligatori per sqlx URI).
+- Fallback nel codice: [src/db/mod.rs](../src/db/mod.rs) `default_db_url()` → `%USERPROFILE%/specter-data/mike.db`. Crea la cartella parent se manca.
 - `load_dotenv()` in [src/lib.rs](../src/lib.rs) cammina dalla cwd e dal path dell'eseguibile fino a trovare `.env`. Prima `dotenvy::dotenv()` falliva silenziosamente perché la cwd di `mike-tauri.exe` è `src-tauri/`.
 - [.taurignore](../.taurignore) al workspace root: ignora `frontend/.next/`, `**/*.log`, `**/*.db*`, `data/`, `target/`. Risolve il loop su `next-development.log`.
 - Migrazione iniziale dei dati esistenti da `src-tauri/mike.db*` e `data/mike.db` al nuovo path.
 
 ### Memoria persistente
-- [feedback_storage_policy.md](C:/Users/df/.claude/projects/c--Progetti-MikeRust/memory/feedback_storage_policy.md): preferire backend SQLite a localStorage per portabilità + sicurezza.
+- [feedback_storage_policy.md](C:/Users/df/.claude/projects/c--Progetti-Specter/memory/feedback_storage_policy.md): preferire backend SQLite a localStorage per portabilità + sicurezza.
 
 ### Migrazione localStorage → backend
 - API keys: cache localStorage rimosso. La pagina [account/models/page.tsx](../frontend/src/app/(pages)/account/models/page.tsx) usa input *uncontrolled* (DOM-only), mostra chip verde "Chiave salvata" senza esporre il valore in React state.
@@ -238,9 +238,9 @@ Vantaggio: `chat.rs::load_attached_docs` e `sync/scanner.rs::extract_text_dispat
 - mikeprj: `aes-gcm`, `sha2` (già usato da migrazione del progetto export).
 
 ### Memoria utente persistente
-1. [MEMORY.md](C:/Users/df/.claude/projects/c--Progetti-MikeRust/memory/MEMORY.md) (indice).
-2. [feedback_ui_i18n.md](C:/Users/df/.claude/projects/c--Progetti-MikeRust/memory/feedback_ui_i18n.md) — ogni edit UI deve passare per i18n.
-3. [feedback_storage_policy.md](C:/Users/df/.claude/projects/c--Progetti-MikeRust/memory/feedback_storage_policy.md) — preferire backend SQLite a localStorage.
+1. [MEMORY.md](C:/Users/df/.claude/projects/c--Progetti-Specter/memory/MEMORY.md) (indice).
+2. [feedback_ui_i18n.md](C:/Users/df/.claude/projects/c--Progetti-Specter/memory/feedback_ui_i18n.md) — ogni edit UI deve passare per i18n.
+3. [feedback_storage_policy.md](C:/Users/df/.claude/projects/c--Progetti-Specter/memory/feedback_storage_policy.md) — preferire backend SQLite a localStorage.
 
 ---
 
@@ -249,7 +249,7 @@ Vantaggio: `chat.rs::load_attached_docs` e `sync/scanner.rs::extract_text_dispat
 > **Non testato dall'utente in questa sessione**, lasciato come prima azione del prossimo giro:
 
 1. Smoke test pipeline RAG end-to-end:
-   - Riavviare MikeRust → migrazioni `0005`–`0009` partono.
+   - Riavviare Specter → migrazioni `0005`–`0009` partono.
    - Account → "Sincronizzazione locale" → aggiungi cartella reale, scope Globale.
    - "Scansiona ora" → primo run scarica e5-base (~280 MB) da HuggingFace.
    - Verificare nei log backend `[rag] loading multilingual-e5-base` e `[rag] sqlite-vec auto-extension registered`.
@@ -270,9 +270,9 @@ cargo check --no-default-features \
 npx tsc --noEmit                               # frontend types
 
 # Dati persistenti
-%USERPROFILE%/mikerust-data/mike.db            # SQLite (DB + vettori sqlite-vec)
-%USERPROFILE%/mikerust-data/storage/           # bytes documenti
-%USERPROFILE%/mikerust-logs/tauri-dev.log      # log dev
+%USERPROFILE%/specter-data/mike.db            # SQLite (DB + vettori sqlite-vec)
+%USERPROFILE%/specter-data/storage/           # bytes documenti
+%USERPROFILE%/specter-logs/tauri-dev.log      # log dev
 
 # Modello e5 cache (fastembed)
 %LOCALAPPDATA%/fastembed/                      # ~280 MB dopo primo download

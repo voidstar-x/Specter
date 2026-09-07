@@ -1,6 +1,6 @@
 # Specter — Change Log & Fork Notes
 
-Original project: **MikeRust** (github.com/SemplificaAI/MikeRust, AGPL-3.0).
+Original upstream: **MikeRust** (github.com/SemplificaAI/MikeRust, AGPL-3.0). This repository is the **Specter** fork (github.com/voidstar-x/Specter).
 This repository is the **Specter** fork maintained by Han (SG-based commercial /
 corporate lawyer, APAC + Australia focus).
 
@@ -11,7 +11,7 @@ are configured. It is the canonical reference for what Specter does differently.
 
 ## 1. Default content/assistant language: ENGLISH (replaces Italian)
 
-**Problem:** MikeRust answered in Italian because the assistant/content language
+**Problem:** Specter answered in Italian because the assistant/content language
 defaulted to `"it"` regardless of the UI locale, loading
 `config/system-prompts/it/*.md` (Italian) for the per-domain system prompt.
 

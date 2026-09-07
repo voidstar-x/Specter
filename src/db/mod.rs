@@ -18,13 +18,13 @@ use crate::sync::scanner::ScanProgressHandle;
 /// Tauri dev's file watcher rebuilds whenever any file under `src-tauri/`
 /// changes. SQLite in WAL mode constantly rewrites `.db-wal` and
 /// `.db-shm`, so a DB anywhere under the project triggers an infinite
-/// rebuild loop. Default location is `<user-home>/mikerust-data/mike.db`
+/// rebuild loop. Default location is `<user-home>/specter-data/mike.db`
 /// — overridable via `DATABASE_URL` for tests / CI.
 fn default_db_url() -> String {
     let home = std::env::var("USERPROFILE")
         .or_else(|_| std::env::var("HOME"))
         .unwrap_or_else(|_| ".".to_string());
-    let path = PathBuf::from(home).join("mikerust-data").join("mike.db");
+    let path = PathBuf::from(home).join("specter-data").join("mike.db");
     // SQLite URI on Windows requires forward slashes after `sqlite:`.
     format!("sqlite:{}", path.display().to_string().replace('\\', "/"))
 }
@@ -202,7 +202,7 @@ impl AppState {
         let db_url = std::env::var("DATABASE_URL").unwrap_or_else(|_| default_db_url());
 
         // SQLite won't auto-create the parent directory; do it explicitly
-        // so `<user-home>/mikerust-data/` exists on first run.
+        // so `<user-home>/specter-data/` exists on first run.
         if let Some(file_path) = db_url.strip_prefix("sqlite:") {
             // Strip query string if any (e.g. ?mode=rwc) before mkdir.
             let raw = file_path.split('?').next().unwrap_or(file_path);

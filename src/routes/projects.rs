@@ -495,7 +495,7 @@ async fn delete_project(
 // Response: binary `.mikeprj` (encrypted zip)
 //
 // The recipient_email is the address that will be used to derive the
-// AES key — only a MikeRust install where the active user's account is
+// AES key — only a Specter install where the active user's account is
 // registered with the same email can open the file. See `mikeprj/mod.rs`
 // for the (intentionally-weak) sharing model.
 // ---------------------------------------------------------------------------
@@ -840,16 +840,16 @@ async fn import_project(
 //
 // Mirror of upstream willchen96/mike `f39f175` endpoint
 // PATCH /projects/:projectId/documents/:documentId. Scope-reduced for
-// MikeRust's leaner schema:
+// Specter's leaner schema:
 //   - Upstream also bumps documents.updated_at and propagates
-//     document_versions.display_name on current_version_id. MikeRust's
+//     document_versions.display_name on current_version_id. Specter's
 //     documents table has no updated_at column and document_versions
 //     has no display_name; both are upstream-only additions to a
 //     larger version-tracking pipeline we haven't ported. The rename
 //     here updates only `documents.filename`.
 //   - Ownership is enforced via (id, project_id, user_id) on the
 //     UPDATE so a caller can't rename someone else's doc by guessing
-//     UUIDs (the same defense MikeRust uses for project-level edits).
+//     UUIDs (the same defense Specter uses for project-level edits).
 
 #[derive(Deserialize)]
 struct RenameDocumentBody {

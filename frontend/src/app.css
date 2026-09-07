@@ -1,4 +1,4 @@
-/* Copyright (c) 2026 MikeRust contributors. Licensed under AGPL-3.0-only. */
+/* Copyright (c) 2026 Specter contributors. Licensed under AGPL-3.0-only. */
 
 @import "tailwindcss";
 
@@ -219,7 +219,7 @@ summary {
   50% { opacity: 0; }
 }
 
-/* ── MikeRust logo ───────────────────────────────────────────────── */
+/* ── Specter logo ───────────────────────────────────────────────── */
 
 /* Hide the native scrollbar on horizontally-scrolled strips. */
 .no-scrollbar { scrollbar-width: none; }

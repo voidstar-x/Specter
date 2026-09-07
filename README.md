@@ -1,32 +1,32 @@
 <p align="left">
-  <img src="src/assets/mikerust_logo_3x3.svg" alt="MikeRust logo" width="120" height="120">
+  <img src="src/assets/specter_logo_3x3.svg" alt="Specter logo" width="120" height="120">
 </p>
 
-# MikeRust
+# Specter
 
 Sovereign local AI document assistant — Rust+axum backend, SQLite, local filesystem storage, ONNX-based embeddings, Tauri shell, clean-room Svelte 5 frontend (forked from [`willchen96/mike`][upstream] upstream).
 
 Designed to run entirely on the user's machine: no cloud database, no external auth provider, no S3 bucket. Optional LLM API keys are stored locally and never leave the box except to call the model provider the user explicitly configured.
 
-Maintained by **Semplifica s.r.l.** — [semplifica.ai](https://semplifica.ai). The code is AGPL-3.0; the Semplifica wordmark and logo are trademarks, see [NOTICE.md](NOTICE.md) for the brand-vs-code separation.
+Maintained by the **Specter** project (a fork of [Semplifica's MikeRust](https://github.com/SemplificaAI/MikeRust)). The code is AGPL-3.0; the Semplifica wordmark and logo remain trademarks of their owner, and the Specter branding is our own — see [NOTICE.md](NOTICE.md) for the brand-vs-code separation.
 
 ### Built in the open — please contribute
 
-MikeRust is meant to be a **collaborative** project. Fixes, new corpus
+Specter is meant to be a **collaborative** project. Fixes, new corpus
 plugins, translations, jurisdiction-specific feedback, design ideas,
 half-formed proposals — all welcome, and a small idea filed as an issue
 tends to land faster than a full feature held back until it's "ready".
 You don't have to write the patch yourself: open an
-[issue](https://github.com/SemplificaAI/MikeRust/issues) to discuss a
+[issue](https://github.com/voidstar-x/Specter/issues) to discuss a
 direction, send a pull request when you have something concrete, or
 reach out at [git@semplifica.ai](mailto:git@semplifica.ai)
 if a public thread is the wrong place.
 
 ## Lineage
 
-MikeRust derives from the open-source **Mike** project by Will Chen
+Specter derives from the open-source **Mike** project by Will Chen
 ([`willchen96/mike`][upstream]) — an AGPL-3.0 AI legal assistant with
-a TypeScript / Express / Supabase / S3 / LibreOffice stack. MikeRust
+a TypeScript / Express / Supabase / S3 / LibreOffice stack. Specter
 keeps the *product* (chat with citations, document viewer, workflows,
 tabular reviews, corpora) but rebuilds both halves:
 
@@ -45,7 +45,7 @@ Both halves have now been rebuilt and the repository contains **no
 source code from the original Mike project**. The Rust backend was
 original from the start; the legacy React frontend — the only
 Mike-derived code — has been **removed from the repository** and
-replaced by the clean-room Svelte rewrite in `frontend/`. MikeRust
+replaced by the clean-room Svelte rewrite in `frontend/`. Specter
 remains a fork of an AGPL-3.0 project and ships under AGPL-3.0 (see
 *License*), but no Mike source survives in the tree.
 
@@ -64,7 +64,7 @@ backend runs in the same process. A few views to set expectations
 
 ### The workspace
 
-![MikeRust Assistant home — left sidebar with Assistant, Projects, Tabular reviews, Workflows, DOCX templates and a recent-chats list; a 'Hello, Dario' greeting; a composer with attachment buttons, a per-conversation model picker and the AI disclaimer](docs/images/ui_main.png)
+![Specter Assistant home — left sidebar with Assistant, Projects, Tabular reviews, Workflows, DOCX templates and a recent-chats list; a 'Hello, Dario' greeting; a composer with attachment buttons, a per-conversation model picker and the AI disclaimer](docs/images/ui_main.png)
 
 The sidebar holds the Assistant, Projects, Tabular reviews, Workflows and
 DOCX templates, plus the recent-chats list and Settings. Light / system /
@@ -145,7 +145,7 @@ a derivative of the upstream React code.
 
 Svelte was chosen because it is a **compiler, not a runtime framework**:
 it emits markedly more **compact** code and the running UI is **leaner
-and more reactive**. MikeRust's interface is form- and panel-heavy —
+and more reactive**. Specter's interface is form- and panel-heavy —
 editors, modals, side panels, settings, tables — the kind of UI that
 gains little from React's virtual-DOM diffing; Svelte's compiled,
 fine-grained reactivity updates exactly the nodes that changed, with no
@@ -174,7 +174,7 @@ original, blind-rewritten Svelte frontend (`frontend/`).
 
 ### Supported platforms
 
-MikeRust currently ships **Windows-only**: x86_64 + ARM64 MSI
+Specter currently ships **Windows-only**: x86_64 + ARM64 MSI
 installers (the latter native on Snapdragon X Elite). **macOS** is on
 the roadmap — work hasn't started yet, but the codebase already
 compiles to `aarch64-apple-darwin` and the Tauri / Webview backends
@@ -195,14 +195,14 @@ and ARM64. They bundle the binary plus the matching `onnxruntime.dll`
 the only post-install requirement is double-clicking the installer.
 
 ```
-dist/MikeRust_<version>_x64.msi    # Windows x86_64
-dist/MikeRust_<version>_arm64.msi  # Windows ARM64 (Snapdragon X Elite)
+dist/Specter_<version>_x64.msi    # Windows x86_64
+dist/Specter_<version>_arm64.msi  # Windows ARM64 (Snapdragon X Elite)
 ```
 
 Builds are produced by `scripts/build-release.ps1` and attached to
 the matching tag on
-[GitHub Releases](https://github.com/SemplificaAI/MikeRust/releases).
-Runtime logs land in `<home>/mikerust-data/mike-tauri.log` (see
+[GitHub Releases](https://github.com/voidstar-x/Specter/releases).
+Runtime logs land in `<home>/specter-data/mike-tauri.log` (see
 v0.2.2 entry in [HISTORY.md](HISTORY.md) for the rationale).
 
 ### Build from source
@@ -244,7 +244,7 @@ cargo run --features rag
 The first run will:
 - create `data/db/mike.db` (SQLite) and apply all migrations
 - create `data/storage/` (uploads, chat cache)
-- download `multilingual-e5-base` ONNX weights (~280 MB) into `%USERPROFILE%/mikerust-data/fastembed/` on first scan / first chat with attachments
+- download `multilingual-e5-base` ONNX weights (~280 MB) into `%USERPROFILE%/specter-data/fastembed/` on first scan / first chat with attachments
 
 ## Architecture
 
@@ -339,11 +339,11 @@ The embedding model state — including the one-shot ~280 MB download — is rep
 **The intent.** The medium-term goal for this project is a **plugin
 system for downloading legal documents locally**: a contributor (or the
 user) describes a new public source — Légifrance, BOE, Bundesgesetzblatt,
-a regional bulletin — in a small JSON manifest, and MikeRust handles the
+a regional bulletin — in a small JSON manifest, and Specter handles the
 rest (sidebar entry, importer, bulk-snapshot ingestion, search, fetch,
 embed). No Rust patch, no rebuild, no per-corpus bespoke UI. The user
 keeps a fully offline mirror of the parts of public law they care about,
-under their own AGPL-licensed copy of MikeRust.
+under their own AGPL-licensed copy of Specter.
 
 The first implementation lives in [`config/corpora-plugins/`](config/corpora-plugins/)
 and is documented in [docs/CORPUS_PLUGINS.md](docs/CORPUS_PLUGINS.md).
@@ -372,7 +372,7 @@ Today three strategies are supported:
 is on the table: instead of (or alongside) the JSON-plugin path, expose
 legal-source ingestion as an **MCP backend**. Each public source becomes
 an MCP server with tools like `search`, `fetch`, `bulk_import`,
-`list_indexed`; MikeRust calls those tools the same way it already calls
+`list_indexed`; Specter calls those tools the same way it already calls
 any other MCP server. The trade-off is roughly:
 
 | | JSON plugins (current) | MCP backend (evaluating) |
@@ -381,7 +381,7 @@ any other MCP server. The trade-off is roughly:
 | Run-time cost | in-process, zero extra deps | extra long-lived process |
 | Reach | bounded by the manifest schema | unbounded — arbitrary code |
 | Sovereignty | data stays in `data/db/mike.db` | depends on the server's policy |
-| Reuse outside MikeRust | none | usable from Claude / any MCP host |
+| Reuse outside Specter | none | usable from Claude / any MCP host |
 
 Neither path forecloses the other. The JSON plugin is shipping now
 because it's the smallest possible footprint; the MCP backend is being
@@ -413,7 +413,7 @@ tell us which path would be less painful for it.
 Everything that contains user data lives under the workspace:
 - `data/db/mike.db` — schema, embeddings, settings, all chats, all documents metadata
 - `data/storage/` — uploads (`documents/`), chat cache (`cache/`)
-- `%USERPROFILE%/mikerust-data/fastembed/` — ONNX weights (out-of-tree to avoid the Tauri watcher)
+- `%USERPROFILE%/specter-data/fastembed/` — ONNX weights (out-of-tree to avoid the Tauri watcher)
 - `data/.mikeprj` envelopes — AES-256-GCM-encrypted project bundles, key derived via Argon2id from a recipient email
 
 No telemetry, no remote logging, no anonymous metrics. Outbound traffic only when the user explicitly invokes a remote LLM (Anthropic / Gemini / OpenAI) or a remote MCP server they configured themselves.
@@ -425,9 +425,9 @@ See `.env.example` for the full reference.
 | Variable | Required | Default |
 |---|---|---|
 | `JWT_SECRET` | **yes** | — |
-| `DATABASE_URL` | no | `sqlite:<USERPROFILE>/mikerust-data/mike.db` |
-| `STORAGE_PATH` | no | `%USERPROFILE%/mikerust-data/storage` |
-| `FASTEMBED_CACHE_DIR` | no | `%USERPROFILE%/mikerust-data/fastembed` |
+| `DATABASE_URL` | no | `sqlite:<USERPROFILE>/specter-data/mike.db` |
+| `STORAGE_PATH` | no | `%USERPROFILE%/specter-data/storage` |
+| `FASTEMBED_CACHE_DIR` | no | `%USERPROFILE%/specter-data/fastembed` |
 | `PDFIUM_DYNAMIC_LIB_PATH` | no | walks ancestors of cwd / exe for `libs/pdfium/` |
 | `ORT_DYLIB_PATH` | no | walks ancestors for `libs/onnxruntime/<platform>/` (see [`libs/onnxruntime/README.md`](libs/onnxruntime/README.md)) |
 | `PORT` | no | `0` (OS picks a free high port — see Architecture) |
@@ -461,7 +461,7 @@ See `.env.example` for the full reference.
 | Chat-attachment hash cache + ref-counted cleanup | ✅ |
 | **Accept / Reject decision on generated docx** (migration 0029) — per-chat decision (`accepted` / `rejected`) on every docx the model emits; rejection requires a user motive and triggers a one-shot LLM summary; subsequent chat turns inject the reason + summary in place of the rejected body so the model can correct itself without re-seeing the vetoed bytes. A read-only **"Vedi riassunto"** modal re-opens the archived reason + summary after the reject modal closes; flipping back to Accept restores the original document while keeping the audit trail. | ✅ |
 | **Chat-files popover** in the composer footer — surfaces all five categories the chat ever touched: uploaded attachments, tool-generated docs, rejected docs (strikethrough + red `Rifiutato` badge), project-inherited docs (`chats.project_id` → `documents.project_id`) and KB / corpora docs cited via `messages.annotations`. Per-format icon colours (Excel green / Word blue / PDF red / PowerPoint orange / Markdown text-primary); origin tag chips colour-coded by category. Reads exclusively from `GET /chat/:id/documents`. | ✅ |
-| **App version badge** next to "MikeRust" in the sidebar + **License panel** in Settings → Licenza (SPDX `AGPL-3.0-only`, plain-language summary, full bundled LICENSE text) | ✅ |
+| **App version badge** next to "Specter" in the sidebar + **License panel** in Settings → Licenza (SPDX `AGPL-3.0-only`, plain-language summary, full bundled LICENSE text) | ✅ |
 | **HyDE — Hypothetical Document Embeddings** (migration 0030, v0.5.0) — opt-in toggle in Settings → Recupero documenti. When ON, `retrieve_kb_chunks` drafts a domain-aware pseudo-answer (anchored on the legal/medical/finance/… prologue), embeds it, runs a second KNN, and merges the two rankings via Reciprocal Rank Fusion (k=60) before the usual top-K + 0.75 distance threshold + PII filter. Default OFF (adds one LLM call per turn). | ✅ |
 | **DirectML execution provider** compiled into the MSI (Windows DX12 GPU). `ort` tries DirectML at runtime; falls back to CPU automatically on machines without a DX12 adapter. No knob — transparent acceleration. | ✅ |
 | **Citation pipeline normalisers (v0.5.1)** — model-independent post-processors that survive the variability of mid-tier LLMs: hybrid bracket splitter (`[c1, c2, FILE.pdf, p.4, doc-7]` → clean per-citation pills, stops at `<CITATIONS>`), cross-message `[cN]` lookup (re-resolves a marker against earlier assistant turns when the current turn forgot to re-emit it), plus five new explicit CITATION QUALITY RULES in `MRUST_SYSTEM_PROMPT` (omit empty quotes, ranges only with `[[PAGE_BREAK]]`, prefer per-passage + attached-doc citations, re-emit cross-turn `[cN]`). | ✅ |
@@ -486,8 +486,8 @@ See `.env.example` for the full reference.
 | **New-chat-in-project confirm modal (v0.5.6)** — clicking `+` in the sidebar while a project-scoped chat is active now opens a confirm modal ("Stai lavorando dentro un progetto. Vuoi mantenere il progetto associato alla nuova chat?") with two action buttons (*Chat indipendente* / *Sì, mantieni il progetto*) plus implicit cancel via X / Esc / backdrop click. Also fixes the long-standing "chip persists silently" bug — the project chip used to silently survive the new-chat action because the composer's `$effect` early-returned on null `activeProjectId` instead of clearing the chip. A new monotonic `chatStore.clearProjectTick` lets the modal's "Chat indipendente" branch reset the chip without race conditions. | ✅ |
 | **Experimental local-only LLM mode (v0.5.6, opt-in)** — new toggle in Settings → Modelli LLM, off by default. When on, locks the local provider to `http://localhost:11434` and collapses the chat picker to two curated Ollama Modelfile derivations (Qwen 3.5 4B `q4_K_M` + `/no_think` chat-template injection, Gemma 4 E2B IT GGUF `Q4_K_M` + `<think>` / `<thinking>` / `<reasoning>` stop sequences). Backend lives in [`src/llm/ollama_manager.rs`](src/llm/ollama_manager.rs) (wraps [`ollama-rs`](https://crates.io/crates/ollama-rs) 0.3); migration 0032 adds `user_settings.local_secure_mode`. Treated as a **preview for the v0.6.x line** — mechanism is feature-complete and tested (13 new unit tests, 15/15 + 6/6 green) but UX around model discovery, context-window tuning, and cross-platform Ollama detection is still being refined. | 🔲 preview |
 | **Mistral first-class — dedicated provider with prompt caching + sequential tools (v0.6.0)** — Mistral La Plateforme promoted from generic OpenAI-compat reuse to a [dedicated provider module](src/llm/mistral.rs) with three Mistral-specific knobs baked in: `parallel_tool_calls: false` (sequential semantics for legal workflows), `safe_prompt: false` (avoids false-positive refusals on legitimate legal content), and `prompt_cache_key = "mike_chat_{chat_id}"` (Mistral charges 10% of normal token price on cache hits — 80-90% effective cost reduction on long document-heavy chats). New `enum Provider::Mistral` routes the `mistral:` prefix to its own `stream` / `complete`; one-shot callers (HyDE, summarisation, title gen, doc summary, translation) pass `chat_id: None` and skip caching. Mistral-specific error mapping (401/403/422/429 with `Retry-After` parsing, 5xx) with Italian-first messages. Two new per-user toggles in the Mistral card (`mistral_safe_prompt`, `mistral_parallel_tools`) backed by migration 0033 — both default OFF. EU hosting + ZDR info paragraph + link to the official Mistral help-center article. 17 new unit tests; 105/105 across `llm::` green. | ✅ |
-| **Mistral 429 retry-with-backoff (v0.6.1)** — `POST /v1/chat/completions` is wrapped in a 3-attempt retry that honours Mistral's `Retry-After` header when present (parsed as integer seconds, capped at 30s) and falls back to exponential backoff (1s→2s→4s, total ~7s) otherwise. Only 429 triggers a retry; 401/403/422/5xx surface immediately because they're authoritative refusals or distinct failure modes. The user-perceptible behaviour: transient 429s (the common case on the free Experiment tier at 1 req/s when MikeRust fires several Mistral calls in quick succession — main chat + title gen + HyDE + tabular cell) now resolve themselves in 1-7s instead of failing the chat turn. Pure-function `next_backoff(attempt, retry_after_header)` so the policy is testable without sleeping; 5 new unit tests pin Retry-After honouring, 30s cap, exponential fallback, bogus-format fallback, whitespace tolerance. 22/22 `llm::mistral` tests green; 110/110 across `llm::`. | ✅ |
-| **Mistral concurrency semaphore + JS console diagnostics (v0.6.2)** — root-cause fix on top of v0.6.1's retry. A process-global `tokio::sync::Semaphore` with 1 permit gates every Mistral request (chat / tabular / HyDE / title gen) so MikeRust never has more than one Mistral request in flight regardless of how many subsystems call it concurrently. Combined with v0.6.1's backoff this keeps the free Experiment tier (1 RPS) usable even during tabular extraction storms. Cap is fair (FIFO) so tabular cells process in worker-pool order. Two `console.warn` hooks added (`[chat] LLM error` and `[tabular] stream error event`) so users can triage 429 storms vs auth vs network failures in the DevTools console alongside the existing UI banners. 24/24 `llm::mistral` tests green; 112/112 across `llm::`. | ✅ |
+| **Mistral 429 retry-with-backoff (v0.6.1)** — `POST /v1/chat/completions` is wrapped in a 3-attempt retry that honours Mistral's `Retry-After` header when present (parsed as integer seconds, capped at 30s) and falls back to exponential backoff (1s→2s→4s, total ~7s) otherwise. Only 429 triggers a retry; 401/403/422/5xx surface immediately because they're authoritative refusals or distinct failure modes. The user-perceptible behaviour: transient 429s (the common case on the free Experiment tier at 1 req/s when Specter fires several Mistral calls in quick succession — main chat + title gen + HyDE + tabular cell) now resolve themselves in 1-7s instead of failing the chat turn. Pure-function `next_backoff(attempt, retry_after_header)` so the policy is testable without sleeping; 5 new unit tests pin Retry-After honouring, 30s cap, exponential fallback, bogus-format fallback, whitespace tolerance. 22/22 `llm::mistral` tests green; 110/110 across `llm::`. | ✅ |
+| **Mistral concurrency semaphore + JS console diagnostics (v0.6.2)** — root-cause fix on top of v0.6.1's retry. A process-global `tokio::sync::Semaphore` with 1 permit gates every Mistral request (chat / tabular / HyDE / title gen) so Specter never has more than one Mistral request in flight regardless of how many subsystems call it concurrently. Combined with v0.6.1's backoff this keeps the free Experiment tier (1 RPS) usable even during tabular extraction storms. Cap is fair (FIFO) so tabular cells process in worker-pool order. Two `console.warn` hooks added (`[chat] LLM error` and `[tabular] stream error event`) so users can triage 429 storms vs auth vs network failures in the DevTools console alongside the existing UI banners. 24/24 `llm::mistral` tests green; 112/112 across `llm::`. | ✅ |
 | **Tabular per-cell rate-limit retry + hourglass UI (v0.6.3)** — third 429-protection layer on top of v0.6.1 backend retry and v0.6.2 semaphore. The earlier two layers protect a single Mistral call but don't help when 24+ tabular cells queue through the semaphore in sequence and Mistral's quota window shifts during the wait. v0.6.3 adds a **frontend-side retry loop**: cells whose `cell_update` SSE event carries `status: "error"` + a 429-class content are flipped to a new `rate_limited` transient state (lucide `Hourglass` icon in amber, distinct from the red `AlertCircle` for permanent failures) and re-issued via `POST /tabular-review/{id}/regenerate-cell` after a linear backoff of N × 5s (attempt 1 = 5s, attempt 2 = 10s, …) up to 10 attempts (~275s cumulative). On 429 again → loop; on success → cell flips to `done`; on permanent error → red pill. `cancelRateLimitRetries(reviewId)` is called from the "Interrompi" / "Genera" actions so stale timers don't fire against a fresh run. Also: every `cell_update` with `status === "error"` now logs to the DevTools console (was previously silent — v0.6.2's hook only covered stream-level error events). | ✅ |
 | **Nuovo settore «Fiscale» — tax/commercialista italiano (v0.7.0)** — twelfth professional vertical (`fiscale`), complementary to `finance` (analysis) on the tax-compliance + advisory side. Registered end-to-end: `src/domain.rs`, `frontend/.../domain.ts`, six-locale `Domains.values.fiscale` labels. Ships 6-language system prompts ([`config/system-prompts/*/fiscale.md`](config/system-prompts/it/fiscale.md)) that bake in the 2024 tax reforms (reclamo-mediazione repealed 4.1.2024 per D.Lgs. 220/2023; new penalty regime D.Lgs. 87/2024 from 1.9.2024 with omitted-payment penalty 30%→25%; generalised prior adversarial procedure D.Lgs. 219/2023). 8 workflow presets ([`config/workflow-presets/fiscale/`](config/workflow-presets/fiscale/)) — 3 assistant (parere tributario, ravvedimento operoso calc, analisi avviso accertamento) + 5 tabular (riconciliazione IVA, verifica forfettario, quadro RW IVIE/IVAFE, imposte indirette su atti, scadenzario F24). 9 column presets (imponibile, aliquota, imposta dovuta, ritenuta, sanzione, interessi, norma, scadenza, codice tributo). Descriptive plan in [`docs/piano_settore_fiscale.md`](docs/piano_settore_fiscale.md) including public/open norm + case-law databases (Normattiva, def.finanze.it, Sentenze Web Cassazione, Giustizia Tributaria DGT). No schema migration; 40/40 preset-loader tests green. | ✅ |
 | Authoritative-corpus framework (`LegalCorpusAdapter` trait) | ✅ |
@@ -531,7 +531,7 @@ See `.env.example` for the full reference.
 The MCP client successfully discovers servers and dispatches **synchronous
 tool calls** (a tool that returns its real result on the same call). What
 is **not yet reliably handled** is the multi-step async pattern that
-human-in-the-loop MCP servers use — Edge / Semplifica.Edge being the
+human-in-the-loop MCP servers use — Edge / Specter.Edge being the
 canonical case:
 
 ```
@@ -570,15 +570,15 @@ preserved, only the dispatcher mechanics are in scope. See
 
 ## License
 
-MikeRust is a fork of the AGPL-3.0 [`willchen96/mike`][upstream] project and ships under **AGPL-3.0**. The backend (`src/`, `src-tauri/`) is original Rust and the `frontend/` is an original clean-room Svelte rewrite; both ship under the same license for consistency. See `LICENSE`.
+Specter is a fork of the AGPL-3.0 [`willchen96/mike`][upstream] project and ships under **AGPL-3.0**. The backend (`src/`, `src-tauri/`) is original Rust and the `frontend/` is an original clean-room Svelte rewrite; both ship under the same license for consistency. See `LICENSE`.
 
-**Brand assets are not AGPL.** The wordmark **Semplifica**, the corporate
-name **Semplifica s.r.l.**, and the Semplifica logo shipped under
+**Brand assets are not AGPL.** The wordmark **Specter**, the corporate
+name **Specter s.r.l.**, and the Specter logo shipped under
 [`frontend/public/semplifica/`](frontend/public/semplifica/) are
-trademarks of [Semplifica s.r.l.](https://semplifica.ai) and are reserved
-separately from the code license. The **MikeRust** name is also reserved
-as the identifier of this upstream (MikeRust ships without its own logo
-for now — only the Semplifica mark is present in the UI). Forks with
-substantive changes are asked to drop the Semplifica wordmark/logo and
+trademarks of [Specter s.r.l.](https://semplifica.ai) and are reserved
+separately from the code license. The **Specter** name is also reserved
+as the identifier of this upstream (Specter ships without its own logo
+for now — only the Specter mark is present in the UI). Forks with
+substantive changes are asked to drop the Specter wordmark/logo and
 rename the binary; see [NOTICE.md](NOTICE.md) for the full policy and
 the precedent (GitLab CE, Mastodon, Nextcloud, Element, Plausible, …).

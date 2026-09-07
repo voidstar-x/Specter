@@ -1,4 +1,4 @@
-# MikeRust v0.7.4 — Cross-dominio nell'editor dei workflow
+# Specter v0.7.4 — Cross-dominio nell'editor dei workflow
 
 Estende il meccanismo cross-dominio `also_applicable_to` — già
 disponibile per i preset di sistema in v0.7.3 — anche ai workflow
@@ -44,11 +44,11 @@ applicabili.
 
 ## Download
 
-- `MikeRust_0.7.4_x64.msi` — Windows x86_64
-- `MikeRust_0.7.4_arm64.msi` — Windows ARM64, Snapdragon X Elite
+- `Specter_0.7.4_x64.msi` — Windows x86_64
+- `Specter_0.7.4_arm64.msi` — Windows ARM64, Snapdragon X Elite
 
 Sostituzione drop-in per v0.7.3.
 
 ## Licenza
 
-AGPL-3.0-only. Il marchio e il logo Semplifica sono marchi registrati.
+AGPL-3.0-only. Il marchio e il logo Specter sono marchi registrati.

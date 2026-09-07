@@ -1,4 +1,4 @@
-# MikeRust v0.5.6 — Chat composer UX fixes
+# Specter v0.5.6 — Chat composer UX fixes
 
 Two bug fixes in the chat composer that surfaced during hands-on
 testing of the v0.5.5 cycle, plus an opt-in experimental local-only
@@ -55,7 +55,7 @@ When on:
   (loopback only — refuses LAN endpoints or public IPs).
 * The chat composer's model picker collapses to two curated entries
   (Qwen 3.5 4B `q4_K_M` and Gemma 4 E2B IT GGUF `Q4_K_M`), both
-  derived through Ollama Modelfiles MikeRust creates on demand with
+  derived through Ollama Modelfiles Specter creates on demand with
   thinking suppression baked in.
 * Install / cancel / parallel-download UX directly from Settings,
   with real-time progress streaming.
@@ -79,8 +79,8 @@ provider works exactly as before.
 
 Pre-built MSIs for Windows:
 
-- `MikeRust_0.5.6_x64.msi` — Windows x86_64
-- `MikeRust_0.5.6_arm64.msi` — Windows ARM64, Snapdragon X Elite
+- `Specter_0.5.6_x64.msi` — Windows x86_64
+- `Specter_0.5.6_arm64.msi` — Windows ARM64, Snapdragon X Elite
   native
 
 Drop-in replacement for v0.5.5.
@@ -95,6 +95,6 @@ Drop-in replacement for v0.5.5.
 
 ## License
 
-MikeRust is distributed under **AGPL-3.0-only**. The Semplifica
+Specter is distributed under **AGPL-3.0-only**. The Specter
 wordmark and logo are trademarks; see `NOTICE.md`. The full
 licence text is available in-app under **Settings → Licenza**.

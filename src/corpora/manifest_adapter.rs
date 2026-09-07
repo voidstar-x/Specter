@@ -73,7 +73,7 @@ impl ManifestAdapter {
         };
         let client = reqwest::Client::builder()
             // Browser-like UA matches what the EUR-Lex adapter does
-            // and avoids the basic "MikeRust/x.y" filter that some
+            // and avoids the basic "Specter/x.y" filter that some
             // sites apply by default.
             .user_agent(
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 \
@@ -285,7 +285,7 @@ impl ManifestAdapter {
             .map(|d| d.as_nanos())
             .unwrap_or(0);
         let path = std::env::temp_dir().join(format!(
-            "mikerust-manifest-{}-{nanos}.pdf",
+            "specter-manifest-{}-{nanos}.pdf",
             std::process::id()
         ));
         if let Err(e) = std::fs::File::create(&path)
