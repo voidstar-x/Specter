@@ -1,0 +1,112 @@
+{
+  "id": "dpia-cross-border",
+  "title": "DPIA & Cross-Border Transfer Assessment (jurisdiction-agnostic)",
+  "type": "tabular",
+  "domain": "legal",
+  "practice": "Two-in-one privacy assessment: (1) a data-protection impact assessment (DPIA) skeleton for new or high-risk processing, and (2) a cross-border transfer assessment covering mechanism, adequacy status, safeguards and destination-country conditions. Jurisdiction-agnostic by design: every column requires the analyst to identify the governing privacy regime(s) first (e.g. GDPR, UK GDPR, PDPA, Australian Privacy Act, or a non-privacy baseline like South Korea/Japan/Indonesia laws) and applies that regime's terminology and thresholds. If a jurisdiction column cannot be answered because the governing law is unclear, the workflow instructs the analyst to stop and ask rather than assume.",
+  "columns_config": [
+    {
+      "index": 0,
+      "name": "Governing Regime(s) Identification",
+      "format": "text",
+      "prompt": "Identify every data-protection regime that governs the processing: where the controller/processor is established, where data subjects are located, and where processing infrastructure sits. For each regime, name the statute and regulator (e.g. GDPR/EDPB, UK GDPR/ICO, PDPA/PDPC, Privacy Act 1988 (Cth)/OAIC) and state which regime's thresholds drive the DPIA and transfer analysis. If more than one regime applies, state whether compliance with one satisfies another or whether the stricter applies. Do not assume GDPR simply because the processing involves data protection concepts."
+    },
+    {
+      "index": 1,
+      "name": "Processing Description",
+      "format": "text",
+      "prompt": "Describe the processing precisely: purpose(s) of processing, data categories and special-category or sensitive data involved, data subjects, volume and scale, sources of the data, storage media and format, retention period and deletion process, and recipients. State the lawful basis or authorisation relied on under each governing regime (consent, contract, legal obligation, legitimate interests balancing, or equivalent PDPA/APP basis), and whether the purpose is one a data subject would reasonably expect from the original collection."
+    },
+    {
+      "index": 2,
+      "name": "DPIA Trigger Assessment",
+      "format": "tag",
+      "prompt": "Assess whether a DPIA/PIA is legally required or prudent: check the governing regime's trigger (GDPR Art. 35 and the EDPB/ICO lists of processing requiring a DPIA; PDPC's advisory on DPIAs and its recommended approach for high-risk processing; OAIC's privacy impact assessment guidance; sectoral rules). Consider indicators: systematic and extensive evaluation or automated decision-making, large-scale special-category/sensitive data, large-scale or systematic monitoring, innovative technology, data concerning vulnerable subjects, cross-border transfer to a non-adequate jurisdiction, or new processing with material change from a prior assessment.",
+      "tags": [
+        "DPIA/PIA legally required under governing regime",
+        "DPIA not mandatory but prudent (high-risk indicators)",
+        "DPIA not required — processing low-risk",
+        "Multiple regimes — different DPIA thresholds (assess each)",
+        "Prior DPIA exists — assess whether still current"
+      ]
+    },
+    {
+      "index": 3,
+      "name": "Cross-Border Transfer Map",
+      "format": "text",
+      "prompt": "Map every cross-border flow of personal data: origin country, destination country(ies), the entity roles at each end (controller-to-controller, controller-to-processor, processor-to-subprocessor), the data involved, the purpose of each leg, and any onward-transfer chain. Include transfers that happen indirectly (cloud hosting regions, support access, group data centres, logging) as well as the obvious export. State which regime's transfer rules apply to each leg (the exporter's regime) and identify legs with no lawful transfer mechanism."
+    },
+    {
+      "index": 4,
+      "name": "Transfer Mechanism & Adequacy",
+      "format": "text",
+      "prompt": "For each transfer leg, identify the mechanism relied on under the exporter's regime: an adequacy/full-protection finding for the destination (GDPR adequacy decision, UK adequacy regulation, PDPC's transfer-limitation exceptions or permitted destinations — note Singapore removed the prescribed-transfer-whitelist approach and now relies on the transfer-limitation obligation with exceptions including binding corporate rules-style or contractual protections), or a safeguard-based mechanism (SCCs and the transfer impact assessment required by Schrems II jurisprudence, UK IDTA/ADD, BCRs, or contractual terms for Singapore transfers). State whether the mechanism is valid, current, and actually implemented, and whether a transfer impact assessment or equivalent was performed and documented."
+    },
+    {
+      "index": 5,
+      "name": "Destination-Country Conditions",
+      "format": "text",
+      "prompt": "Assess the destination country's legal and practical conditions: its data-protection law and enforcement, government-access powers (surveillance, national-security access) and their proportionality under the exporter's law, the destination regulator's posture, and any blocking or conflicting local law that would prevent the importer from honouring the exporter's protections. For each destination, state whether the conditions support or undermine the transfer mechanism and what supplementary measures would be needed (technical encryption, pseudonymisation, contractual access limits, localisation options)."
+    },
+    {
+      "index": 6,
+      "name": "Risk Identification & Likelihood/Impact",
+      "format": "text",
+      "prompt": "Identify risks to data subjects arising from the processing and the transfers: risks inherent to the processing purpose (unlawful access, misuse, re-identification, disclosure of sensitive data, discrimination, financial or reputational harm, loss of control) and risks specific to each destination (government access, weak local protection, insecure infrastructure, inadequate importer practices). For each risk state likelihood (remote/possible/likely) and severity (limited/significant/severe) on the governing regime's scale, and whether residual risk is acceptable without further measures."
+    },
+    {
+      "index": 7,
+      "name": "Mitigation & Supplementary Measures",
+      "format": "text",
+      "prompt": "For each identified risk above the acceptable threshold, set out the mitigation actually in place or proposed: technical measures (encryption in transit and at rest, pseudonymisation, access controls, logging), organisational measures (contractual protections, training, incident response, oversight), and transfer-specific supplementary measures (localisation of high-risk data, contractual government-access commitments, importer audit rights, secure processing enclaves). State which mitigations are implemented, which are planned, and who owns implementation."
+    },
+    {
+      "index": 8,
+      "name": "Data-Subject Rights & Controls",
+      "format": "text",
+      "prompt": "Assess how data-subject rights are honoured under each governing regime: access, correction, erasure/deletion, restriction, portability, objection and complaint rights as applicable; the operational pathway for each right (who receives requests, response timelines under the regime, format); whether automated decision-making requires additional information or opt-out; and how rights operate across borders given the transfer map — including whether the importer is contractually bound to cooperate with rights requests."
+    },
+    {
+      "index": 9,
+      "name": "Consent & Notice Adequacy",
+      "format": "text",
+      "prompt": "Assess the consent and notice architecture under each governing regime: whether consent is validly obtained (freely given, specific, informed, unambiguous, and withdrawable where the regime requires consent rather than another basis), whether collection notices were given at the point of collection with the mandated content (identity, purposes, recipients, transfer destinations and mechanisms, rights, retention), and whether notices disclose the cross-border transfers in a way a regulator would accept. Flag notice content that is generic, buried, or missing the transfer story."
+    },
+    {
+      "index": 10,
+      "name": "Security & Breach-Response Posture",
+      "format": "text",
+      "prompt": "Assess security of processing and breach-readiness: the technical and organisational measures protecting the data at each location, the breach-detection and notification obligations under each governing regime (regulator and data-subject notification, timelines, exemptions), and the incident-response plan covering the processor chain and foreign hosts. State whether breach notification duties differ by location of the data and whether the organisation can meet the shortest applicable timeline."
+    },
+    {
+      "index": 11,
+      "name": "Processor & Third-Party Chain",
+      "format": "text",
+      "prompt": "Map the processors, subprocessors and third parties touching the data: identity and location of each, the processing they perform, contractual coverage (processor terms, transfer terms, audit and deletion rights), and any recipient not covered by a written agreement. Assess whether processor instructions are documented and whether the controller retains control sufficient to meet its own obligations, including the ability to terminate and compel deletion on exit."
+    },
+    {
+      "index": 12,
+      "name": "Accountability & Documentation",
+      "format": "text",
+      "prompt": "Audit the accountability record under the governing regime(s): the DPIA/PIA document itself (complete, current, signed off at the right level), records of processing activities, transfer registers, lawful-basis records, privacy notices as published, internal policies, and training evidence. Identify which documents exist, which are missing, and which a regulator would request first in an investigation."
+    },
+    {
+      "index": 13,
+      "name": "Gap Analysis & Remediation Plan",
+      "format": "text",
+      "prompt": "Consolidate the gaps into a remediation plan: each gap with severity (critical — unlawful processing or transfer; material — regulator censure likely; minor — compliance hygiene), the governing-regime obligation it breaches, the owner, the action, and a target date. Sequence critical transfer legs without a valid mechanism before documentation gaps. State any gap that cannot be closed without a product or architecture change and the interim risk treatment."
+    },
+    {
+      "index": 14,
+      "name": "Sign-Off, Review Triggers & Residual Risk",
+      "format": "text",
+      "prompt": "Document the sign-off record (who approved, when, at what level — data-protection officer/privacy officer or equivalent, with any regulator-consultation duty where the DPIA reveals high residual risk), the residual risks accepted after mitigation, and the review triggers that require re-running this assessment (new processing purpose, new destination, new vendor, change in adequacy status or law, material data-subject harm, or scheduled periodic review). State the maximum period after which this assessment should be revisited."
+    },
+    {
+      "index": 15,
+      "name": "Confidence & Open Questions",
+      "format": "text",
+      "prompt": "State confidence (high/medium/low) for the regime identification, transfer-mechanism validity, and each critical gap. List open questions: facts needed from the business (actual data flows, vendor subprocessors, retention settings), regulator positions that are unsettled, and any point where the governing law's current text must be verified against an official source. Where a statute, adequacy decision or regulator list is checkable, verify before answering; otherwise mark explicitly."
+    }
+  ]
+}

@@ -1,0 +1,130 @@
+{
+  "id": "ai-governance-assessment",
+  "title": "AI Governance Risk-Tier Assessment (multi-jurisdiction)",
+  "type": "tabular",
+  "domain": "legal",
+  "practice": "Jurisdiction-agnostic governance assessment of an AI system or feature: classify the system by governance risk tier (anchored to the EU AI Act risk categories as classification labels), then produce an obligation-and-evidence checklist calibrated to that tier. Cross-references the SG Model AI Governance Framework (incl. Generative AI and Agentic AI) with AI Verify testing, and the AU Guidance for AI Adoption / Voluntary AI Safety Standard approach to assurance. Non-binding frameworks are treated as governance evidence, not legal obligations.",
+  "columns_config": [
+    {
+      "index": 0,
+      "name": "Jurisdiction & Applicable Regimes",
+      "format": "text",
+      "prompt": "Identify every jurisdiction with a regulatory nexus to this AI system: where it is developed, trained, deployed, and where end-users are located, plus the place of establishment of the provider/deployer. For each nexus, name the applicable instruments (binding law vs voluntary framework, e.g. EU AI Act, SG Model AI Governance Framework and AI Verify, AU Guidance for AI Adoption). If a jurisdiction is unclear or contested, state the assumption prominently and label it ASSUMED; do not silently pick one."
+    },
+    {
+      "index": 1,
+      "name": "System Identification & AI Definition Fit",
+      "format": "text",
+      "prompt": "Describe the system precisely: function, model type (predictive, generative, agentic), integration point, autonomous scope (read-only vs controlled write vs full access), and user-facing surface. Then assess whether the system falls within each jurisdiction's statutory definition of an 'AI system' (or the framework's working definition) — if the definition fit is arguable, state both readings and the compliance consequence of each."
+    },
+    {
+      "index": 2,
+      "name": "Role in AI Value Chain",
+      "format": "tag",
+      "prompt": "What is this organisation's role in the AI value chain for this system, in each applicable jurisdiction's terminology (provider/model provider, deployer, importer, distributor, downstream fine-tuner, substantial modifier)? State where roles could change (e.g. a deployer becoming a provider by rebranding or substantially modifying the system) and the legal consequence of the shift.",
+      "tags": [
+        "Provider / developer (own-brand system)",
+        "Deployer / deployer-operator (uses under own authority)",
+        "GPAI / foundation model provider",
+        "Downstream fine-tuner or substantial modifier",
+        "Importer / distributor",
+        "Product manufacturer integrating AI",
+        "Multiple roles (explain split)"
+      ]
+    },
+    {
+      "index": 3,
+      "name": "EU AI Act Risk Classification",
+      "format": "tag",
+      "prompt": "Classify the system under the EU AI Act risk architecture, citing the Annex or Article relied on: prohibited practice; high-risk (Annex I embedded product or Annex III use case); GPAI model with systemic risk; GPAI model (non-systemic); transparency-obligation system (Art. 50, e.g. chatbots, synthetic content); or minimal risk. If the classification is borderline, state the facts that would move it across the line and apply the Commission's classification guidance. Note the classification applies to the specific use, not the technology.",
+      "tags": [
+        "Prohibited practice (Art. 5)",
+        "High-risk — Annex I regulated product",
+        "High-risk — Annex III use case",
+        "High-risk — disputed / pending classification",
+        "GPAI model with systemic risk",
+        "GPAI model (non-systemic)",
+        "Transparency-obligation system (Art. 50)",
+        "Minimal risk / outside scope"
+      ]
+    },
+    {
+      "index": 4,
+      "name": "Framework Risk Tier (SG / AU lens)",
+      "format": "tag",
+      "prompt": "Independently of the EU classification, rate governance risk on a jurisdiction-neutral scale for the SG and AU frameworks' purposes: consider impact on individuals (rights, safety, livelihood), scale of affected users, degree of autonomy/agency (e.g. IMDA's agentic-AI agency levels L0–L5), sector sensitivity (financial services, health, employment, minors), and irreversibility of harm. State which framework lens drove the rating and what facts would raise or lower it one tier.",
+      "tags": [
+        "Tier 1 — Minimal: low-stakes internal or assistive use",
+        "Tier 2 — Moderate: user-facing, limited autonomy, bounded harm",
+        "Tier 3 — Elevated: consequential decisions or sensitive data, minors, higher agency",
+        "Tier 4 — High: safety-critical, systemic reach, full-agency or irreversible harm"
+      ]
+    },
+    {
+      "index": 5,
+      "name": "Governing Obligations by Jurisdiction",
+      "format": "text",
+      "prompt": "For each nexus jurisdiction, list the obligations that actually bind (statute/regulation, with provision references) and separately the obligations that are voluntary-but-expected (model frameworks, standards, assurance schemes). Distinguish them explicitly — do not present SG Model Framework or AU Voluntary Standard items as if legally mandated. For binding obligations state the trigger (placing on market, deployment, use by public authority) and the compliance deadline, checking against the current applicable-date regime rather than relying on memory."
+    },
+    {
+      "index": 6,
+      "name": "Data Protection Interaction",
+      "format": "text",
+      "prompt": "Map the data-protection overlay: whether personal data is processed at any stage (training, fine-tuning, prompts, outputs, logs), the controller/processor (or PDPA data controller/APP entity) roles, the lawful basis or consent pathway for training and inference, any DPIA/PIA trigger, and cross-border transfer implications of model hosting or logging locations. Note where AI-specific rules (e.g. Art. 10 EU AI Act data governance) sit on top of privacy law and which is stricter."
+    },
+    {
+      "index": 7,
+      "name": "Transparency & User Disclosure Duties",
+      "format": "text",
+      "prompt": "State what must be disclosed, to whom, and when: AI-interaction disclosure (users must know they are talking to AI), synthetic/deepfake content labelling (generation and manipulation marking), machine-readable provenance, disclosure when AI content is published, and any consumer-law overlay on AI-generated claims (misleading conduct). Cite the instrument and provision for each duty, and note voluntary frameworks' disclosure expectations separately."
+    },
+    {
+      "index": 8,
+      "name": "Human Oversight & Accountability Design",
+      "format": "text",
+      "prompt": "Assess the oversight architecture required versus designed: who is the accountable human owner (named role, not a committee), what human-in-the-loop / on-the-loop checkpoints exist, override and fallback mechanisms, escalation paths on failure, and how oversight is evidenced for high-agency systems (e.g. IMDA agentic framework's levels L0–L5 and its requirement that humans remain meaningfully accountable). Identify where the design would fail a regulatory or assurance review."
+    },
+    {
+      "index": 9,
+      "name": "Testing & Assurance Obligations",
+      "format": "text",
+      "prompt": "Specify the testing and assurance expectation for the assigned tier: pre-deployment testing scope (robustness, bias, safety, red-teaming), benchmark discipline, and which tooling fits — AI Verify toolkit and its testing framework for traditional and GenAI use cases, Singapore's GenAI Starter Kit pre-deployment testing practices, internal conformity work for EU high-risk, or AU Guidance for AI Adoption record-keeping practices. State whether independent third-party testing is legally required, expected, or merely reputational."
+    },
+    {
+      "index": 10,
+      "name": "Documentation & Evidence Checklist",
+      "format": "text",
+      "prompt": "Produce the evidence checklist for this system and tier, each item marked [BINDING], [VOLUNTARY], or [MARKET EXPECTATION] per jurisdiction: technical documentation and model cards, intended-purpose and limitation statements, risk assessment/impact assessment records, testing and evaluation reports, training-data summaries where required, logging and monitoring records, incident register, vendor/third-party model diligence, and user-facing disclosures. Each item must name its source instrument or framework section."
+    },
+    {
+      "index": 11,
+      "name": "Third-Party & Supply-Chain Dependencies",
+      "format": "text",
+      "prompt": "Identify dependencies that carry governance risk: upstream foundation-model providers (and the terms governing them), APIs, embedded third-party models, open-source components with licence obligations, and data licensors. For each, state what contractual assurance the organisation holds (model documentation, indemnities, compliance warranties, audit rights) and what is missing; flag where an upstream provider's non-compliance would flow down."
+    },
+    {
+      "index": 12,
+      "name": "Incident, Complaint & Redress Handling",
+      "format": "text",
+      "prompt": "Assess incident-readiness: whether serious-incident reporting is legally required for this classification (and to whom, within what timeline), the internal threshold for escalation, handling of user complaints about AI outputs (including discrimination or defamation-type harm), correction/withdrawal capability, and record-keeping for post-market monitoring. Note obligations for minors-affected or safety-impacting outputs specifically."
+    },
+    {
+      "index": 13,
+      "name": "Gap Analysis & Remediation Plan",
+      "format": "text",
+      "prompt": "Compare current-state practice (as evidenced by the materials) against the obligations and evidence checklist: list each gap with severity (critical / material / minor), whether it creates legal exposure or only assurance deficit, the owner role, and a proportionate remediation action with indicative effort. Prioritise gaps that block a legally required deadline over voluntary-framework polish. State plainly what cannot be remediated before deployment and the risk of proceeding."
+    },
+    {
+      "index": 14,
+      "name": "Go/No-Go & Residual Risk",
+      "format": "text",
+      "prompt": "Give a defensible go / conditional-go / no-go recommendation for deployment as at the assessment date: conditions precedent (each traced to an obligation or gap), residual risks that remain after remediation (reputational, emergent-behaviour, regulatory-change risk), and the review trigger (re-assessment on material model change, new jurisdiction, new feature, or regulatory development). A conditional-go without named conditions is not acceptable."
+    },
+    {
+      "index": 15,
+      "name": "Confidence & Open Questions",
+      "format": "text",
+      "prompt": "State confidence (high/medium/low) for the classification, the obligations map, and each go/no-go condition. List open questions: facts needed from the product team, regulatory positions still forming (e.g. pending EU Omnibus-driven changes to high-risk timing — verify current dates before relying on them), and jurisdictions whose frameworks may harden into law. Where an instrument's current text or applicable date is checkable against an official source, verify before citing; otherwise flag explicitly."
+    }
+  ]
+}

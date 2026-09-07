@@ -1,0 +1,102 @@
+{
+  "id": "oss-licence-review",
+  "title": "OSS & Third-Party Licence Review (commercial distribution)",
+  "type": "tabular",
+  "domain": "legal",
+  "practice": "Open-source and third-party licence review for a product that will be distributed commercially (embedded, SaaS, or shipped software), jurisdiction-agnostic. The workflow classifies each dependency's licence, determines what the licence requires (attribution, notice preservation, copyleft source-delivery obligations), assesses whether those obligations are triggered by the product's distribution or use model, checks licence compatibility across the dependency graph, and produces a compliance action list. Treats licence obligations as a matter of the licence text and the distribution facts — not of memory of 'usual' terms — and flags any licence whose current version text should be verified against the official licence text before relying on a characterisation.",
+  "columns_config": [
+    {
+      "index": 0,
+      "name": "Component & Licence Identification",
+      "format": "text",
+      "prompt": "Identify each component precisely: name, version, repository or package-manager source, the licence declaration (in the package manifest, LICENSE file, or header), and the licence's SPDX identifier where one exists. State whether the declared licence matches the actual licence text shipped with the component and whether the component mixes multiple licences (core, tests, assets, fonts, documentation may carry different terms). If the licence is unclear, missing, or non-standard, flag it for manual review rather than inferring from a package-manager tag."
+    },
+    {
+      "index": 1,
+      "name": "Licence Category & Obligation Class",
+      "format": "tag",
+      "prompt": "Classify the licence into its obligation class, then state in the answer what that class generally requires and the specific provisions in this licence's text that carry those requirements (with clause references). Do not rely on the licence name alone — check the text, since versions differ (e.g. GPL-2.0-only vs GPL-3.0-or-later, MIT variants, custom permissive terms).",
+      "tags": [
+        "Permissive (MIT / BSD / Apache-2.0 / ISC / similar)",
+        "Weak copyleft (LGPL / MPL / EPL / CDDL — file/derivative-level)",
+        "Strong copyleft (GPL family / AGPL — derivative-work-level)",
+        "Network copyleft (AGPL — server-side trigger)",
+        "Dual-licensed / multiple-use terms",
+        "Non-standard / custom licence",
+        "Unknown or unlicensed (flag immediately)"
+      ]
+    },
+    {
+      "index": 2,
+      "name": "Attribution & Notice Obligations",
+      "format": "text",
+      "prompt": "Set out the attribution and notice duties the licence text imposes: preserving copyright notices, reproducing the licence text in distributions, the required form of attribution (THIRD-PARTY-NOTICES file, about box, documentation), any notice for modified files, and any advertising or endorsement clauses (and their enforceability). State for each component what artefact the product must ship and where, and list components whose notices are missing from the current distribution."
+    },
+    {
+      "index": 3,
+      "name": "Copyleft Trigger Analysis",
+      "format": "text",
+      "prompt": "Analyse whether copyleft obligations are actually triggered for each copyleft component: the distribution model (shipped binary, embedded device, SaaS-only, internal use), whether the component is modified, how it is linked or integrated (static, dynamic, separate process, network interaction), and what the licence text says about the trigger (e.g. 'convey', 'propagate', 'distribute', 'based on'). State whether the obligation is triggered, not triggered, or uncertain, and the factual or architectural change that would flip the answer. Do not assume a SaaS deployment avoids copyleft — check the licence's network clause (AGPL) and the component's actual role."
+    },
+    {
+      "index": 4,
+      "name": "Source-Code Delivery Obligations",
+      "format": "text",
+      "prompt": "Where copyleft applies, state the source-delivery obligations precisely: what source must be provided (corresponding source for the component, modifications, build scripts and installation information under GPL-3.0 terms), to whom, in what medium, within what time, and under what licence (the same licence, no additional restrictions). Assess whether the organisation's engineering process can actually produce compliant source (version control hygiene, build reproducibility) and what artefact it would deliver."
+    },
+    {
+      "index": 5,
+      "name": "Compatibility & Licence-Graph Conflicts",
+      "format": "text",
+      "prompt": "Assess licence compatibility across the dependency graph: whether the obligations of each licence can be satisfied simultaneously when components are combined or linked (e.g. GPL with proprietary code, GPL with Apache-2.0 code in certain combinations, weak vs strong copyleft mixing, copyleft with permissive), and whether any combination forces a choice between breaching one licence and another. Identify the specific components whose combination creates the conflict and the resolution options (relicense, replace component, isolate in a separate process, obtain a commercial licence from the copyright holder)."
+    },
+    {
+      "index": 6,
+      "name": "Dynamic-Link & Boundary Analysis",
+      "format": "text",
+      "prompt": "For each copyleft component embedded in a larger product, analyse the boundary question: is the component a derivative work of the larger product or vice versa, based on how it is linked, the interfaces used, the communication between processes, and any plugin architecture? State the legal characterisation risk for the product's proprietary code under each relevant licence and the engineering mitigation that would preserve the boundary (process isolation, standard interfaces, plugin model) if the current integration does not."
+    },
+    {
+      "index": 7,
+      "name": "Distribution & Sale Terms Compliance",
+      "format": "text",
+      "prompt": "Assess whether the product's commercial distribution terms comply with the licences in force: does the end-user licence or SaaS agreement include the notices and licence texts required, impose any 'additional restrictions' that a copyleft licence prohibits (e.g. anti-tivoisation, non-disclosure of source availability, discriminatory terms), and handle the relationship between the proprietary EULA and the open-source terms correctly (the OSS terms govern the OSS components; the EULA must not purport to override them)? Flag EULA clauses that would breach the licences (e.g. prohibiting reverse engineering where the licence permits it, asserting all-rights-reserved over OSS components)."
+    },
+    {
+      "index": 8,
+      "name": "SaaS & Network-Delivery Model",
+      "format": "text",
+      "prompt": "Where the product is delivered as a service, analyse the network-copyleft exposure: whether any AGPL or similarly network-triggered component is used (including indirectly via libraries), whether the service's interaction with the component triggers the source-offer obligation, and whether the organisation's SaaS terms, privacy practices and API use change the analysis. State the compliance action if AGPL components are found in a proprietary SaaS stack, including replacement or commercial-licensing options."
+    },
+    {
+      "index": 9,
+      "name": "Dual-Licensing & Commercial Options",
+      "format": "text",
+      "prompt": "Where a component is dual-licensed or offers a commercial licence, analyse the options: the terms of the commercial licence (fees, scope, support), the consequences of staying on the OSS licence, and the trigger for taking the commercial route (copyleft contamination risk, redistribution needs, indemnification, support obligations). State the recommendation for each dual-licensed component with the cost and risk trade-offs."
+    },
+    {
+      "index": 10,
+      "name": "Contributor & Internal-Development Obligations",
+      "format": "text",
+      "prompt": "Assess the obligations arising from the organisation's own contributions and internal use: contribution-licence terms in place for employee contributions to OSS projects (CLA/DCO), whether internal modifications to OSS components are tracked and their licence implications on release, and whether the organisation's use of internal 'free' components (code copied from the internet, Stack Overflow snippets, AI-generated code with unknown provenance) introduces unmanaged licence obligations. Flag unmanaged provenance as a risk class and prescribe the intake control."
+    },
+    {
+      "index": 11,
+      "name": "Compliance Artefacts & Notice Packaging",
+      "format": "text",
+      "prompt": "Specify the compliance artefacts the product must ship or maintain: a third-party-notices file listing every component with its licence and copyright holder, licence texts, source-offer mechanisms where copyleft is triggered, and the process for keeping the notice set current across releases (SBOM generation, licence-scan tooling, CI checks). Identify what exists, what is missing, and who owns the notice file's maintenance."
+    },
+    {
+      "index": 12,
+      "name": "Risk Rating & Remediation Plan",
+      "format": "text",
+      "prompt": "Rate the overall licence risk for the product (low / medium / high with reasons), list the components that create material risk in priority order, and give each a concrete remediation: replace the component, isolate it architecturally, comply (ship source/notices), obtain a commercial licence, or remove it. State which remediations are legal must-dos versus risk-reduction choices, the indicative effort, and the residual risk if the organisation proceeds without remediation. Distinguish risk of copyright-infringement claims from risk of losing the proprietary status of the organisation's own code."
+    },
+    {
+      "index": 13,
+      "name": "Confidence & Open Questions",
+      "format": "text",
+      "prompt": "State confidence (high/medium/low) for each classification and for the trigger analysis. List open questions: the actual licence text for components verified only by package-manager tags, integration architecture facts needed from engineering, components still to be scanned, and any licence whose current official text should be checked at its canonical source (e.g. the licence steward's site) before the characterisation is relied on. Where a licence text is checkable, verify before finalising; otherwise mark explicitly."
+    }
+  ]
+}

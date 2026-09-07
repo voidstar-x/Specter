@@ -1,0 +1,105 @@
+{
+  "id": "cloud-saas-dpa-review",
+  "title": "Cloud/SaaS Data Processing Agreement Review (jurisdiction-agnostic processor terms)",
+  "type": "tabular",
+  "domain": "legal",
+  "practice": "Dedicated review of a cloud/SaaS vendor's data-processing agreement (DPA) and associated terms from the perspective of the customer/controller. Covers the full processor-contract lifecycle: scope of processing and instruction-following; sub-processor chain (authorisation model, notification, objection rights); data location and transfer mechanisms; breach notification timelines and duties; security obligations against a stated baseline (SOC 2, ISO 27001); audit and verification rights; deletion, return and exit/portability mechanics; and liability allocation. Jurisdiction-agnostic by design: each column requires the reviewer to identify the governing privacy law(s) and to test the DPA against both statutory requirements (e.g. GDPR Art. 28, PDPA intermediary terms, APP-entity accountability) and commercial reasonableness, and to state which regime's processor duties are the benchmark for each clause.",
+  "columns_config": [
+    {
+      "index": 0,
+      "name": "Agreement & Parties Identification",
+      "format": "text",
+      "prompt": "Identify the agreement under review: vendor name and entity, customer entity, DPA version and date, the master agreement it attaches to (SaaS terms, cloud terms, support terms), the services covered, and the governing law and jurisdiction clauses of the underlying agreement. Confirm the customer's role (controller, joint controller, processor passing data on) and the vendor's role (processor/sub-processor) for each service, and state which privacy laws the parties have chosen to reference or which actually govern the processing by location of the parties and data subjects. Flag mismatches between the governing law chosen and the laws that will actually be asserted."
+    },
+    {
+      "index": 1,
+      "name": "Scope & Instruction-Following",
+      "format": "text",
+      "prompt": "Assess the processing-scope provisions: whether the DPA defines the subject matter, duration, nature and purpose of processing, the types of personal data and categories of data subjects (the GDPR Art. 28(3) essentials; the equivalent detail expected under other regimes), and whether the vendor may process only on the customer's documented instructions. Check for clauses allowing the vendor to use customer data for its own purposes (product improvement, AI training, analytics, benchmarking) and assess whether those are consistent with the customer's own lawful-basis obligations and with the regulator's expectations of processor neutrality."
+    },
+    {
+      "index": 2,
+      "name": "Sub-Processor Chain",
+      "format": "text",
+      "prompt": "Map the sub-processor regime: the authorisation model (general prior authorisation vs specific prior consent), the vendor's obligation to impose equivalent data-protection terms on sub-processors, the notification mechanism for new or changed sub-processors, the customer's objection right and what happens on objection (vendor remedies, customer termination right), and the vendor's liability for sub-processor breaches. List the disclosed sub-processors, their locations and functions, and assess whether the notification/objection mechanics are commercially usable or a formality."
+    },
+    {
+      "index": 3,
+      "name": "Data Location & Transfer Mechanisms",
+      "format": "text",
+      "prompt": "Assess the data-location terms: where primary data is stored and processed, whether the vendor promises a specific region or data residency (and any regional-option architecture), whether support and sub-processor access can move data elsewhere, and the transfer mechanisms the vendor relies on for each flow (SCCs and transfer impact assessments under GDPR; other regimes' transfer rules; and whether the vendor's TIA covers the customer's data). State whether the location commitments match the customer's own transfer obligations and whether the customer needs regional restriction or localisation options the DPA does not provide."
+    },
+    {
+      "index": 4,
+      "name": "Security Obligations & Baseline",
+      "format": "text",
+      "prompt": "Assess the security provisions: whether the vendor commits to appropriate technical and organisational measures (state of the art, cost, risk) and to the specific baseline claimed (SOC 2 Type II, ISO 27001, PCI DSS), whether the DPA's security annex or schedule contains concrete controls (encryption in transit and at rest, access control, logging, vulnerability management, business continuity), and whether commitments are auditable rather than aspirational. Flag security language that is marketing-grade or that disclaims responsibility for the customer's data."
+    },
+    {
+      "index": 5,
+      "name": "Breach Notification Duties",
+      "format": "text",
+      "prompt": "Assess the breach-notification terms: the vendor's obligation to notify the customer without undue delay after becoming aware of a personal-data breach, the stated timeline (and whether it lets the customer meet its own regulatory deadlines — e.g. GDPR 72 hours, PDPC notification duties, OAIC NDB scheme — noting the customer may need notification faster than the vendor offers), the content the notification must include, and cooperation duties during investigation and remediation. Flag notification clauses that permit the vendor to delay, cap, or silently exclude certain incident types, and clauses that leave the customer unable to meet its own regulator deadlines."
+    },
+    {
+      "index": 6,
+      "name": "Audit & Verification Rights",
+      "format": "text",
+      "prompt": "Assess audit rights: the customer's right to audit or inspect the vendor's processing (and its limitation to the customer's data), whether audits are real or reduced to a right to receive the vendor's certification reports (SOC 2/ISO), the frequency, cost allocation, and confidentiality constraints, and any right to commission independent audits. State whether the audit mechanics give the customer sufficient assurance to satisfy its own regulator's accountability expectations, and whether the vendor can refuse or indefinitely defer audits."
+    },
+    {
+      "index": 7,
+      "name": "Assistance & Data-Subject Rights",
+      "format": "text",
+      "prompt": "Assess the vendor's assistance obligations: helping the customer respond to data-subject requests (access, correction, erasure/deletion, restriction, portability and objection as applicable under the governing law), assisting with DPIAs/PIAs and regulator consultations, and providing information needed for the customer's records of processing. Check whether the assistance is scoped, timebound and chargeable at reasonable rates, and whether the vendor's tooling actually supports the required actions (search, export, delete, pseudonymise) within the contractual response times."
+    },
+    {
+      "index": 8,
+      "name": "Deletion, Return & Exit/Portability",
+      "format": "text",
+      "prompt": "Assess the data-return and deletion mechanics on termination or expiry: whether the customer can retrieve all data in a usable, portable format within a stated window, whether the vendor must delete all copies (including backups and sub-processor copies) within a stated period and certify deletion, whether deletion timing is compatible with the customer's retention obligations, and what happens to data if the customer fails to export before the deadline. Flag one-way exit terms (data destroyed on a schedule the customer cannot meet), export surcharges, and vendor discretion on format."
+    },
+    {
+      "index": 9,
+      "name": "Confidentiality & Personnel Controls",
+      "format": "text",
+      "prompt": "Assess confidentiality and personnel provisions: vendor personnel authorised to process data are subject to confidentiality obligations (contractual or statutory), access is limited to personnel who need it, and the vendor maintains access controls and training. Check whether confidentiality obligations survive termination and extend to sub-processor personnel, and whether the DPA restricts vendor use of customer data in support and quality-assurance contexts."
+    },
+    {
+      "index": 10,
+      "name": "Liability & Indemnity Allocation",
+      "format": "text",
+      "prompt": "Assess the liability architecture for data-protection claims: the vendor's liability for its own breaches, the customer's liability for its instructions, any indemnities for third-party claims (including data-subject claims and regulator fines), limitations of liability and their carve-outs (data-protection claims often carved out of caps — check), and whether the allocation would leave the customer bearing risk that should sit with the vendor (e.g. vendor sub-processor failures, vendor security failures). State the net exposure position if a serious breach occurred."
+    },
+    {
+      "index": 11,
+      "name": "Customer Obligations & Warranties",
+      "format": "text",
+      "prompt": "List the obligations and warranties the customer must give: warranties that the customer's data was lawfully collected and that its instructions comply with law, cooperation duties, indemnities for data the customer provides, and any clause making the customer liable for vendor actions taken on the customer's instructions. Assess whether each is standard and acceptable or shifts undue risk, and whether the customer can actually give the warranties required (e.g. that no data provided violates third-party rights)."
+    },
+    {
+      "index": 12,
+      "name": "Governing-Law & Regulator-Access Gaps",
+      "format": "text",
+      "prompt": "Assess the provisions that matter when a regulator or court comes knocking: the DPA's treatment of regulator information requests, the vendor's cooperation with the customer's regulator (including cross-border regulators the vendor may not have anticipated), the governing law and jurisdiction of the DPA relative to the processing locations, and any conflict between the DPA and the vendor's terms of service or privacy policy. Flag gaps where the customer could not compel the vendor to cooperate with the customer's regulator."
+    },
+    {
+      "index": 13,
+      "name": "Commercial & Practical Risk Notes",
+      "format": "text",
+      "prompt": "Assess the commercial realities beyond the legal text: the vendor's market position and willingness to negotiate, the customer's leverage at the relevant stage (procurement vs renewal vs in-crisis), standard-vs-negotiated terms, fees for assistance and export, and the operational burden of the controls the DPA promises (will the vendor's actual tooling deliver?). Recommend which clauses are worth negotiating hard, which are acceptable as standard, and which should be flagged to procurement as must-have versus nice-to-have."
+    },
+    {
+      "index": 14,
+      "name": "Risk Rating & Recommendations",
+      "format": "text",
+      "prompt": "Give an overall risk rating of the DPA for the customer's data profile (low / medium / high with reasons), summarise the top negotiation points in priority order, state which gaps are deal-breakers versus acceptable residual risk given the data involved and the customer's own compliance posture, and identify what the customer must do operationally to stay compliant even with this DPA in place (vendor due diligence records, sub-processor registers, TIA completion, data-flow documentation)."
+    },
+    {
+      "index": 15,
+      "name": "Confidence & Open Questions",
+      "format": "text",
+      "prompt": "State confidence (high/medium/low) for each clause assessment and the overall rating. List open questions: facts needed from the customer (actual data flows, sub-processor list currency, regulator exposure), vendor documents not supplied (security annex, sub-processor list, SCC annexes, TIA), and legal points to verify against the current text of the governing statutes. Where a statute, regulator list, or vendor document is checkable, verify before finalising; otherwise mark explicitly."
+    }
+  ]
+}

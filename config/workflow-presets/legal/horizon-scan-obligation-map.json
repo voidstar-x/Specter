@@ -1,0 +1,138 @@
+{
+  "id": "horizon-scan-obligation-map",
+  "title": "Regulatory Horizon Scan & Obligation Map (jurisdiction-agnostic)",
+  "type": "tabular",
+  "domain": "legal",
+  "practice": "Jurisdiction-agnostic regulatory horizon scanning and obligation mapping. The workflow ingests new or amended bills, Acts, codes, standards or guidance across one or more jurisdictions and converts each into a structured obligation map: instrument identity and legal force, affected legal entities and products, each discrete obligation with its in-scope product/feature and accountable owner, and a tracked status progression (proposed -> assented/enacted -> in force -> compliance due). Because it spans many jurisdictions and instrument types, every column requires explicit identification of the jurisdiction and instrument before any mapping, and the status columns require verification against official sources (gazettes, registers, regulator pages) rather than memory of enactment dates.",
+  "columns_config": [
+    {
+      "index": 0,
+      "name": "Instrument Identification",
+      "format": "text",
+      "prompt": "Identify the instrument precisely: jurisdiction (country and sub-national level where relevant), full short title exactly as printed, year and official reference number using the jurisdiction's convention, instrument type (bill / primary Act / subsidiary legislation / code / standard / guidance / consultation draft), and the official source where the current consolidated text is published. If the jurisdiction is not identifiable from the document, STOP and ask; do not assume."
+    },
+    {
+      "index": 1,
+      "name": "Regulator & Issuing Body",
+      "format": "tag",
+      "prompt": "Name the body that issued, administers, or will enforce the instrument (use its exact styling), and tag the body type. Note where issuing and enforcing bodies differ, and where a code or standard is issued by an industry body but registered or enforced by a regulator.",
+      "tags": [
+        "Government ministry / department",
+        "Independent statutory regulator",
+        "Co-regulatory body / industry association",
+        "Legislature (bill or Act)",
+        "Multiple bodies (split by function)",
+        "Other / unclear (explain)"
+      ]
+    },
+    {
+      "index": 2,
+      "name": "Legal Force & Applicability",
+      "format": "tag",
+      "prompt": "What legal force does the instrument carry, and who does it bind? Distinguish instruments that bind all persons from those binding only designated/licensed entities, those binding only when a direction or designation is issued, and non-binding guidance. State whether the instrument is in force now, will commence later, or is only proposed.",
+      "tags": [
+        "Binding — applies to all persons / general public",
+        "Binding — designated or licensed entities only",
+        "Binding — on designation / direction / registration",
+        "Non-binding guidance / framework / policy",
+        "Draft / proposed — not yet law",
+        "Voluntary code with co-regulatory effect"
+      ]
+    },
+    {
+      "index": 3,
+      "name": "Status Tracker — Current Stage",
+      "format": "tag",
+      "prompt": "Track the instrument's status progression accurately, verifying against an official source: where in the lifecycle is it now? If dates are unknown or the instrument's status is uncertain, say so and flag the item for verification rather than guessing the stage.",
+      "tags": [
+        "Proposed / exposure draft / pre-introduction",
+        "Introduced / gazetted for consultation",
+        "Assented / enacted / registered",
+        "Commencement pending (proclaimed or appointed)",
+        "In force — full or phased",
+        "Compliance deadline passed / in application",
+        "Amended, repealed or superseded (note details)"
+      ]
+    },
+    {
+      "index": 4,
+      "name": "Key Dates & Phasing",
+      "format": "text",
+      "prompt": "State every operative date with its source: introduction/publication date, assent/enactment or registration date, commencement date(s) including phased application by obligation or entity class, any transitional or saving periods, and the final compliance deadline. Apply the jurisdiction's default commencement rule where the instrument is silent. Where a date depends on ministerial appointment or is not yet fixed, state that explicitly instead of estimating."
+    },
+    {
+      "index": 5,
+      "name": "Obligation Inventory",
+      "format": "text",
+      "prompt": "Extract each discrete obligation from the instrument, one per row or clearly enumerated item, with pinpoint provision/section references and the operative trigger: continuing duty, event-triggered, periodic, on-request, on-notification, or on-commencement-of-activity. For each, state who bears it (entity class, role, officer), what conduct or output it requires, and whether the standard is absolute or qualified ('reasonable steps', 'best endeavours', 'proportionate'). Do not merge distinct obligations into a single item."
+    },
+    {
+      "index": 6,
+      "name": "Prohibitions & Offence Risk",
+      "format": "text",
+      "prompt": "Identify prohibitions, offences and penalty-triggering conduct in the instrument with provision references, including the fault element where specified. State which of the organisation's current or planned activities could collide with each prohibition, and flag obligations whose breach is itself an offence versus those that expose only to regulatory action."
+    },
+    {
+      "index": 7,
+      "name": "In-Scope Products & Services",
+      "format": "tag",
+      "prompt": "Map the instrument's scope onto the organisation's portfolio: which products, services, features, or operational functions fall within the instrument's defined scope (by the instrument's own terms, not by the organisation's internal naming)? List each in-scope item explicitly.",
+      "tags": [
+        "In-scope — direct product/service obligations",
+        "In-scope — operational/process obligations (e.g. reporting, complaints)",
+        "In-scope — only for designated/threshold entities",
+        "Adjacent — not in scope but likely to be monitored",
+        "Out of scope for current portfolio",
+        "Scope uncertain — needs legal confirmation"
+      ]
+    },
+    {
+      "index": 8,
+      "name": "Obligation-to-Product Map",
+      "format": "text",
+      "prompt": "For each obligation in the inventory, name the in-scope product(s), feature(s) or workflow(s) it attaches to, the internal owner role (product, engineering, legal, ops, privacy), and the dependency or upstream team whose work the obligation requires. Identify obligations with no current owner and obligations whose mapping depends on a product decision still to be made."
+    },
+    {
+      "index": 9,
+      "name": "Gap Analysis — Current vs Required",
+      "format": "text",
+      "prompt": "For each mapped obligation, compare current state (as evidenced by the materials supplied) against what the instrument requires by the compliance date: state the delta, whether it is a product change, process change, documentation change or policy change, and the indicative effort. Tag each gap's severity by reference to enforcement risk and deadline proximity. If no current-state materials were provided, say so and mark the assessment as based on assumptions."
+    },
+    {
+      "index": 10,
+      "name": "Compliance Workstream & Owners",
+      "format": "text",
+      "prompt": "Consolidate the obligations into named compliance workstreams (e.g. product change, policy and process, reporting, training, contracting), each with an accountable owner role, a target completion date that precedes the legal deadline with buffer, and the artefacts each workstream must produce (updated terms, reports, logs, policies, evidence files). Flag workstreams that are blocked on external events (regulator guidance, standards finalisation) and the fallback position if those events slip."
+    },
+    {
+      "index": 11,
+      "name": "Cross-Instrument Interaction",
+      "format": "text",
+      "prompt": "Map how this instrument interacts with the organisation's existing obligations: overlapping or cumulative regimes covering the same products, express precedence or non-derogation clauses, gaps where the new instrument imposes duties another regime does not, and double-regulation or conflicting-compliance risk. For each interaction, state the practical compliance posture that satisfies all regimes."
+    },
+    {
+      "index": 12,
+      "name": "Enforcement & Penalty Exposure",
+      "format": "text",
+      "prompt": "State the enforcement toolkit and penalty exposure the instrument creates, with references and figures as enacted (no currency conversion): regulator powers, penalty bands and their basis (per contravention, per day, percentage of turnover), officer liability, and enforcement-start dates. Assess the organisation's practical exposure if it did nothing between now and the compliance deadline, and identify which obligation carries the largest financial or reputational tail."
+    },
+    {
+      "index": 13,
+      "name": "Monitoring & Review Triggers",
+      "format": "text",
+      "prompt": "Define the forward-looking monitoring plan: the sources to watch (official gazettes/registers, regulator pages, consultation lists, industry body updates), the cadence for re-checking the instrument's status and any implementing rules, the trigger events that require re-running this obligation map (amendment, guidance publication, designation notice, product change), and the owner of the monitoring function. State the next expected milestone for this instrument if known."
+    },
+    {
+      "index": 14,
+      "name": "Executive Summary & Priorities",
+      "format": "text",
+      "prompt": "Write a plain-English executive summary in no more than 250 words: WHAT the instrument does, WHO it binds, WHAT obligations land on the organisation's products, the three highest-priority actions with dates, and the single biggest risk of inaction. No unexplained jargon; suitable for a non-lawyer executive briefing."
+    },
+    {
+      "index": 15,
+      "name": "Confidence & Open Questions",
+      "format": "text",
+      "prompt": "State confidence (high/medium/low) for the status stage, the obligation inventory, and each priority action. List open questions requiring verification against official sources — current in-force status, exact commencement or penalty figures, implementing or subsidiary instruments not yet published, and regulator guidance still in draft. Where an instrument's current text or status is checkable (gazette, official register, regulator site), verify before answering; otherwise flag 'verify current status' explicitly rather than relying on possibly-stale knowledge."
+    }
+  ]
+}

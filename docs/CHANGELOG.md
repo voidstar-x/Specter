@@ -102,3 +102,7 @@ in `src/presets/system_prompt.rs`, which walks a locale fall-back chain.
 - `frontend/.npmrc` & `frontend/pnpm-workspace.yaml` — pnpm build configuration
   for the Svelte frontend (`node-linker=hoisted`, esbuild as the only built
   dependency).
+
+## [Unreleased] - 2026-09-07
+### Added
+- 18 new SG/common-law & jurisdiction-aware tabular-review workflow presets (config/workflow-presets/legal/): i-governance-assessment (+-sg/-au), i-act-conformity-eu, dpia-cross-border (+-sg/-au), horizon-scan-obligation-map (+-sg/-au), consultation-response-sg/-au, privacy-notice-consent-sg/-au, cloud-saas-dpa-review, oss-licence-review, online-safety-code-sg/-au. Authored with legal-counsel (Astra); validated against the Specter wire schema and deployed to both the install dir and this repo.

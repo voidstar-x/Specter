@@ -1,0 +1,137 @@
+{
+  "id": "ai-act-conformity-eu",
+  "title": "EU AI Act Full Conformity Map (high-risk, GPAI & transparency)",
+  "type": "tabular",
+  "domain": "legal",
+  "practice": "End-to-end EU AI Act (Regulation (EU) 2024/1689, as amended by the Digital Omnibus package adopted June 2026 / in force 27 July 2026) conformity mapping for an AI system or GPAI model. Establishes role and classification first (prohibited practice, high-risk Annex I or Annex III, GPAI with/without systemic risk, transparency-only, minimal risk), then walks the full duty set — risk management, data governance, technical documentation and EU declaration of conformity, record-keeping/logging, transparency and human oversight, accuracy robustness and cybersecurity — the conformity-assessment route (self-assessment vs notified body), the responsible entity (provider, deployer-as-provider, authorised representative), and the phased applicable dates. Prompts require current, verified dates and text because the Omnibus amendments moved several application dates and the rules are being simplified.",
+  "columns_config": [
+    {
+      "index": 0,
+      "name": "Role & Territorial Nexus",
+      "format": "tag",
+      "prompt": "Establish the organisation's role for this system under the AI Act Articles 2 and 3: provider established in the EU; provider established outside the EU placing on the EU market or putting into service in the EU; deployer established or located in the EU; provider/deployer outside the EU whose system output is used in the EU; importer or distributor; or authorised representative (Article 22). State which role carries which core duties and confirm the territorial nexus with the facts. If the role could change (e.g. deployer becomes provider by substantial modification or rebranding under Article 25), say so with the consequence.",
+      "tags": [
+        "Provider (EU-established)",
+        "Provider (non-EU, placing on EU market / putting into service in EU)",
+        "Deployer",
+        "GPAI model provider",
+        "Importer / distributor",
+        "Authorised representative (Art. 22)",
+        "Role disputed or borderline (explain)"
+      ]
+    },
+    {
+      "index": 1,
+      "name": "System Classification — Risk Tier",
+      "format": "tag",
+      "prompt": "Classify the system under the current AI Act architecture (as amended by the Digital Omnibus): prohibited practice (Art. 5 — confirm none of the listed practices applies, including social scoring, manipulative techniques, real-time remote biometric identification subject to conditions); high-risk Annex I (safety component of regulated product covered by listed EU harmonisation legislation) vs Annex III (use case list — verify against the current list as amended); GPAI model; transparency-only (Art. 50-type); or minimal risk. State the operative facts supporting the classification and the borderline facts that could reclassify it.",
+      "tags": [
+        "Prohibited practice (Art. 5) — flag immediately",
+        "High-risk — Annex I (regulated-product safety component)",
+        "High-risk — Annex III use case",
+        "GPAI model — systemic-risk duties",
+        "GPAI model — general duties only",
+        "Transparency obligations only (e.g. chatbot/synthetic content)",
+        "Minimal risk / outside scope"
+      ]
+    },
+    {
+      "index": 2,
+      "name": "High-Risk vs GPAI Boundary Check",
+      "format": "text",
+      "prompt": "Where the system is a foundation/GPAI model used within a high-risk system or an Annex III use case, resolve the boundary: whether duties run to the model provider (GPAI chapter duties), the system provider (high-risk chapter duties), or both under the Act's layered structure; and how 'substantial modification' of a model integrated into a system allocates or shifts provider duties. Apply the Act's definitions and any Commission guidance; if guidance is still forming, say so rather than inventing a position."
+    },
+    {
+      "index": 3,
+      "name": "Applicable Dates & Transition Status",
+      "format": "text",
+      "prompt": "Set out every applicable date for this system's duties as they currently stand (verify against the amended Act and official Commission timeline rather than memory): prohibited practices and AI literacy from 2 Feb 2025; GPAI obligations from 2 Aug 2025; governance/enforcement phase and transparency + high-risk Annex III duties — confirm the current date post-Omnibus (high-risk Annex III moved to 2 Dec 2027 under the simplification proposal adopted June 2026); Annex I high-risk embedded products extended to 2 Aug 2028. For each duty, state whether it already applies, is pending, or was deferred, and identify any transitional provision relevant to systems already on the market."
+    },
+    {
+      "index": 4,
+      "name": "Obligation Map — High-Risk Chapter Duties",
+      "format": "text",
+      "prompt": "For a high-risk system, list each provider obligation with article references and a current-state assessment: risk-management system (Art. 9), data and data-governance (Art. 10), technical documentation (Art. 11 and Annex IV), record-keeping/logging (Art. 12 and Art. 19), transparency and information to deployers (Art. 13), human oversight (Art. 14), accuracy robustness cybersecurity (Art. 15), quality-management system (Art. 17), EU declaration of conformity (Art. 47), CE marking (Art. 48), registration in the EU database (Art. 49), and post-market monitoring (Art. 72). For each, mark the compliance status and the evidence that supports it, and flag any obligation the organisation has not yet addressed."
+    },
+    {
+      "index": 5,
+      "name": "Deployer Obligations (if deployer)",
+      "format": "text",
+      "prompt": "Where the organisation deploys (uses) a high-risk system, list deployer duties under Art. 26 and related provisions: use in accordance with instructions, human oversight assignment by competent personnel, input-data relevance monitoring, duties under the transparency and fundamental-rights-impact-assessment provisions, logging duties in certain contexts, and the deployer's obligations when a public authority (Art. 26.8 flags FRIA). Assess each with current practice and evidence."
+    },
+    {
+      "index": 6,
+      "name": "GPAI & Foundation-Model Duties",
+      "format": "tag",
+      "prompt": "If the organisation provides a general-purpose AI model, identify which GPAI duty set applies: the general duties (Art. 53 — technical documentation including training-data summary, copyright policy, training content summary) for all GPAI models, and the systemic-risk duties (Art. 55 — model evaluations, adversarial testing, incident reporting, cybersecurity) for models designated with systemic risk under Art. 51 thresholds (10^25 FLOPs) or Commission designation. Tag which set applies and state the current compliance posture for each duty.",
+      "tags": [
+        "GPAI general duties apply (Art. 53 set)",
+        "Systemic-risk duties apply (Art. 55 set)",
+        "Systemic-risk designation pending / disputed",
+        "Open-source / free-licence exemption analysis needed",
+        "Not a GPAI provider — model used via API or downstream"
+      ]
+    },
+    {
+      "index": 7,
+      "name": "Transparency, Explainability & Art. 50-type Duties",
+      "format": "text",
+      "prompt": "Assess transparency duties across the system: informing users they are interacting with AI (chatbot/interaction disclosure), disclosure of synthetic content including deepfakes and AI-generated text published for public-information purposes, machine-readable marking where required, and explainability expectations — what explanation of decisions the system must support for deployers and affected persons, and how the organisation evidences explainability for its model class. Cite the relevant articles as amended and any implementing guidance; distinguish AI-Act transparency from GDPR Art. 13–15 automated-decision information duties where both apply."
+    },
+    {
+      "index": 8,
+      "name": "Conformity-Assessment Route",
+      "format": "tag",
+      "prompt": "Determine the conformity-assessment route for a high-risk system under Art. 43 as amended: whether the system qualifies for internal control (Annex VI) based on its Annex III category (most Annex III use cases), or requires third-party conformity assessment by a notified body (Annex I product-embedded systems and listed cases). State the route, whether a notified body has been engaged where required, and the documents the route consumes (technical documentation, QMS, risk management). Note the Omnibus amendments if they simplify the route for the category.",
+      "tags": [
+        "Internal control route (Annex VI) — Annex III system",
+        "Notified-body assessment required (Annex I / listed)",
+        "Assessment route depends on disputed classification",
+        "GPAI model — no product CE route; codes of practice / harmonised standards",
+        "Not applicable — outside high-risk scope"
+      ]
+    },
+    {
+      "index": 9,
+      "name": "Responsible Entity & Authorised Representation",
+      "format": "text",
+      "prompt": "Identify the entity that bears each set of duties (provider, deployer, importer, distributor, authorised representative, GPAI provider) and whether a non-EU provider has appointed an authorised representative under Art. 22 with a written mandate. Confirm the provider's legal identity, address for market surveillance contact, and whether the entity named on the EU declaration of conformity and CE marking matches the actual provider. Flag any entity that is 'acting as provider' in substance without having assumed provider duties."
+    },
+    {
+      "index": 10,
+      "name": "Governance, Standards & Documentation Evidence",
+      "format": "text",
+      "prompt": "Audit the governance and evidence layer: quality-management system maturity, adoption of harmonised standards (CEN/CENELEC) or common specifications, engagement with the AI Act codes of practice for GPAI (including the GPAI Code of Practice), the internal processes that keep technical documentation current, version control of model/system changes and their substantial-modification analysis, and staff AI-literacy arrangements (Art. 4). List each artefact the organisation must produce for a conformity file and mark its status."
+    },
+    {
+      "index": 11,
+      "name": "Post-Market Monitoring & Incident Reporting",
+      "format": "text",
+      "prompt": "Assess post-market duties: the provider's post-market monitoring system under Art. 72, serious-incident reporting (Art. 73) thresholds and timelines and the channel for reporting, market-surveillance authority coordination, and the deployer's role in feeding incidents back up the chain. Map the organisation's incident-handling workflow against these duties and identify gaps in detection, escalation, or reporting, including for GPAI systemic incidents where they apply."
+    },
+    {
+      "index": 12,
+      "name": "Adjacent EU Law Interactions",
+      "format": "text",
+      "prompt": "Map overlapping EU obligations that interact with AI Act compliance for this system: GDPR (incl. Art. 22 automated decision-making and DPIA), the Product Liability Directive as amended for AI, the proposed or adopted AI Liability Directive status, NIS2/cyber rules for digital infrastructure, DSA content obligations where the AI generates or distributes content, sector rules (MDR, machinery, financial services AI uses), and copyright/DMCA-type duties implicated by training data. For each, state the interaction (cumulative, reinforcing, or conflicting) and the compliance posture that satisfies both regimes."
+    },
+    {
+      "index": 13,
+      "name": "Enforcement, Penalties & Non-Compliance Exposure",
+      "format": "text",
+      "prompt": "State the enforcement exposure: market-surveillance authority powers (including the AI Office for GPAI), the penalty bands under Art. 99 (as applicable: the higher of specified amounts or percentages of worldwide annual turnover for prohibited practices and data-governance breaches, lower bands for other breaches, and administrative fines for SMEs proportionate rules), corrective powers, and the enforcement start dates relevant to this system. Assess the organisation's practical exposure given its size and the classification, and flag any conduct that is already non-compliant since its applicable date."
+    },
+    {
+      "index": 14,
+      "name": "Conformity Action Plan & Timeline",
+      "format": "text",
+      "prompt": "Produce a prioritised conformity action plan keyed to the applicable dates: each open item with the article it satisfies, the owner, the target date (must beat the legal deadline with buffer), and the artefact it produces. Sequence: classification confirmation first, then blocking gaps for any duty already in application, then items due at the next milestone, then best-practice items. Identify what depends on external events (harmonised standards finalisation, GPAI code of practice, notified-body capacity) and the fallback if those events slip."
+    },
+    {
+      "index": 15,
+      "name": "Confidence & Open Questions",
+      "format": "text",
+      "prompt": "State confidence (high/medium/low) for the classification, the applicable-date analysis, and each action-plan item. List open questions requiring verification against official sources (EUR-Lex consolidated text, the Commission's AI Act pages and timeline, the AI Act Service Desk, the digital-strategy regulatory-framework page): the precise current wording of Articles as amended by the Digital Omnibus, the effective application dates for this system's category, notified-body availability, and pending guidance. Where the current text or date is checkable, verify it; otherwise mark the answer as 'verify current position' rather than relying on possibly-stale knowledge."
+    }
+  ]
+}
