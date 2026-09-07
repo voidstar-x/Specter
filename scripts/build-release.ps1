@@ -9,7 +9,7 @@
 .DESCRIPTION
   Pipeline per target architecture:
     1. Make sure the native runtime DLLs for the target arch exist by
-       running scripts/fetch-native-libs.ps1 (idempotent — skips DLLs
+       running scripts/fetch-native-libs.ps1 (idempotent â€” skips DLLs
        already on disk).
     2. Hand-craft a per-arch JSON overlay for `bundle.resources` that
        names only the matching arch's DLLs and write it under
@@ -179,7 +179,7 @@ function New-ResourcesOverlay {
     # Tauri resolves the SOURCE side relative to the directory of the
     # config file (i.e. src-tauri/), so we walk one level up with `../`
     # to reach the repo root where libs/ actually lives. The DEST side
-    # is relative to the install's `resources/` folder — the Rust
+    # is relative to the install's `resources/` folder â€” the Rust
     # loaders look for `<exe_dir>/resources/libs/<lib>/win-<arch>/<dll>`,
     # which is exactly what we ask the WiX MSI bundler to produce.
     #
@@ -198,7 +198,7 @@ function New-ResourcesOverlay {
     # bundled JSON at `<install>/config/...` lets the installed app
     # find them without an env-var override. The walker happily
     # recurses into per-domain subfolders (workflow-presets/legal/,
-    # workflow-presets/insurance/, …) — the glob source preserves
+    # workflow-presets/insurance/, â€¦) â€” the glob source preserves
     # the relative subpath under each root. `corpora-plugins/` is
     # deliberately excluded: the plugin system reads its own dir
     # via a separate resolver and shouldn't conflict, and pre-built
@@ -211,10 +211,10 @@ function New-ResourcesOverlay {
         "../config/docx-templates/**/*.json"                = "config/docx-templates/"
         "../config/model.json"                              = "config/model.json"
         # Domain-aware system-prompt prologue (v0.4.0). Six locale
-        # sub-folders × 11 domains = 66 Markdown files; the Rust
+        # sub-folders Ã— 11 domains = 66 Markdown files; the Rust
         # loader in crate::presets::system_prompt walks
         # <install>/config/system-prompts/<locale>/<domain>.md with
-        # locale fallback chain (requested → it → en → None).
+        # locale fallback chain (requested â†’ it â†’ en â†’ None).
         #
         # One glob per locale (instead of a single `**/*.md` mapped to
         # `config/system-prompts/`) because the WiX bundler flattens a
@@ -224,19 +224,14 @@ function New-ResourcesOverlay {
         # install the same target file"). Mapping each locale to its
         # own destination subdir preserves the `<locale>/<domain>.md`
         # layout the Rust loader expects.
-        "../config/system-prompts/it/*.md"                  = "config/system-prompts/it/"
         "../config/system-prompts/en/*.md"                  = "config/system-prompts/en/"
-        "../config/system-prompts/fr/*.md"                  = "config/system-prompts/fr/"
-        "../config/system-prompts/de/*.md"                  = "config/system-prompts/de/"
-        "../config/system-prompts/es/*.md"                  = "config/system-prompts/es/"
-        "../config/system-prompts/pt/*.md"                  = "config/system-prompts/pt/"
     }
     $obj = @{
         build  = @{ beforeBuildCommand = '' }
         bundle = @{ resources = $resources }
     }
     $path = Join-Path $overlayDir ("tauri-overlay-$Arch.json")
-    # PowerShell 5.1's ConvertTo-Json defaults to depth 2 — passes here
+    # PowerShell 5.1's ConvertTo-Json defaults to depth 2 â€” passes here
     # because the structure is shallow; bump it for safety.
     $obj | ConvertTo-Json -Depth 6 | Set-Content -Path $path -Encoding UTF8
     return $path
@@ -247,7 +242,7 @@ Write-Host ("Host architecture: {0}" -f $hostArch) -ForegroundColor DarkGray
 
 # Build the frontend ONCE up front. The arch loop's bundle phase used
 # to depend on tauri's `beforeBuildCommand` to invoke `pnpm build`, but
-# every pnpm invocation rewrites frontend/dist with fresh timestamps —
+# every pnpm invocation rewrites frontend/dist with fresh timestamps â€”
 # which invalidates mike-tauri's cargo fingerprint between phase 1 and
 # phase 2, defeating the DLL sweep. Building the frontend once before
 # the loop and silencing `beforeBuildCommand` in the bundle-phase
@@ -265,7 +260,7 @@ foreach ($arch in $archesToBuild) {
 
     # 1. Locate the Visual Studio install that carries the C++ build
     #    tools for this specific arch. Fails with a clear error if the
-    #    matching workload isn't installed — much better than letting
+    #    matching workload isn't installed â€” much better than letting
     #    link.exe blow up later on a "machine type" mismatch.
     $vsInstall = Get-VsInstallPath -Requires @($workloadByArch[$arch])
     $vsDev = Join-Path $vsInstall 'Common7\Tools\VsDevCmd.bat'
@@ -284,7 +279,7 @@ foreach ($arch in $archesToBuild) {
     $overlay = New-ResourcesOverlay -Arch $arch
     Write-Host "Overlay    : $overlay" -ForegroundColor DarkGray
 
-    # 2. Build → sweep → bundle, in two `tauri build` invocations
+    # 2. Build â†’ sweep â†’ bundle, in two `tauri build` invocations
     #    sharing the same VsDevCmd-primed cmd subprocess each time
     #    (PATH/INCLUDE/LIB don't persist between separate cmd.exe
     #    calls). The sweep in between exists because
@@ -297,7 +292,7 @@ foreach ($arch in $archesToBuild) {
     #    fetches the full ONNX Runtime distribution (a 617 MB CUDA
     #    EP DLL on x64) and `copy-dylibs` replicates them next to
     #    the output binary. Tauri's MSI bundler auto-includes every
-    #    adjacent DLL — that's how the previous build shipped a
+    #    adjacent DLL â€” that's how the previous build shipped a
     #    161 MB x64 MSI carrying CUDA/TensorRT/shared EPs we never
     #    use (we load onnxruntime.dll dynamically out of
     #    libs/<arch>/, CPU EP only). Sweeping these between cargo
@@ -309,8 +304,8 @@ foreach ($arch in $archesToBuild) {
     #    into <install>/resources/libs/<lib>/win-<arch>/.
     # Phase 1 uses `cargo build` directly because the Tauri CLI we
     # ship rejects `--bundles none` (only knows `msi` / `nsis`). The
-    # mike-tauri binary doesn't need the frontend dist to compile —
-    # frontend assets are bundled at WiX time in phase 2 — so we can
+    # mike-tauri binary doesn't need the frontend dist to compile â€”
+    # frontend assets are bundled at WiX time in phase 2 â€” so we can
     # safely skip `pnpm build` here too. Phase 2's `tauri build` then
     # runs `pnpm build` via `beforeBuildCommand`, finds cargo already
     # up-to-date, and goes straight to the WiX bundler.
