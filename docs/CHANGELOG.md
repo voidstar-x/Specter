@@ -106,3 +106,11 @@ in `src/presets/system_prompt.rs`, which walks a locale fall-back chain.
 ## [Unreleased] - 2026-09-07
 ### Added
 - 18 new SG/common-law & jurisdiction-aware tabular-review workflow presets (config/workflow-presets/legal/): i-governance-assessment (+-sg/-au), i-act-conformity-eu, dpia-cross-border (+-sg/-au), horizon-scan-obligation-map (+-sg/-au), consultation-response-sg/-au, privacy-notice-consent-sg/-au, cloud-saas-dpa-review, oss-licence-review, online-safety-code-sg/-au. Authored with legal-counsel (Astra); validated against the Specter wire schema and deployed to both the install dir and this repo.
+
+## [Unreleased] - docs cleanup
+### Removed
+- Removed upstream Italian/EU domain & plan docs (macchine*, piano_*, nis2-prompts, pa-prompts, TEMPLATE_PRONTUARIO, Toolkit_Prompt_Commercialista, EURLEX_REGISTRATION, PLAN_FONTI_INTERNAZIONALI, PLAN_MISTRAL, insurance-workflows-plan, PLAN/session recaps) not relevant to Specter.s APAC/common-law focus.
+### Changed
+- NOTICE.md: Specter trademarks now attributed to this project (not upstream); logo path corrected; dead semplifica.ai link removed; third-party trademark list updated to the APAC official legal sources.
+- CORPORA.md: rewritten from the EU/Danish corpus survey to document the 8 bundled APAC official-government corpora.
+- WORKFLOWS.md: built-in preset count updated (14 -> 25) and Italian UI strings replaced with English.
