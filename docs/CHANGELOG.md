@@ -1,201 +1,46 @@
 # Specter — Change Log & Fork Notes
 
-Original upstream: **MikeRust** (github.com/SemplificaAI/MikeRust, AGPL-3.0). This repository is the **Specter** fork (github.com/voidstar-x/Specter).
-This repository is the **Specter** fork maintained by Han (SG-based commercial /
-corporate lawyer, APAC + Australia focus).
+Original upstream: **MikeRust** (github.com/SemplificaAI/MikeRust, AGPL-3.0). This repository is the **Specter** fork (github.com/voidstar-x/Specter), maintained by Han (SG-based commercial / corporate lawyer, APAC + Australia focus).
 
-This file records the substantive changes made on top of upstream and how they
-are configured. It is the canonical reference for what Specter does differently.
+This file records the substantive changes made on top of upstream. It is the canonical reference for what Specter does differently.
 
 ---
 
-## 1. Default content/assistant language: ENGLISH (replaces Italian)
+## Release — Specter 0.7.4 APAC / common-law build (2026-09-07)
 
-**Problem:** Specter answered in Italian because the assistant/content language
-defaulted to `"it"` regardless of the UI locale, loading
-`config/system-prompts/it/*.md` (Italian) for the per-domain system prompt.
-
-**Setting that controls it:** the assistant/content language is driven by
-`user_settings.locale` (migration `0005_user_locale.sql`). It is read in
-`src/routes/chat.rs` at two points (the HyDE path and the domain prologue) and
-resolved through `crate::presets::system_prompt::resolve()` / `assemble_prologue()`
-in `src/presets/system_prompt.rs`. The original fallback chain has since been
-replaced by English-only resolution (see the docs cleanup entry below).
-
-**What we changed:**
-- `src/routes/chat.rs` — the locale default in both locations is now `"en"`
-  (`unwrap_or("it")` → `unwrap_or("en")`), so a user with no stored preference
-  gets English.
-- `src/presets/system_prompt.rs` — `FALLBACK_LOCALES` reordered from
-  `["it", "en"]` to `["en", "it"]`, so English is the first fall-back locale
-  and no non-English content leaks for unknown locales. Module docs updated to
-  state `en` is canonical.
-- `config/system-prompts/` — **`en/` is now the sole canonical prompt set.**
-  The `it/`, `fr/`, `de/`, `es/`, `pt/` directories were removed so English is
-  always used (their removal is what makes the English guarantee hold even if a
-  stored `user_settings.locale` is `it`). The `en/*` bodies already instruct
-  "Default working language: English" and "Default jurisdiction: Singapore /
-  ask which applies".
-- Hard-coded Italian strings that surfaced to users were translated to English:
-  - `src/llm/ollama_manager.rs` — local-model GEMMA system prompt &
-    "Secure local mode" no-think preamble.
-  - `src/llm/local.rs` — "Secure local mode active: …" error messages & tests.
-  - `src/routes/documents.rs` — document-summary system prompt ("You are an
-    assistant that produces technical and concise summaries…") and the
-    "Summary (max 700 characters)" prompt.
-  - `src/routes/corpora.rs` & `src/routes/eurlex.rs` — "Indexing completed but
-    N chunks created…" import status messages.
-  - `src/corpora/dila_bulk.rs` — "Local indexing…" progress label.
-  - `src/llm/builtin_tools.rs` — test fixture strings ("You are an
-    assistant…", "You are a lawyer…").
-
-## 2. APAC / official-government corpus connectors
-
-- Added a **DirectPdf** fetch shape + **gzip** adapter support in
-  `src/corpora/manifest_adapter.rs`, `src/corpora/plugin.rs` so corpus manifests
-  can declare PDF-direct and gzip-compressed fetches (needed for the APAC
-  official-gov sources, several of which serve raw PDFs or gzip).
-- Added/updated the following **APAC official-government** corpus manifests in
-  `config/corpora-plugins/`:
-  `sg-statutes` (Singapore), `my-lom` (Malaysia), `id-peraturan` (Indonesia),
-  `kr-lawinfo` (Korea), `vn-legal` (Vietnam), `th-royalgazette` (Thailand),
-  `au-federalregister` (Australia), `jp-egov` (Japan) — all 8 APAC sources.
-- **Removed** the EU/world corpus plugins that are not relevant to the
-  APAC/common-law focus (eurlex, eu-curia, it-normattiva, fr-legifrance,
-  de-gesetze, uk-legislation, us-courtlistener, etc.) to keep the catalogue
-  minimal. The builtin EUR-Lex / Italian-Legal routes remain in code.
-
-## 3. SG / common-law workflow presets
-
-- Added new **tabular review** workflow presets for Singapore and common-law
-  practice in `config/workflow-presets/legal/`:
-  - `statutory-analysis.json` (jurisdiction-agnostic statutory analysis)
-  - `statutory-analysis-sg.json` (Singapore statutory analysis)
-  - `statutory-analysis-au.json` (Australia (Cth) statutory analysis)
-  - `nda-review-sg.json` (NDA review, SG & common law)
-  - `saas-supply-review-sg.json` (SaaS / supply & services review, SG)
-  - `gdpr-pdpa-compliance.json` (data-protection gap analysis, SG PDPA 2012)
-  - `content-online-safety.json` (content / online-safety / AI regulation, SG
-    with AU comparators)
-- These are English-language, wide-column tabular reviews covering jurisdiction
-  identification, instruments, obligations, exemptions, enforcement, penalties
-  and SG-common-law case law where relevant.
-
-## 4. LLM model catalogue
-
-- `config/model.json` — added a **DeepSeek V4 Flash Vision Exp** entry to the
-  `local` (OpenAI-compatible) provider's model list, matching the local engine
-  configured via `VLLM_MAIN_MODEL=deepseek-v4-flash-vision-exp`. This is the
-  local inference engine used for the auxiliary/side-job work.
-
-## 5. Serving / environment
-
-- `src/lib.rs` — the API server now binds **`0.0.0.0`** instead of loopback so
-  it is reachable on the LAN (`.env` `PORT=3001`).
-- `.env` (git-ignored; see `.env.example` for the documented keys) configures:
-  `PORT=3001`, `VLLM_BASE_URL`, `VLLM_API_KEY`, `VLLM_MAIN_MODEL` (the local
-  DeepSeek-v4 vit language model), and `JWT_SECRET`.
-
-## 6. Example & tooling
-
-- `examples/apac_probe.rs` — a probe binary used to exercise the APAC corpus
-  adapters / DirectPdf fetch shape against the live sources.
-- `frontend/.npmrc` & `frontend/pnpm-workspace.yaml` — pnpm build configuration
-  for the Svelte frontend (`node-linker=hoisted`, esbuild as the only built
-  dependency).
-
-## [Unreleased] - 2026-09-07
 ### Added
-- 18 new SG/common-law & jurisdiction-aware tabular-review workflow presets (config/workflow-presets/legal/): i-governance-assessment (+-sg/-au), i-act-conformity-eu, dpia-cross-border (+-sg/-au), horizon-scan-obligation-map (+-sg/-au), consultation-response-sg/-au, privacy-notice-consent-sg/-au, cloud-saas-dpa-review, oss-licence-review, online-safety-code-sg/-au. Authored with legal-counsel (Astra); validated against the Specter wire schema and deployed to both the install dir and this repo.
 
-## [Unreleased] - docs cleanup
-### Removed
-- Removed upstream Italian/EU domain & plan docs (macchine*, piano_*, nis2-prompts, pa-prompts, TEMPLATE_PRONTUARIO, Toolkit_Prompt_Commercialista, EURLEX_REGISTRATION, PLAN_FONTI_INTERNAZIONALI, PLAN_MISTRAL, insurance-workflows-plan, PLAN/session recaps) not relevant to Specter.s APAC/common-law focus.
+- **25 workflow presets** in `config/workflow-presets/legal/` (tabular review), English-language and SG/common-law focused:
+  - 7 core presets: `statutory-analysis` (jurisdiction-agnostic), `statutory-analysis-sg`, `statutory-analysis-au`, `nda-review-sg`, `saas-supply-review-sg`, `gdpr-pdpa-compliance`, `content-online-safety`.
+  - 18 new regulatory/AI-governance presets: `ai-governance-assessment` (+`-sg`/`-au`), `ai-act-conformity-eu`, `dpia-cross-border` (+`-sg`/`-au`), `horizon-scan-obligation-map` (+`-sg`/`-au`), `consultation-response-sg`/`-au`, `privacy-notice-consent-sg`/`-au`, `cloud-saas-dpa-review`, `oss-licence-review`, `online-safety-code-sg`/`-au`. Authored via legal-counsel (Astra) and validated against the Specter wire schema.
+- **8 APAC official-government corpus connectors** (`config/corpora-plugins/`): `sg-statutes` (Singapore), `my-lom` (Malaysia), `id-peraturan` (Indonesia), `kr-lawinfo` (Korea), `vn-legal` (Vietnam), `th-royalgazette` (Thailand), `au-federalregister` (Australia), `jp-egov` (Japan).
+- **DirectPdf** fetch shape + **gzip** adapter support in `src/corpora/manifest_adapter.rs` and `src/corpora/plugin.rs` (needed for the PDF-only / gzip official sources).
+- **DeepSeek V4 Flash Vision Exp** model entry in `config/model.json` under the `local` (OpenAI-compatible) provider, matching the local engine (`VLLM_MAIN_MODEL`).
+- `examples/apac_probe.rs` and `scripts/verify-msi-config.ps1` (checks the built MSI file table against the source config).
+
 ### Changed
-- NOTICE.md: Specter trademarks now attributed to this project (not upstream); logo path corrected; dead semplifica.ai link removed; third-party trademark list updated to the APAC official legal sources.
-- CORPORA.md: rewritten from the EU/Danish corpus survey to document the 8 bundled APAC official-government corpora.
-- WORKFLOWS.md: built-in preset count updated (14 -> 25) and Italian UI strings replaced with English.
 
-## [Unreleased] - docs cleanup
-### Removed
-- Removed upstream Italian/EU domain & plan docs (macchine*, piano_*, nis2-prompts, pa-prompts, TEMPLATE_PRONTUARIO, Toolkit_Prompt_Commercialista_Bilanci, EURLEX_REGISTRATION, PLAN_FONTI_INTERNAZIONALI, PLAN_MISTRAL, insurance-workflows-plan, PLAN.md, SESSION_RECAP) not relevant to Specter APAC/common-law focus.
-### Changed
-- WORKFLOWS.md: built-in preset count updated (14 -> 25) and Italian UI strings replaced with English.
+- **Default assistant/content language is now English.** locale default flipped to `"en"` in `src/routes/chat.rs` (was `"it"`); `FALLBACK_LOCALES` in `src/presets/system_prompt.rs` reordered to English-first; `config/system-prompts/en/` is the sole canonical prompt set (English-only resolution). Hard-coded Italian user-facing strings translated (GEMMA system prompt, "Secure local mode" preambles, document-summary prompt, corpus import status labels, test fixtures).
+- API server now binds **`0.0.0.0`** (`.env` `PORT=3001`) so it is reachable on the LAN (was loopback).
+- `config/column-presets/insurance/*` and `legal/*` field names/labels translated Italian → English.
+- **Documentation** aligned to Specter: `README.md` rewritten (fork lineage, differences table, no upstream assets); `NOTICE.md` re-attributed to this project with corrected logo path, no dead `semplifica.ai` link, and the third-party trademark list updated to the APAC official sources; `CORPORA.md` rewritten from the EU/Danish corpus survey to the APAC corpora; `WORKFLOWS.md` built-in count updated (14 → 25) and Italian strings removed.
 
-## [Unreleased] - upstream (Italian/EU) cleanup
-### Removed
-- EU/EUR-Lex & European corpus code and routes: src/corpora/{eurlex,fedlex,dila_bulk,italian_legal,limits}.rs, src/routes/{eurlex,italian_legal}.rs, EU corpus config (config/corpora.json), and the frontend EU Settings section (frontend/src/lib/components/settings/EurlexSection.svelte).
-- Non-English locale files (frontend/locales/{de,es,fr,it,pt}.json) and the fill-i18n helper (Specter is English-only).
-- Italian DOCX templates (config/docx-templates/it/* and config/docx-templates/compliance/{macchine-*,nis2-*,procedura-iso-sgi}).
-- Italian fiscal column presets (config/column-presets/fiscale/*) and upstream dev-plan/session docs (PLAN.md, PLAN_FONTI_INTERNAZIONALI.md, docs/specter-ui-rewrite-plan.md) plus orphaned upstream images (docs/images/*).
-- tests/insurance_diffida_e2e.rs (upstream Italian test for a removed workflow).
-### Changed
-- config/column-presets/insurance/* and legal/*: Italian field names/labels translated to English.
-- Cargo.toml/Cargo.lock: dropped unused EU corpus crates/dependencies.
-- HISTORY.md: fixed dangling cross-references to removed docs; translated/neutralised terse Italian; clarified timezone note.
-- README.md: updated built-in preset count/description.
-- frontend/pnpm-workspace.yaml: fixed the allowBuilds esbuild placeholder (esbuild: true) so the pnpm build runs.
+### Removed (upstream Italian/EU, not relevant to APAC/common-law)
 
+- EU/EUR-Lex & European corpus code/routes/UI: `src/corpora/{eurlex,fedlex,dila_bulk,italian_legal,limits}.rs`, `src/routes/{eurlex,italian_legal}.rs`, `config/corpora.json`, `frontend/src/lib/components/settings/EurlexSection.svelte`.
+- Non-English locale files (`frontend/locales/{de,es,fr,it,pt}.json`) and the `fill-i18n` generator (Specter is English-only).
+- Italian DOCX templates (`config/docx-templates/it/*`, `config/docx-templates/compliance/{macchine-*,nis2-*,procedura-iso-sgi}`).
+- Italian fiscal column presets (`config/column-presets/fiscale/*`), upstream dev-plan/session docs (`PLAN.md`, `PLAN_FONTI_INTERNAZIONALI.md`, `docs/specter-ui-rewrite-plan.md`), orphaned upstream screenshots (`docs/images/*`), and `tests/insurance_diffida_e2e.rs`.
+- `Cargo.toml`/`Cargo.lock` deps for the removed EU corpus crates.
 
-## Docs cleanup and installer config parity — 2026-09-07
+### Fixed
 
-- Completed upstream cleanup in `a04fe41`: removed unused European corpus
-  adapters/routes/UI, Italian DOCX and tax presets, non-English UI catalogs,
-  orphan screenshots and obsolete plans; retained upstream licence attribution.
-- Fixed remaining HISTORY links to the removed translation generator.
-- Added the eight APAC corpus manifests to the release resource map. Workflow
-  and column globs are recursive (`**/*.json`), so domain subdirectories are
-  included. Runtime presets scan the root and one domain level; corpus manifests
-  are flat. English prompts remain under `system-prompts/en/`.
-- Translated Australian/Japanese corpus descriptions and status labels; corrected
-  Indonesian/Korean availability prose without changing connector flags or URLs.
-  Manifest availability is not evidence that an official source can be fetched.
-- Fixed English-only prompt test fixtures and serialized/restored their temporary
-  environment overrides. Production prompt selection remains English-only.
-- Added `scripts/verify-msi-config.ps1` to check the actual MSI File table against
-  every workflow, column, corpus and English prompt in the source config.
-- Mirrored installed config using flat JSON and `system-prompts/en/`: 25 workflows,
-  8 corpus manifests, 30 English-labelled columns, 12 English prompts, no DOCX
-  sidecars. Existing `.env` and `model.json` were left unchanged; config was backed
-  up before replacement. The 25 workflows include deliberate cross-border EU
-  AI Act/GDPR coverage, not only Singapore-specific workflows.
+- **Installed preset lookup regression.** `src/presets/mod.rs` now treats executable-adjacent `config/` as authoritative after explicit environment overrides (working-directory lookup remains only as a dev fallback), and `scripts/build-release.ps1` purges stale release-config staging before Tauri recopies resources. This resolved the live app reporting **119 workflows** (94 stale upstream presets were being loaded from build staging) — it now serves exactly the 25 installed presets with no `builtin-*` IDs.
+- `frontend/pnpm-workspace.yaml` `allowBuilds: esbuild` placeholder fixed to `esbuild: true` (the pnpm build had been failing on `ERR_PNPM_IGNORED_BUILDS`).
+- `HISTORY.md` dangling cross-references to removed docs corrected and terse Italian neutralised.
 
-- Updated the Gemma assertion to match its existing English system prompt and
-  removed deleted bulk-import state from three integration-test constructors.
-- Windows verification: `cargo check`, `pnpm install`, `pnpm build`, and
-  `scripts/build-release.ps1 -Target x64` all exited 0. Library tests: 420 passed;
-  frontend tests: 61 passed; DOCX integration tests: 3 passed.
-- MSI administrative extraction verified exact SHA-256 matches and runtime paths
-  for all 25 workflows, 8 corpora, 30 columns and 12 English prompts; no DOCX
-  sidecars. The running installed app reports 25 workflows, 30 columns and zero
-  DOCX templates; its corpus API lists the eight APAC sources.
-- Full `cargo test` remains blocked by pre-existing `tests/embedding_perf.rs`
-  fastembed API incompatibilities (non-exhaustive struct construction and removed
-  fields). Required application and installer builds are green; the full test
-  suite is not claimed green. Existing build warnings remain.
+### Build & verification
 
-
-## Installed preset lookup regression — 2026-09-07
-
-- Reproduced 119 live workflow presets despite 25 installed JSON files. Startup
-  logs identified `target/x86_64-pc-windows-msvc/release/config/workflow-presets`
-  as the loaded directory: inherited working-directory lookup selected 94 stale
-  upstream JSON presets in build staging. No embedded workflow seed exists in
-  the current source, and system presets are not inserted into the database.
-- `src/presets/mod.rs` now treats executable-adjacent `config/` as authoritative
-  after explicit environment overrides. Absent families stay absent rather than
-  resurrecting retired DOCX templates from a working-directory ancestor.
-  Development lookup still falls back to repository ancestors when no adjacent
-  config root exists.
-- `scripts/build-release.ps1` removes only generated release/config staging before
-  Tauri recopies resources, preventing deleted upstream JSON from accumulating.
-- Regression test failed under the old precedence, then passed after the fix;
-  all 422 library tests and cargo check passed on Windows.
-- Rebuilt x64 MSI (exit 0), verified staging contains exactly 25 workflows and
-  no `builtin-*` IDs. Same-version maintenance returned success without updating
-  the executable; removed the old registered MSI product and installed the new
-  package (both exit 0). Installed executable hash matches extracted MSI.
-- Authenticated post-install `/workflow`: 25 unique IDs, zero `builtin-*`, no
-  missing or extra IDs relative to repo; health reports 25 workflows, 30 columns,
-  zero DOCX templates. Startup log confirms `D:\AI\Specter\config` is loaded.
-  `.env` and model settings were restored and hash-verified against backup.
+- `cargo check`, `pnpm install`, `pnpm build`, and `scripts/build-release.ps1 -Target x64` all exit 0. Library tests (420+), frontend tests (61), and DOCX integration tests (3) pass. The full `cargo test` remains blocked by a pre-existing `tests/embedding_perf.rs` fastembed incompatibility (non-exhaustive struct / removed fields).
+- Fresh MSI rebuilt (`dist/Specter_0.7.4_x64.msi`); MSI admin-extraction verified exact hash matches and runtime paths for **25 workflows, 8 corpora, 30 columns, 12 English prompts**, no DOCX sidecars.
+- Running installed app verified: `GET /workflow` returns exactly **25** unique IDs (zero `builtin-*`), health reports `workflows=25, columns=30, docx_templates=0`, the corpus API lists the 8 APAC sources, and a live chat prompt returned a correct English legal answer via the local engine.
