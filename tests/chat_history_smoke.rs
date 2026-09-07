@@ -45,7 +45,6 @@ async fn fresh_app() -> (axum::Router, Arc<AppState>) {
         scans: Default::default(),
         corpus_plugins: Default::default(),
         corpus_adapters: Default::default(),
-        corpus_import_progress: Default::default(),
         workflow_presets: Default::default(),
         column_presets: Default::default(),
         model_catalogue: Arc::new(mike::presets::model::ModelCatalogue {

@@ -1929,7 +1929,7 @@ list:
 - [`frontend/src/lib/components/chat/ChatFilesPanel.svelte`](frontend/src/lib/components/chat/ChatFilesPanel.svelte) — new popover.
 - [`frontend/src/lib/components/chat/ChatInput.svelte`](frontend/src/lib/components/chat/ChatInput.svelte) — Files button + popover mount.
 - [`frontend/src/lib/components/chat/ChatSteps.svelte`](frontend/src/lib/components/chat/ChatSteps.svelte) — now imports `fileIconColor` instead of inlining the switch.
-- [`frontend/scripts/fill-i18n.mjs`](frontend/scripts/fill-i18n.mjs) — six new `ChatFiles.*` strings re-filled into the six locale bundles (now 1130 keys each).
+- `frontend/scripts/fill-i18n.mjs` (historical file, removed) — six new `ChatFiles.*` strings re-filled into the six locale bundles (now 1130 keys each).
 
 Backend unchanged: the popover reads exclusively from the
 already-streamed `chat.messages` array (user `files` + assistant
@@ -2045,7 +2045,7 @@ chat turn (per [`chat::load_attached_docs`](src/routes/chat.rs)).
 
 - [`frontend/src/lib/components/documents/ViewSummaryModal.svelte`](frontend/src/lib/components/documents/ViewSummaryModal.svelte) — new read-only modal.
 - [`frontend/src/lib/components/documents/DocViewerPanel.svelte`](frontend/src/lib/components/documents/DocViewerPanel.svelte) — toolbar button + modal mount.
-- [`frontend/scripts/fill-i18n.mjs`](frontend/scripts/fill-i18n.mjs) — seven new translation entries; the script re-fills the six locale bundles to 1124 keys.
+- `frontend/scripts/fill-i18n.mjs` (historical file, removed) — seven new translation entries; the script re-fills the six locale bundles to 1124 keys.
 
 No backend changes were necessary — `set_decision` (v0.3.5) and
 `load_attached_docs` already implement steps 3–8 correctly; v0.4.1
@@ -3424,7 +3424,7 @@ no group labels, no extra chrome, just enough visual cadence to make
   `userStore.isDomainEnabled(d)` helper. Hydrated post-unlock alongside
   locale and default-domain.
 - **5 new i18n keys** across all six locales via
-  [`fill-i18n.mjs`](frontend/scripts/fill-i18n.mjs):
+  `fill-i18n.mjs` (historical file, removed):
   `Settings.domains`, `Settings.domainsHint`,
   `Settings.enabledDomainsSaved`, `Settings.enabledDomainsError`,
   `Settings.atLeastOneDomain`.

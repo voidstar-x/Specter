@@ -146,23 +146,51 @@ fn sanitize_segment(s: &str) -> Option<String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::ffi::OsString;
     use std::fs;
+    use std::sync::{Mutex, MutexGuard};
     use tempfile::TempDir;
 
-    fn make_tree(files: &[(&str, &str, &str)]) -> TempDir {
+    static ENV_LOCK: Mutex<()> = Mutex::new(());
+
+    struct PromptTree {
+        _tmp: TempDir,
+        previous_dir: Option<OsString>,
+        _lock: MutexGuard<'static, ()>,
+    }
+
+    impl Drop for PromptTree {
+        fn drop(&mut self) {
+            // Keep the lock held while restoring the caller's environment,
+            // including when a test assertion panics.
+            unsafe {
+                match &self.previous_dir {
+                    Some(dir) => std::env::set_var("MRUST_SYSTEM_PROMPTS_DIR", dir),
+                    None => std::env::remove_var("MRUST_SYSTEM_PROMPTS_DIR"),
+                }
+            }
+        }
+    }
+
+    fn make_tree(files: &[(&str, &str, &str)]) -> PromptTree {
+        let lock = ENV_LOCK.lock().unwrap_or_else(|err| err.into_inner());
         let tmp = TempDir::new().unwrap();
         for (locale, domain, body) in files {
             let dir = tmp.path().join(locale);
             fs::create_dir_all(&dir).unwrap();
             fs::write(dir.join(format!("{domain}.md")), body).unwrap();
         }
-        // SAFETY: tests run sequentially via `cargo test`'s default
-        // thread model; the env-var nudge here is observed only by the
-        // child resolver call inside this same test.
+        let previous_dir = std::env::var_os("MRUST_SYSTEM_PROMPTS_DIR");
+        // Serialize this module's environment overrides and resolver calls.
+        // The returned guard holds the lock for the entire test fixture lifetime.
         unsafe {
             std::env::set_var("MRUST_SYSTEM_PROMPTS_DIR", tmp.path());
         }
-        tmp
+        PromptTree {
+            _tmp: tmp,
+            previous_dir,
+            _lock: lock,
+        }
     }
 
     #[test]
@@ -177,7 +205,7 @@ mod tests {
     #[test]
     fn resolve_does_not_fall_back_to_legacy_locale() {
         let _tmp = make_tree(&[("it", "medical", "ITALIANO")]);
-        assert!(resolve("fr", "medical").is_none());
+        assert!(resolve("it", "medical").is_none());
     }
 
     #[test]
@@ -188,20 +216,20 @@ mod tests {
 
     #[test]
     fn resolve_returns_none_when_domain_missing_everywhere() {
-        let _tmp = make_tree(&[("it", "medical", "ITALIANO")]);
+        let _tmp = make_tree(&[("en", "medical", "ENGLISH")]);
         assert!(resolve("it", "finance").is_none());
     }
 
     #[test]
     fn resolve_rejects_path_traversal() {
-        let _tmp = make_tree(&[("it", "medical", "ITALIANO")]);
+        let _tmp = make_tree(&[("en", "medical", "ENGLISH")]);
         assert!(resolve("../etc", "medical").is_none());
         assert!(resolve("it", "../passwd").is_none());
     }
 
     #[test]
     fn assemble_prologue_wraps_body() {
-        let _tmp = make_tree(&[("it", "medical", "BODY")]);
+        let _tmp = make_tree(&[("en", "medical", "BODY")]);
         let p = assemble_prologue("it", "medical");
         assert!(p.contains("Domain: medical"));
         assert!(p.contains("Working language: English"));
@@ -212,7 +240,7 @@ mod tests {
 
     #[test]
     fn assemble_prologue_falls_back_when_md_missing() {
-        let _tmp = make_tree(&[("it", "medical", "BODY")]);
+        let _tmp = make_tree(&[("en", "medical", "BODY")]);
         let p = assemble_prologue("it", "ip");
         assert!(p.contains("Domain: ip"));
         assert!(p.contains("No domain-specific guidance"));

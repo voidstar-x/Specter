@@ -2,7 +2,7 @@
 #requires -Version 5.1
 <#
 .SYNOPSIS
-  Build MikeRust release MSI installers for Windows x86_64 and ARM64,
+  Build Specter release MSI installers for Windows x86_64 and ARM64,
   bundle the matching native DLLs (onnxruntime + pdfium), and collect
   the artefacts under ./dist/.
 
@@ -192,22 +192,16 @@ function New-ResourcesOverlay {
     # copy-dylibs step again, re-emitting the same 617 MB CUDA EP DLL
     # we just deleted. Silencing pnpm here keeps cargo a true no-op so
     # the swept DLLs stay swept and the bundler ships a lean MSI.
-    # Bundle JSON-driven config registries alongside the binary.
-    # The runtime `crate::presets::*_dir` resolvers walk ancestors of
-    # the executable looking for `config/<dir>/`, so dropping the
-    # bundled JSON at `<install>/config/...` lets the installed app
-    # find them without an env-var override. The walker happily
-    # recurses into per-domain subfolders (workflow-presets/legal/,
-    # workflow-presets/insurance/, â€¦) â€” the glob source preserves
-    # the relative subpath under each root. `corpora-plugins/` is
-    # deliberately excluded: the plugin system reads its own dir
-    # via a separate resolver and shouldn't conflict, and pre-built
-    # installs don't ship third-party plugins anyway.
+    # Preset loaders scan the root and one domain subdirectory. Recursive
+    # globs include legal/ and insurance/ presets; Tauri glob mappings flatten
+    # matches into the destination, which these loaders also support.
+    # Corpus manifests are flat; prompts retain the required en/ directory.
     $resources = [ordered]@{
         ("../libs/pdfium/win-$Arch/pdfium.dll")             = "libs/pdfium/win-$Arch/pdfium.dll"
         ("../libs/onnxruntime/win-$Arch/onnxruntime.dll")   = "libs/onnxruntime/win-$Arch/onnxruntime.dll"
         "../config/workflow-presets/**/*.json"              = "config/workflow-presets/"
         "../config/column-presets/**/*.json"                = "config/column-presets/"
+        "../config/corpora-plugins/*.json"                  = "config/corpora-plugins/"
         "../config/model.json"                              = "config/model.json"
         # English-only domain prompts. Preserve the en/ directory because
         # the runtime resolves config/system-prompts/en/<domain>.md.

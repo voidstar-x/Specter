@@ -1,7 +1,7 @@
 {
     "id":  "id-peraturan",
     "display_name":  "Indonesia / National Regulations (Peraturan)",
-    "description":  "Indonesian national regulations (Peraturan). The national portals are not machine-readable today: peraturan.bpk.go.id sits behind a Cloudflare challenge (403 for plain HTTP) and peraturan.go.id times out; PDF copies that do load (e.g. on municipal JDIH portals) are image-only scans requiring OCR. Kept available=false until a national full-text or OCR-capable path exists.",
+    "description":  "Indonesian national regulations (Peraturan). The national portals are not machine-readable today: peraturan.bpk.go.id sits behind a Cloudflare challenge (403 for plain HTTP) and peraturan.go.id times out; PDF copies that do load (e.g. on municipal JDIH portals) are image-only scans requiring OCR. The manifest is enabled, but availability is not proof of successful retrieval; a national full-text or OCR-capable path still needs verification.",
     "homepage":  "https://peraturan.bpk.go.id/",
     "languages":  [
                       "id"

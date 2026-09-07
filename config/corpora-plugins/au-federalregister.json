@@ -5,7 +5,7 @@
                                 "it":  "Australia â€” Federal Register",
                                 "en":  "Australia â€” Federal Register"
                             },
-    "description":  "Federal Register of Legislation (Australia). Fonte attiva con ricerca e fetch via adapter runtime.",
+    "description":  "Federal Register of Legislation (Australia). Search and document retrieval use the runtime adapter.",
     "homepage":  "https://www.legislation.gov.au/",
     "languages":  [
                       "en"
@@ -58,7 +58,7 @@
                         "display_name":  "Federal Register",
                         "available":  false,
                         "default_enabled":  false,
-                        "status_label":  "in arrivo"
+                        "status_label":  "coming soon"
                     }
                 ]
 }

@@ -5,7 +5,7 @@
                                 "it":  "Giappone â€” e-Gov",
                                 "en":  "Japan â€” e-Gov"
                             },
-    "description":  "Leggi giapponesi da e-Gov. Fonte attiva con fetch e indicizzazione via adapter runtime.",
+    "description":  "Japanese legislation from e-Gov. Document retrieval and indexing use the runtime adapter.",
     "homepage":  "https://laws.e-gov.go.jp/",
     "languages":  [
                       "ja"
@@ -58,7 +58,7 @@
                         "display_name":  "e-Gov",
                         "available":  false,
                         "default_enabled":  false,
-                        "status_label":  "in arrivo"
+                        "status_label":  "coming soon"
                     }
                 ]
 }

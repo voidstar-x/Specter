@@ -463,7 +463,7 @@ mod tests {
             Some("hf.co/unsloth/gemma-4-E2B-it-GGUF:Q4_K_M")
         );
         let system = req.system.as_deref().expect("Gemma variant must set a system preamble");
-        assert!(system.contains("modo diretto"));
+        assert!(system.contains("directly and concisely, in English"));
         // The serialised parameters carry the three stop sequences;
         // ModelOptions doesn't expose getters in 0.3 so we roundtrip
         // through JSON to inspect them.

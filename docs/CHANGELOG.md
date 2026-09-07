@@ -19,7 +19,8 @@ defaulted to `"it"` regardless of the UI locale, loading
 `user_settings.locale` (migration `0005_user_locale.sql`). It is read in
 `src/routes/chat.rs` at two points (the HyDE path and the domain prologue) and
 resolved through `crate::presets::system_prompt::resolve()` / `assemble_prologue()`
-in `src/presets/system_prompt.rs`, which walks a locale fall-back chain.
+in `src/presets/system_prompt.rs`. The original fallback chain has since been
+replaced by English-only resolution (see the docs cleanup entry below).
 
 **What we changed:**
 - `src/routes/chat.rs` — the locale default in both locations is now `"en"`
@@ -134,3 +135,41 @@ in `src/presets/system_prompt.rs`, which walks a locale fall-back chain.
 - HISTORY.md: fixed dangling cross-references to removed docs; translated/neutralised terse Italian; clarified timezone note.
 - README.md: updated built-in preset count/description.
 - frontend/pnpm-workspace.yaml: fixed the allowBuilds esbuild placeholder (esbuild: true) so the pnpm build runs.
+
+
+## Docs cleanup and installer config parity — 2026-09-07
+
+- Completed upstream cleanup in `a04fe41`: removed unused European corpus
+  adapters/routes/UI, Italian DOCX and tax presets, non-English UI catalogs,
+  orphan screenshots and obsolete plans; retained upstream licence attribution.
+- Fixed remaining HISTORY links to the removed translation generator.
+- Added the eight APAC corpus manifests to the release resource map. Workflow
+  and column globs are recursive (`**/*.json`), so domain subdirectories are
+  included. Runtime presets scan the root and one domain level; corpus manifests
+  are flat. English prompts remain under `system-prompts/en/`.
+- Translated Australian/Japanese corpus descriptions and status labels; corrected
+  Indonesian/Korean availability prose without changing connector flags or URLs.
+  Manifest availability is not evidence that an official source can be fetched.
+- Fixed English-only prompt test fixtures and serialized/restored their temporary
+  environment overrides. Production prompt selection remains English-only.
+- Added `scripts/verify-msi-config.ps1` to check the actual MSI File table against
+  every workflow, column, corpus and English prompt in the source config.
+- Mirrored installed config using flat JSON and `system-prompts/en/`: 25 workflows,
+  8 corpus manifests, 30 English-labelled columns, 12 English prompts, no DOCX
+  sidecars. Existing `.env` and `model.json` were left unchanged; config was backed
+  up before replacement. The 25 workflows include deliberate cross-border EU
+  AI Act/GDPR coverage, not only Singapore-specific workflows.
+
+- Updated the Gemma assertion to match its existing English system prompt and
+  removed deleted bulk-import state from three integration-test constructors.
+- Windows verification: `cargo check`, `pnpm install`, `pnpm build`, and
+  `scripts/build-release.ps1 -Target x64` all exited 0. Library tests: 420 passed;
+  frontend tests: 61 passed; DOCX integration tests: 3 passed.
+- MSI administrative extraction verified exact SHA-256 matches and runtime paths
+  for all 25 workflows, 8 corpora, 30 columns and 12 English prompts; no DOCX
+  sidecars. The running installed app reports 25 workflows, 30 columns and zero
+  DOCX templates; its corpus API lists the eight APAC sources.
+- Full `cargo test` remains blocked by pre-existing `tests/embedding_perf.rs`
+  fastembed API incompatibilities (non-exhaustive struct construction and removed
+  fields). Required application and installer builds are green; the full test
+  suite is not claimed green. Existing build warnings remain.

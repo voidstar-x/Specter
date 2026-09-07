@@ -1,7 +1,7 @@
 {
     "id":  "kr-lawinfo",
     "display_name":  "Korea / Law Information Center (law.go.kr)",
-    "description":  "Korean statutes from the National Law Information Center (law.go.kr). Official source. NOT YET WIRED: current law text requires an exact effective date (lsInfoR.do?lsiSeq=\u003cid\u003e\u0026efYd=\u003cYYYYMMDD\u003e); the lsiSeq-only fetch returns an error page and lsTextP.do is gone. Needs a lookup step (lsInfoP.do -\u003e efYd) before fetch. Kept available=false until that lands.",
+    "description":  "Korean statutes from the National Law Information Center (law.go.kr). Official source. NOT YET WIRED: current law text requires an exact effective date (lsInfoR.do?lsiSeq=\u003cid\u003e\u0026efYd=\u003cYYYYMMDD\u003e); the lsiSeq-only fetch returns an error page and lsTextP.do is gone. Needs a lookup step (lsInfoP.do -\u003e efYd) before fetch. The manifest is enabled, but availability is not proof of successful retrieval; this lookup path still needs verification.",
     "homepage":  "https://law.go.kr/",
     "languages":  [
                       "ko"
