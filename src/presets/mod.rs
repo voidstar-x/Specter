@@ -29,9 +29,10 @@ use std::path::{Path, PathBuf};
 /// Resolve the on-disk directory for a preset family. Lookup order:
 ///
 ///   1. `MRUST_<KIND>_PRESETS_DIR` env var (absolute path).
-///   2. Walk ancestors from CWD looking for `config/<kind>-presets/`.
-///   3. Walk ancestors from the current executable's path.
-///   4. Fallback to `./config/<kind>-presets`.
+///   2. Use executable-adjacent `config/` when present (even for absent families).
+///   3. Walk ancestors from CWD looking for `config/<kind>-presets/`.
+///   4. Walk ancestors from the current executable's path.
+///   5. Fallback to `./config/<kind>-presets`.
 ///
 /// `kind` is the lowercase prefix used both in the env var and in the
 /// directory name — `"workflow"` resolves to `MRUST_WORKFLOW_PRESETS_DIR`
@@ -46,17 +47,8 @@ pub fn presets_dir(kind: &str) -> PathBuf {
     if let Ok(dir) = std::env::var(&env_var) {
         return PathBuf::from(dir);
     }
-    if let Ok(cwd) = std::env::current_dir() {
-        if let Some(found) = walk_ancestors_for(&cwd, &dir_name) {
-            return found;
-        }
-    }
-    if let Ok(exe) = std::env::current_exe() {
-        if let Some(found) = walk_ancestors_for(&exe, &dir_name) {
-            return found;
-        }
-    }
-    PathBuf::from(format!("./config/{dir_name}"))
+    resolve_config_dir(&dir_name, std::env::current_exe().ok().as_deref(),
+                       std::env::current_dir().ok().as_deref())
 }
 
 /// Resolve any subdirectory under `config/` — used for registries
@@ -67,9 +59,10 @@ pub fn presets_dir(kind: &str) -> PathBuf {
 /// Lookup order:
 ///   1. `MRUST_<NAME>_DIR` env var (absolute path), where `<NAME>` is
 ///      `dir_name` upper-cased with `-` rewritten to `_`.
-///   2. Walk ancestors from CWD for `config/<dir_name>/`.
-///   3. Walk ancestors from the current executable's path.
-///   4. Fallback to `./config/<dir_name>`.
+///   2. Use executable-adjacent `config/` when present (even for absent families).
+///   3. Walk ancestors from CWD for `config/<dir_name>/`.
+///   4. Walk ancestors from the current executable's path.
+///   5. Fallback to `./config/<dir_name>`.
 pub fn config_subdir(dir_name: &str) -> PathBuf {
     let env_var = format!(
         "MRUST_{}_DIR",
@@ -78,15 +71,23 @@ pub fn config_subdir(dir_name: &str) -> PathBuf {
     if let Ok(dir) = std::env::var(&env_var) {
         return PathBuf::from(dir);
     }
-    if let Ok(cwd) = std::env::current_dir() {
-        if let Some(found) = walk_ancestors_for(&cwd, dir_name) {
-            return found;
+    resolve_config_dir(&dir_name, std::env::current_exe().ok().as_deref(),
+                       std::env::current_dir().ok().as_deref())
+}
+
+fn resolve_config_dir(dir_name: &str, exe: Option<&Path>, cwd: Option<&Path>) -> PathBuf {
+    // An installed config root is authoritative, including absent families.
+    // Otherwise a missing retired family can fall back to stale build files.
+    if let Some(root) = exe.and_then(Path::parent).map(|p| p.join("config")) {
+        if root.is_dir() {
+            return root.join(dir_name);
         }
     }
-    if let Ok(exe) = std::env::current_exe() {
-        if let Some(found) = walk_ancestors_for(&exe, dir_name) {
-            return found;
-        }
+    if let Some(found) = cwd.and_then(|p| walk_ancestors_for(p, dir_name)) {
+        return found;
+    }
+    if let Some(found) = exe.and_then(|p| walk_ancestors_for(p, dir_name)) {
+        return found;
     }
     PathBuf::from(format!("./config/{dir_name}"))
 }
@@ -140,4 +141,35 @@ pub fn collect_json_files(root: &Path) -> std::io::Result<Vec<PathBuf>> {
     }
     out.sort();
     Ok(out)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn installed_config_wins_over_stale_working_directory() {
+        let temp = tempfile::tempdir().unwrap();
+        let install = temp.path().join("installed");
+        let stale = temp.path().join("build/release");
+        std::fs::create_dir_all(install.join("config/workflow-presets")).unwrap();
+        std::fs::create_dir_all(stale.join("config/workflow-presets")).unwrap();
+        let exe = install.join("specter.exe");
+        assert_eq!(resolve_config_dir("workflow-presets", Some(&exe), Some(&stale)),
+                   install.join("config/workflow-presets"));
+        // An intentionally absent family must not resurrect legacy templates.
+        std::fs::create_dir_all(stale.join("config/docx-templates")).unwrap();
+        assert_eq!(resolve_config_dir("docx-templates", Some(&exe), Some(&stale)),
+                   install.join("config/docx-templates"));
+    }
+
+    #[test]
+    fn development_without_adjacent_config_finds_repo() {
+        let temp = tempfile::tempdir().unwrap();
+        std::fs::create_dir_all(temp.path().join("config/workflow-presets")).unwrap();
+        let cwd = temp.path().join("frontend");
+        let exe = temp.path().join("target/debug/specter.exe");
+        assert_eq!(resolve_config_dir("workflow-presets", Some(&exe), Some(&cwd)),
+                   temp.path().join("config/workflow-presets"));
+    }
 }

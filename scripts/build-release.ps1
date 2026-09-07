@@ -262,6 +262,14 @@ foreach ($arch in $archesToBuild) {
         Remove-Item -Recurse -Force $bundleRoot
     }
 
+    # Tauri copies resources additively: removed upstream JSON otherwise stays
+    # beside the build executable and can be picked up from an inherited CWD.
+    # This is generated staging only, never the repository or installed config.
+    $stagedConfig = Join-Path $RepoRoot "target\$triple\release\config"
+    if (Test-Path -LiteralPath $stagedConfig) {
+        Remove-Item -LiteralPath $stagedConfig -Recurse -Force
+    }
+
     $overlay = New-ResourcesOverlay -Arch $arch
     Write-Host "Overlay    : $overlay" -ForegroundColor DarkGray
 

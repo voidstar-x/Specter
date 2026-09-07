@@ -173,3 +173,29 @@ replaced by English-only resolution (see the docs cleanup entry below).
   fastembed API incompatibilities (non-exhaustive struct construction and removed
   fields). Required application and installer builds are green; the full test
   suite is not claimed green. Existing build warnings remain.
+
+
+## Installed preset lookup regression — 2026-09-07
+
+- Reproduced 119 live workflow presets despite 25 installed JSON files. Startup
+  logs identified `target/x86_64-pc-windows-msvc/release/config/workflow-presets`
+  as the loaded directory: inherited working-directory lookup selected 94 stale
+  upstream JSON presets in build staging. No embedded workflow seed exists in
+  the current source, and system presets are not inserted into the database.
+- `src/presets/mod.rs` now treats executable-adjacent `config/` as authoritative
+  after explicit environment overrides. Absent families stay absent rather than
+  resurrecting retired DOCX templates from a working-directory ancestor.
+  Development lookup still falls back to repository ancestors when no adjacent
+  config root exists.
+- `scripts/build-release.ps1` removes only generated release/config staging before
+  Tauri recopies resources, preventing deleted upstream JSON from accumulating.
+- Regression test failed under the old precedence, then passed after the fix;
+  all 422 library tests and cargo check passed on Windows.
+- Rebuilt x64 MSI (exit 0), verified staging contains exactly 25 workflows and
+  no `builtin-*` IDs. Same-version maintenance returned success without updating
+  the executable; removed the old registered MSI product and installed the new
+  package (both exit 0). Installed executable hash matches extracted MSI.
+- Authenticated post-install `/workflow`: 25 unique IDs, zero `builtin-*`, no
+  missing or extra IDs relative to repo; health reports 25 workflows, 30 columns,
+  zero DOCX templates. Startup log confirms `D:\AI\Specter\config` is loaded.
+  `.env` and model settings were restored and hash-verified against backup.
